@@ -42,10 +42,10 @@
     --radius: 0.5rem;
   }
   .dark {
-    --background: 180 4% 2%;
+    --background: 35 0% 14%;
     --foreground: 0 0% 80%;
     --background-soft: 180 4% 4%;
-    --background-muted: 180 4% 6%;
+    --background-muted: 0 0% 19%;
     --text-strong: 0 0% 100%;
     --text-default: 0 0% 85%;
     --text-muted: 0 0% 65%;
