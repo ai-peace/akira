@@ -11,12 +11,6 @@ const route = getDocument.get('/documents/:uniqueKey', async (c) => {
       where: {
         uniqueKey: uniqueKey,
       },
-      include: {
-        setting: true,
-        agent: true,
-        project: true,
-        prompts: true,
-      },
     })
 
     if (!document) {

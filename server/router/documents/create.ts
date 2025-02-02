@@ -2,10 +2,9 @@ import { documentMapper } from '@/domains/mappers/document/index.mapper'
 import { prisma } from '@/server/server-lib/prisma'
 import { generateUniqueKey } from '@/server/server-lib/uuid'
 import { zValidator } from '@hono/zod-validator'
+import { LlmStatus } from '@prisma/client'
 import { Hono } from 'hono'
 import { createDocumentSchema } from './schema'
-import { LlmStatus } from '@prisma/client'
-import { generateTableOfContentService } from '@/server/server-service/generate-table-of-content.service'
 
 export const createDocument = new Hono()
 
@@ -20,33 +19,11 @@ const route = createDocument.post(
         data: {
           uniqueKey: generateUniqueKey('doc_'),
           llmStatus: LlmStatus.PROCESSING,
-          project: {
-            connect: {
-              uniqueKey: data.projectUniqueKey,
-            },
-          },
-          agent: {
-            connect: {
-              uniqueKey: data.agentUniqueKey,
-            },
-          },
-          setting: data.setting
-            ? {
-                create: {
-                  uniqueKey: generateUniqueKey('doc_setting_'),
-                  prompt: data.setting.prompt,
-                  additionals: data.setting.additionals,
-                },
-              }
-            : undefined,
-        },
-        include: {
-          setting: true,
         },
       })
 
       // LLM処理を非同期に実施、追ってデータを更新する
-      generateTableOfContentService(document.id)
+      // generateTableOfContentService(document.id)
 
       const documentEntity = documentMapper.toDomain(document)
 
