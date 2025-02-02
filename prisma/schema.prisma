@@ -1,0 +1,35 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ドキュメント
+model Document {
+  id        Int    @id @default(autoincrement()) @map("id")
+  uniqueKey String @map("unique_key")
+
+  title      String? @map("title")
+  mdxContent String? @map("mdx_content") @db.Text
+
+  llmStatus         LlmStatus @default(IDLE) @map("llm_status")
+  llmStatusChangeAt DateTime? @default(now()) @map("llm_status_change_at")
+  llmError          String?   @map("llm_error") @db.Text
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([uniqueKey])
+  @@index([uniqueKey])
+  @@map("documents")
+}
+
+enum LlmStatus {
+  IDLE
+  PROCESSING
+  SUCCESS
+  FAILED
+}

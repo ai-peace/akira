@@ -1,0 +1,7 @@
+{
+  "extends": ["next", "next/core-web-vitals", "eslint-config-prettier"],
+  "plugins": ["@typescript-eslint"],
+  "rules": {
+    // 必要なルールをここに追加
+  }
+}
