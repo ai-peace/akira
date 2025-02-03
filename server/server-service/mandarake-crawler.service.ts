@@ -45,6 +45,7 @@ export class MandarakeCrawlerTool extends Tool {
 
     try {
       const url = `https://order.mandarake.co.jp/order/listPage/list?keyword=${encodeURIComponent(keyword)}`
+      console.log('url-----------', url)
       await page.setViewport({ width: 1280, height: 800 })
       await page.setUserAgent(
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',

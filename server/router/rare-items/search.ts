@@ -2,6 +2,7 @@ import { RareItemSearchService } from '@/server/server-service/rare-item-search.
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
+import { applicationServerConst } from '@/server/server-const/appilication.server-const'
 
 export const searchRareItems = new Hono()
 
@@ -15,7 +16,8 @@ const route = searchRareItems.post(
   async (c) => {
     try {
       const { keyword } = await c.req.json()
-      const service = await RareItemSearchService.create(process.env.OPENAI_API_KEY!)
+
+      const service = await RareItemSearchService.create(applicationServerConst.openai.apiKey)
       const result = await service.searchItems(keyword)
 
       return c.json({ data: result })
