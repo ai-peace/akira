@@ -1,30 +1,26 @@
 'use client'
 
 import { TCreateDocumentForm } from '@/components/03_templates/TCreateDocumentForm'
-import { useCreateDocument } from '@/hooks/resources/documents/useCreateDocument'
-import { getDocumentUrl } from '@/utils/url.helper'
+import { useCreateChat } from '@/hooks/resources/chats/useCreateChat'
+import { getChatUrl } from '@/utils/url.helper'
 import { useRouter } from 'next/navigation'
 import { FC } from 'react'
 
 const Component: FC = () => {
   const router = useRouter()
-  const { createDocument } = useCreateDocument()
+  const { createChat } = useCreateChat()
 
   const handleSubmit = async (prompt: string) => {
     try {
-      const document = await createDocument({
+      const chat = await createChat({
         json: {
-          projectUniqueKey: 'a',
-          agentUniqueKey: 'b',
-          setting: {
-            prompt,
-          },
+          mainPrompt: prompt,
         },
       })
 
-      router.push(getDocumentUrl(document.uniqueKey))
+      router.push(getChatUrl(chat.uniqueKey))
     } catch (error) {
-      console.error('ドキュメント作成エラー:', error)
+      console.error('Error creating chat:', error)
       throw error // 再スローしてフォーム側でハンドリング可能に
     }
   }

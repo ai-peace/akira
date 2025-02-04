@@ -1,3 +1,3 @@
-export const getDocumentUrl = (uniqueKey: string) => {
-  return `/documents/${uniqueKey}`
+export const getChatUrl = (uniqueKey: string) => {
+  return `/chats/${uniqueKey}`
 }
