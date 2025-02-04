@@ -1,5 +1,5 @@
-import { CreateDocumentRoute } from './documents/create'
-import { GetDocumentRoute } from './documents/show'
+import { CreateChatRoute } from './chats/create'
+import { GetChatRoute } from './chats/show'
 import { SearchRareItemsRoute } from './rare-items/search'
 
-export type ApiRoutes = CreateDocumentRoute | GetDocumentRoute | SearchRareItemsRoute
+export type ApiRoutes = CreateChatRoute | GetChatRoute | SearchRareItemsRoute

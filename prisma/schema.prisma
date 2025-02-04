@@ -14,6 +14,25 @@ model Chat {
   title      String? @map("title")
   mdxContent String? @map("mdx_content") @db.Text
 
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  prompts Prompt[]
+
+  @@unique([uniqueKey])
+  @@index([uniqueKey])
+  @@map("chats")
+}
+
+model Prompt {
+  id        Int    @id @default(autoincrement()) @map("id")
+  uniqueKey String @map("unique_key")
+
+  chatId Int @map("chat_id")
+
+  mainPrompt       String? @map("main_prompt") @db.Text
+  resultMdxContent String? @map("result_mdx_content") @db.Text
+
   llmStatus         LlmStatus @default(IDLE) @map("llm_status")
   llmStatusChangeAt DateTime? @default(now()) @map("llm_status_change_at")
   llmError          String?   @map("llm_error") @db.Text
@@ -21,9 +40,12 @@ model Chat {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
+  chat Chat @relation(fields: [chatId], references: [id])
+
   @@unique([uniqueKey])
   @@index([uniqueKey])
-  @@map("chats")
+  @@index([chatId], name: "prompts_chat_id_idx")
+  @@map("prompts")
 }
 
 enum LlmStatus {

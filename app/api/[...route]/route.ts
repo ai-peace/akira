@@ -1,13 +1,13 @@
-import { createDocument } from '@/server/router/documents/create'
-import { getDocument } from '@/server/router/documents/show'
+import { createChat } from '@/server/router/chats/create'
+import { getChat } from '@/server/router/chats/show'
 import { searchRareItems } from '@/server/router/rare-items/search'
 import { Hono } from 'hono'
 import { handle } from 'hono/vercel'
 
 const hono = new Hono().basePath('/api')
 
-hono.route('/', getDocument)
-hono.route('/', createDocument)
+hono.route('/', getChat)
+hono.route('/', createChat)
 hono.route('/', searchRareItems)
 
 export const GET = handle(hono)
