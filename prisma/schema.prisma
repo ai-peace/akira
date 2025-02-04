@@ -7,8 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ドキュメント
-model Document {
+model Chat {
   id        Int    @id @default(autoincrement()) @map("id")
   uniqueKey String @map("unique_key")
 
@@ -24,7 +23,7 @@ model Document {
 
   @@unique([uniqueKey])
   @@index([uniqueKey])
-  @@map("documents")
+  @@map("chats")
 }
 
 enum LlmStatus {

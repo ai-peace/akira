@@ -44,7 +44,7 @@ const Component: FC<Props> = ({ onSubmit }) => {
       <div className="border-border-muted relative flex-grow rounded-lg border bg-background-muted p-4">
         <Textarea
           {...form.register('prompt')}
-          placeholder="ドラゴンボールのセル画"
+          placeholder="Dragon Ball cel animation"
           onChange={(e) => {
             form.setValue('prompt', e.target.value)
             e.target.style.height = 'auto'

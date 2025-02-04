@@ -1,16 +1,9 @@
 'use client'
 
-import { Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
 import { SCreateDocumentScreen } from '@/components/04_screens/SCreateDocumentScreen'
+import { Suspense } from 'react'
 
 const DocumentContent = () => {
-  const searchParams = useSearchParams()
-  const hasTableOfContent = searchParams.get('table-of-content') === 'true'
-
-  if (hasTableOfContent) {
-    return <div>test</div>
-  }
   return <SCreateDocumentScreen />
 }
 
