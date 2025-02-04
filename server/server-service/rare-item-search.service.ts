@@ -42,16 +42,40 @@ export class RareItemSearchService {
     })
   }
 
-  async searchItems(keyword: string): Promise<string> {
+  async searchItems(keyword: string): Promise<any> {
     if (!this.agentExecutor) {
       throw new Error('Service not initialized')
     }
 
     const result = await this.agentExecutor.invoke({
-      input: keyword,
-      // input: `Please search for rare items on Mandarake using the keyword "${keyword}" and analyze the results. Focus on finding the most interesting and valuable items.`,
+      input: `Search for rare items on Mandarake using the keyword "${keyword}". Focus on finding the most interesting and valuable items.`,
     })
 
-    return result.output
+    try {
+      // JSON文字列を抽出する
+      const jsonMatch = result.output.match(/```json\n([\s\S]*?)\n```/)
+      if (!jsonMatch) {
+        throw new Error('No JSON found in response')
+      }
+
+      // 抽出したJSON文字列をパースする
+      const jsonData = JSON.parse(jsonMatch[1])
+
+      // 必要なデータ構造に変換
+      return {
+        items: jsonData.items.map((item: any) => ({
+          title: item.title,
+          price: item.price,
+          priceWithTax: item.priceWithTax,
+          condition: item.status || 'Unknown',
+          rarity: 'Standard', // または適切な値を設定
+          description: `Available at: ${item.shopInfo}${item.priceRange ? ` ${item.priceRange}` : ''}`,
+        })),
+        summary: `Found ${jsonData.items.length} items on Mandarake`,
+      }
+    } catch (error) {
+      console.error('Failed to parse response:', result.output)
+      throw new Error('Failed to parse agent response as JSON')
+    }
   }
 }

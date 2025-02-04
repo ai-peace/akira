@@ -1,10 +1,12 @@
 import { Tool } from '@langchain/core/tools'
-import puppeteer, { type Page } from 'puppeteer'
 import * as cheerio from 'cheerio'
+import puppeteer from 'puppeteer'
+import { saveHtml } from '../utils/save-html'
 
 interface MandarakeItem {
   title: string
   price: number
+  priceWithTax: number
   url: string
   imageUrl: string
   status: string
@@ -34,10 +36,14 @@ export class MandarakeCrawlerTool extends Tool {
     const browser = await puppeteer.launch({
       headless: true,
       args: [
-        '--no-sandbox',
+        // '--no-sandbox',
+        // '--disable-setuid-sandbox',
+        // '--ignore-certificate-errors',
+        // '--ignore-certificate-errors-spki-list',
+        // 必要最小限の設定
+        '--disable-gpu',
+        '--disable-dev-shm-usage',
         '--disable-setuid-sandbox',
-        '--ignore-certificate-errors',
-        '--ignore-certificate-errors-spki-list',
       ],
     })
     const page = await browser.newPage()
@@ -80,6 +86,9 @@ export class MandarakeCrawlerTool extends Tool {
       console.log('================================================================')
       console.log(content)
       console.log('================================================================')
+
+      await saveHtml('mandarake', content, ['tmp', 'cache'])
+
       const $ = cheerio.load(content)
 
       const entries = $('.block')
@@ -91,7 +100,15 @@ export class MandarakeCrawlerTool extends Tool {
         try {
           const title = $(element).find('.title').text().trim()
           const priceText = $(element).find('.price').text().trim()
-          const price = parseInt(priceText.replace(/[^0-9]/g, ''))
+
+          // 税抜価格と税込価格を抽出
+          const basePrice = priceText.match(/^[\d,]+/)?.[0] || ''
+          const taxIncludedPrice = priceText.match(/\(税込\s*([\d,]+)円\)/)?.[1] || ''
+
+          // カンマを除去して数値に変換
+          const price = parseInt(basePrice.replace(/,/g, '')) || 0
+          const priceWithTax = parseInt(taxIncludedPrice.replace(/,/g, '')) || 0
+
           const url = $(element).find('.title a').attr('href') || ''
           const imageUrl = $(element).find('.thum img').attr('src') || ''
           const status = $(element).find('.stock').text().trim()
@@ -103,6 +120,7 @@ export class MandarakeCrawlerTool extends Tool {
             items.push({
               title,
               price,
+              priceWithTax,
               url: url.startsWith('http') ? url : `https://order.mandarake.co.jp${url}`,
               imageUrl: imageUrl.startsWith('http')
                 ? imageUrl
