@@ -11,7 +11,7 @@ type Props = {
 const ETypewriterText: React.FC<Props> = ({
   text,
   className = '',
-  speed = 100,
+  speed = 8,
   delay = 0,
   animate = true,
 }) => {

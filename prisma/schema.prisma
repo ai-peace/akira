@@ -30,8 +30,9 @@ model Prompt {
 
   chatId Int @map("chat_id")
 
-  mainPrompt       String? @map("main_prompt") @db.Text
-  resultMdxContent String? @map("result_mdx_content") @db.Text
+  mainPrompt String? @map("main_prompt") @db.Text
+  result     Json?   @map("result")
+  resultType String? @map("result_type")
 
   llmStatus         LlmStatus @default(IDLE) @map("llm_status")
   llmStatusChangeAt DateTime? @default(now()) @map("llm_status_change_at")

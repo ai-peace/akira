@@ -47,13 +47,17 @@ const askRareItemSearch = async (promptUniqueKey: string, keyword: string) => {
   const service = await RareItemSearchService.create(applicationServerConst.openai.apiKey)
   const result = await service.searchItems(keyword)
 
+  console.log('result--------------------------')
+  console.log(result)
+
   await prisma.prompt.update({
     where: {
       uniqueKey: promptUniqueKey,
     },
     data: {
-      resultMdxContent: JSON.stringify(result),
+      result: result,
       llmStatus: LlmStatus.SUCCESS,
+      resultType: 'RARE_ITEM_SEARCH',
     },
   })
 }

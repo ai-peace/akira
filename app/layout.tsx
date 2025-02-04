@@ -45,9 +45,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <RootLayoutClient>
           <section className="flex h-screen bg-background-muted pl-[72px]">
             <OGlobalSideMenu />
-            <section className="smooth-scroll flex h-full w-full overflow-y-scroll rounded-md border border-border-subtle bg-background text-foreground">
-              {children}
-            </section>
+            <section className="flex w-full bg-background text-foreground">{children}</section>
           </section>
         </RootLayoutClient>
         <Toaster />

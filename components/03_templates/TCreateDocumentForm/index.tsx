@@ -34,7 +34,6 @@ const Component: FC<Props> = ({ onSubmit }) => {
       await onSubmit(data.prompt)
       form.reset()
     } catch (error) {
-      // エラーハンドリング（必要に応じてUIフィードバック）
       console.error(error)
     }
   }
@@ -53,7 +52,7 @@ const Component: FC<Props> = ({ onSubmit }) => {
             e.target.style.height = `${newHeight}px`
             setTextareaHeight(`${newHeight}px`)
           }}
-          className="min-h-[24px] resize-none border-0 bg-transparent p-0 pb-12 text-lg focus-visible:ring-0"
+          className="min-h-[24px] resize-none border-0 bg-transparent p-0 pb-12 text-lg text-foreground-strong shadow-none focus-visible:ring-0"
           style={{
             overflow: parseInt(textareaHeight) >= lineHeight * 18 ? 'auto' : 'hidden',
             lineHeight: '24px',

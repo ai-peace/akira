@@ -6,7 +6,8 @@ const promptMapper = {
     return {
       uniqueKey: prompt.uniqueKey,
       mainPrompt: prompt.mainPrompt ?? '',
-      resultMdxContent: prompt.resultMdxContent ?? undefined,
+      result: prompt.result ?? undefined,
+      resultType: prompt.resultType ?? undefined,
       llmStatus: prompt.llmStatus,
       llmStatusChangeAt: prompt.llmStatusChangeAt ?? undefined,
       llmError: prompt.llmError ?? undefined,

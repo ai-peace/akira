@@ -2,6 +2,7 @@ import { ChatOpenAI } from '@langchain/openai'
 import { MandarakeCrawlerTool } from './mandarake-crawler.service'
 import { ChatPromptTemplate, MessagesPlaceholder } from '@langchain/core/prompts'
 import { AgentExecutor, createOpenAIFunctionsAgent } from 'langchain/agents'
+import { ProductEntity } from '@/domains/entities/product.entity'
 
 export class RareItemSearchService {
   private agentExecutor: AgentExecutor | null = null
@@ -42,7 +43,7 @@ export class RareItemSearchService {
     })
   }
 
-  async searchItems(keyword: string): Promise<any> {
+  async searchItems(keyword: string): Promise<ProductEntity[]> {
     if (!this.agentExecutor) {
       throw new Error('Service not initialized')
     }
@@ -61,20 +62,15 @@ export class RareItemSearchService {
       // 抽出したJSON文字列をパースする
       const jsonData = JSON.parse(jsonMatch[1])
 
-      // 必要なデータ構造に変換
-      return {
-        items: jsonData.items.map((item: any) => ({
-          title: item.title,
-          price: item.price,
-          priceWithTax: item.priceWithTax,
-          condition: item.status || 'Unknown',
-          rarity: 'Standard', // または適切な値を設定
-          description: `Available at: ${item.shopInfo}${item.priceRange ? ` ${item.priceRange}` : ''}`,
-          imageUrl: item.imageUrl,
-          url: item.url,
-        })),
-        summary: `Found ${jsonData.items.length} items on Mandarake`,
-      }
+      return jsonData.items.map((item: any) => ({
+        title: item.title,
+        price: item.price,
+        priceWithTax: item.priceWithTax,
+        condition: item.status || 'Unknown',
+        description: `Available at: ${item.shopInfo}${item.priceRange ? ` ${item.priceRange}` : ''}`,
+        imageUrl: item.imageUrl,
+        url: item.url,
+      }))
     } catch (error) {
       console.error('Failed to parse response:', result.output)
       throw new Error('Failed to parse agent response as JSON')

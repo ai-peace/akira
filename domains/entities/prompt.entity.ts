@@ -1,7 +1,8 @@
 export interface PromptEntity {
   uniqueKey: string
   mainPrompt: string
-  resultMdxContent?: string
+  result?: any
+  resultType?: string
   llmStatus: string
   llmStatusChangeAt?: Date
   llmError?: string
