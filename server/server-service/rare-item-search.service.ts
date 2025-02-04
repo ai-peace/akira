@@ -70,6 +70,8 @@ export class RareItemSearchService {
           condition: item.status || 'Unknown',
           rarity: 'Standard', // または適切な値を設定
           description: `Available at: ${item.shopInfo}${item.priceRange ? ` ${item.priceRange}` : ''}`,
+          imageUrl: item.imageUrl,
+          url: item.url,
         })),
         summary: `Found ${jsonData.items.length} items on Mandarake`,
       }
