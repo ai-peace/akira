@@ -25,15 +25,15 @@ const route = createChat.post('/chats', zValidator('json', createChatSchema), as
           },
         },
       },
+      include: {
+        prompts: true,
+      },
     })
 
-    // LLM処理を非同期に実施、追ってデータを更新する
-    const service = await RareItemSearchService.create(applicationServerConst.openai.apiKey)
-    service.searchItems(data.mainPrompt)
+    askRareItemSearch(chat.prompts[0].uniqueKey, data.mainPrompt)
 
     const chatEntity = chatMapper.toDomain(chat)
 
-    // 作成したデータで一旦返す
     return c.json({ data: chatEntity }, 201)
   } catch (error) {
     console.error('Error creating chat:', error)
@@ -42,3 +42,18 @@ const route = createChat.post('/chats', zValidator('json', createChatSchema), as
 })
 
 export type CreateChatRoute = typeof route
+
+const askRareItemSearch = async (promptUniqueKey: string, keyword: string) => {
+  const service = await RareItemSearchService.create(applicationServerConst.openai.apiKey)
+  const result = await service.searchItems(keyword)
+
+  await prisma.prompt.update({
+    where: {
+      uniqueKey: promptUniqueKey,
+    },
+    data: {
+      resultMdxContent: JSON.stringify(result),
+      llmStatus: LlmStatus.SUCCESS,
+    },
+  })
+}
