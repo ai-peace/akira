@@ -1,5 +1,7 @@
 import { hcClient } from '@/api-client/hc.api-client'
 import { ChatEntity } from '@/domains/entities/chat.entity'
+import { PromptEntity } from '@/domains/entities/prompt.entity'
+import { PromptGroupEntity } from '@/domains/entities/prompt-group.entity'
 import type { InferRequestType } from 'hono/client'
 
 const client = hcClient()
@@ -20,13 +22,18 @@ export const chatRepository = {
         ...data,
         updatedAt: new Date(data.updatedAt),
         createdAt: new Date(data.createdAt),
-        prompts: data.prompts.map((prompt) => ({
-          ...prompt,
-          llmStatusChangeAt: prompt.llmStatusChangeAt
-            ? new Date(prompt.llmStatusChangeAt)
-            : undefined,
-          updatedAt: new Date(prompt.updatedAt),
-          createdAt: new Date(prompt.createdAt),
+        promptGroups: data.promptGroups.map((promptGroup: PromptGroupEntity) => ({
+          ...promptGroup,
+          updatedAt: new Date(promptGroup.updatedAt),
+          createdAt: new Date(promptGroup.createdAt),
+          prompts: promptGroup.prompts.map((prompt: PromptEntity) => ({
+            ...prompt,
+            llmStatusChangeAt: prompt.llmStatusChangeAt
+              ? new Date(prompt.llmStatusChangeAt)
+              : undefined,
+            updatedAt: new Date(prompt.updatedAt),
+            createdAt: new Date(prompt.createdAt),
+          })),
         })),
       }
     } catch (error) {
@@ -42,19 +49,24 @@ export const chatRepository = {
       const json = await res.json()
 
       if (!('data' in json)) throw new Error('Failed to create chat')
-      const data = json.data
+      const data = json.data as ChatEntity
 
       return {
         ...data,
         updatedAt: new Date(data.updatedAt),
         createdAt: new Date(data.createdAt),
-        prompts: data.prompts.map((prompt) => ({
-          ...prompt,
-          llmStatusChangeAt: prompt.llmStatusChangeAt
-            ? new Date(prompt.llmStatusChangeAt)
-            : undefined,
-          updatedAt: new Date(prompt.updatedAt),
-          createdAt: new Date(prompt.createdAt),
+        promptGroups: data.promptGroups?.map((promptGroup: PromptGroupEntity) => ({
+          ...promptGroup,
+          updatedAt: new Date(promptGroup.updatedAt),
+          createdAt: new Date(promptGroup.createdAt),
+          prompts: promptGroup.prompts?.map((prompt: PromptEntity) => ({
+            ...prompt,
+            llmStatusChangeAt: prompt.llmStatusChangeAt
+              ? new Date(prompt.llmStatusChangeAt)
+              : undefined,
+            updatedAt: new Date(prompt.updatedAt),
+            createdAt: new Date(prompt.createdAt),
+          })),
         })),
       }
     } catch (error) {

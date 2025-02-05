@@ -1,21 +1,21 @@
 import { ChatEntity } from '@/domains/entities/chat.entity'
-import { Chat, Prompt } from '@prisma/client'
-import { chatPromptRelationMapper } from './relation/chat-prompt-relation.mapper'
-import { PromptEntity } from '@/domains/entities/prompt.entity'
+import { PromptGroupEntity } from '@/domains/entities/prompt-group.entity'
+import { Chat, PromptGroup } from '@prisma/client'
+import { promptGroupMapper } from '../prompt-group/index.mapper'
 
 export const chatMapper = {
   toDomain: (
     prismaChat: Chat & {
-      prompts?: Prompt[]
+      promptGroups: PromptGroup[]
     },
   ): ChatEntity & {
-    prompts: PromptEntity[]
+    promptGroups: PromptGroupEntity[]
   } => {
     return {
       uniqueKey: prismaChat.uniqueKey,
       title: prismaChat.title ?? undefined,
       mdxContent: prismaChat.mdxContent ?? undefined,
-      prompts: chatPromptRelationMapper.toDomain(prismaChat.prompts),
+      promptGroups: promptGroupMapper.toDomainCollection(prismaChat.promptGroups),
       updatedAt: prismaChat.updatedAt,
       createdAt: prismaChat.createdAt,
     }
@@ -23,7 +23,7 @@ export const chatMapper = {
 
   toDomainCollection: (
     prismaChats: (Chat & {
-      prompts?: Prompt[]
+      promptGroups: PromptGroup[]
     })[],
   ): ChatEntity[] => {
     return prismaChats.map(chatMapper.toDomain)

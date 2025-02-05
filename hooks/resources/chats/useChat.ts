@@ -1,6 +1,6 @@
 import { ChatEntity } from '@/domains/entities/chat.entity'
 import { chatRepository } from '@/repository/chat'
-import { promptRepository } from '@/repository/prompt'
+import { promptGroupRepository } from '@/repository/prompt-group'
 import { useEffect, useState } from 'react'
 import useSWR from 'swr'
 
@@ -26,10 +26,10 @@ export const useChat = (variables: { uniqueKey: string }) => {
     }
   }, [error])
 
-  const createChatPrompt = async (mainPrompt: string) => {
-    const response = await promptRepository.createInChat({
+  const createChatPromptGroup = async (question: string) => {
+    const response = await promptGroupRepository.create({
       json: {
-        mainPrompt,
+        question,
       },
       param: {
         uniqueKey: variables.uniqueKey,
@@ -44,6 +44,6 @@ export const useChat = (variables: { uniqueKey: string }) => {
     chatError: error,
     chatIsLoading: isLoading,
     chatErrorType: errorType,
-    createChatPrompt,
+    createChatPromptGroup,
   }
 }

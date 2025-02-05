@@ -1,4 +1,4 @@
-import { PromptEntity } from './prompt.entity'
+import { PromptGroupEntity } from './prompt-group.entity'
 
 export type ChatEntity = {
   uniqueKey: string
@@ -6,5 +6,5 @@ export type ChatEntity = {
   mdxContent?: string
   updatedAt: Date
   createdAt: Date
-  prompts?: PromptEntity[]
+  promptGroups?: PromptGroupEntity[]
 }

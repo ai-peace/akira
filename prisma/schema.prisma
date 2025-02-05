@@ -17,20 +17,38 @@ model Chat {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  prompts Prompt[]
+  promptGroups PromptGroup[]
 
   @@unique([uniqueKey])
   @@index([uniqueKey])
   @@map("chats")
 }
 
-model Prompt {
+model PromptGroup {
   id        Int    @id @default(autoincrement()) @map("id")
   uniqueKey String @map("unique_key")
 
   chatId Int @map("chat_id")
 
-  mainPrompt String? @map("main_prompt") @db.Text
+  question String @map("question") @db.Text
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  chat    Chat     @relation(fields: [chatId], references: [id])
+  prompts Prompt[]
+
+  @@unique([uniqueKey])
+  @@index([uniqueKey])
+  @@map("prompt_groups")
+}
+
+model Prompt {
+  id        Int    @id @default(autoincrement()) @map("id")
+  uniqueKey String @map("unique_key")
+
+  promptGroupId Int?
+
   result     Json?   @map("result")
   resultType String? @map("result_type")
 
@@ -41,11 +59,10 @@ model Prompt {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  chat Chat @relation(fields: [chatId], references: [id])
+  promptGroup PromptGroup? @relation(fields: [promptGroupId], references: [id])
 
   @@unique([uniqueKey])
   @@index([uniqueKey])
-  @@index([chatId], name: "prompts_chat_id_idx")
   @@map("prompts")
 }
 

@@ -1,7 +1,7 @@
-import { chatMapper } from '@/server/server-mappers/chat/index.mapper'
 import { applicationServerConst } from '@/server/server-const/appilication.server-const'
 import { prisma } from '@/server/server-lib/prisma'
 import { generateUniqueKey } from '@/server/server-lib/uuid'
+import { chatMapper } from '@/server/server-mappers/chat/index.mapper'
 import { RareItemSearchService } from '@/server/server-service/rare-item-search.service'
 import { zValidator } from '@hono/zod-validator'
 import { LlmStatus } from '@prisma/client'
@@ -16,21 +16,51 @@ const route = createChat.post('/chats', zValidator('json', createChatSchema), as
 
     const chat = await prisma.chat.create({
       data: {
-        uniqueKey: generateUniqueKey('chat_'),
-        prompts: {
+        uniqueKey: generateUniqueKey(),
+        promptGroups: {
           create: {
-            uniqueKey: generateUniqueKey('prompt_'),
-            mainPrompt: data.mainPrompt,
-            llmStatus: LlmStatus.PROCESSING,
+            uniqueKey: generateUniqueKey(),
+            question: data.mainPrompt,
+            prompts: {
+              createMany: {
+                data: [
+                  {
+                    uniqueKey: generateUniqueKey(),
+                    llmStatus: LlmStatus.PROCESSING,
+                    resultType: 'FIRST_RESPONSE',
+                  },
+                  {
+                    uniqueKey: generateUniqueKey(),
+                    llmStatus: LlmStatus.PROCESSING,
+                    resultType: 'RARE_ITEM_SEARCH',
+                  },
+                ],
+              },
+            },
           },
         },
       },
       include: {
-        prompts: true,
+        promptGroups: {
+          include: {
+            prompts: true,
+          },
+        },
       },
     })
 
-    askRareItemSearch(chat.prompts[0].uniqueKey, data.mainPrompt)
+    const searchablePrompt = chat.promptGroups[0].prompts.find(
+      (p) => p.resultType === 'RARE_ITEM_SEARCH',
+    )
+
+    const firstResponsePrompt = chat.promptGroups[0].prompts.find(
+      (p) => p.resultType === 'FIRST_RESPONSE',
+    )
+
+    if (!searchablePrompt || !firstResponsePrompt) throw new Error('Prompt not found')
+
+    generateFirstResponse(firstResponsePrompt.uniqueKey, `${data.mainPrompt}を探しています`)
+    askRareItemSearch(searchablePrompt.uniqueKey, data.mainPrompt)
 
     const chatEntity = chatMapper.toDomain(chat)
 
@@ -42,6 +72,19 @@ const route = createChat.post('/chats', zValidator('json', createChatSchema), as
 })
 
 export type CreateChatRoute = typeof route
+
+const generateFirstResponse = async (promptUniqueKey: string, result: string) => {
+  await prisma.prompt.update({
+    where: {
+      uniqueKey: promptUniqueKey,
+    },
+    data: {
+      result: result,
+      llmStatus: LlmStatus.SUCCESS,
+      resultType: 'FIRST_RESPONSE',
+    },
+  })
+}
 
 const askRareItemSearch = async (promptUniqueKey: string, keyword: string) => {
   const service = await RareItemSearchService.create(applicationServerConst.openai.apiKey)

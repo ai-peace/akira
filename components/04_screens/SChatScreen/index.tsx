@@ -26,10 +26,11 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
         <div className="scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent relative h-full overflow-y-scroll overscroll-y-contain scroll-smooth pb-64 [-webkit-overflow-scrolling:touch]">
           <div className="mx-auto block md:max-w-3xl md:gap-5 lg:max-w-[40rem] lg:gap-6 xl:max-w-[48rem]">
             <ChatMessageList>
-              {chat.prompts?.map((prompt) =>
-                prompt.llmStatus === 'SUCCESS' ? (
-                  <>
-                    <ChatBubble variant="sent">
+              {chat.promptGroups?.map((promptGroup) =>
+                promptGroup.prompts?.map((prompt) =>
+                  prompt.llmStatus === 'SUCCESS' ? (
+                    <>
+                      <ChatBubble variant="sent">
                       <ChatBubbleAvatar fallback="Y" />
                       <ChatBubbleMessage variant="sent">{prompt.mainPrompt}</ChatBubbleMessage>
                     </ChatBubble>
