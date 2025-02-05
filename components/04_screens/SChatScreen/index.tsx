@@ -1,19 +1,11 @@
 'use client'
 import { OChatTextarea } from '@/components/02_organisms/OChatTextarea'
-import { TCreateDocumentForm } from '@/components/03_templates/TCreateDocumentForm'
 import { Card } from '@/components/ui/card'
 import { ChatBubble, ChatBubbleAvatar, ChatBubbleMessage } from '@/components/ui/chat/chat-bubble'
-import { ChatInput } from '@/components/ui/chat/chat-input'
 import { ChatMessageList } from '@/components/ui/chat/chat-message-list'
 import { ProductEntity } from '@/domains/entities/product.entity'
 import { useChat } from '@/hooks/resources/chats/useChat'
-import { useCreateChat } from '@/hooks/resources/chats/useCreateChat'
-import { CreateChatPromptInput } from '@/repository/prompt'
-import { getChatUrl } from '@/utils/url.helper'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { FC } from 'react'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
 
 type Props = {
   chatUniqueKey: string
