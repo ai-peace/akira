@@ -6,7 +6,7 @@ import { RareItemSearchService } from '@/server/server-service/rare-item-search.
 import { zValidator } from '@hono/zod-validator'
 import { LlmStatus } from '@prisma/client'
 import { Hono } from 'hono'
-import { createChatSchema } from './schema'
+import { createChatSchema } from './schema/create.schema'
 
 export const createChat = new Hono()
 

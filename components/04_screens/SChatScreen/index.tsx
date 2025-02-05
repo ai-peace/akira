@@ -8,6 +8,7 @@ import { ChatMessageList } from '@/components/ui/chat/chat-message-list'
 import { ProductEntity } from '@/domains/entities/product.entity'
 import { useChat } from '@/hooks/resources/chats/useChat'
 import { useCreateChat } from '@/hooks/resources/chats/useCreateChat'
+import { CreateChatPromptInput } from '@/repository/prompt'
 import { getChatUrl } from '@/utils/url.helper'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { FC } from 'react'
@@ -19,7 +20,9 @@ type Props = {
 }
 
 const Component: FC<Props> = ({ chatUniqueKey }) => {
-  const { chat, chatError, chatIsLoading, chatErrorType } = useChat({ uniqueKey: chatUniqueKey })
+  const { chat, chatError, chatIsLoading, chatErrorType, createChatPrompt } = useChat({
+    uniqueKey: chatUniqueKey,
+  })
 
   if (chatIsLoading) return <div>Loading...</div>
   if (!chat) return <div>Chat not found</div>
@@ -31,40 +34,32 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
         <div className="scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent relative h-full overflow-y-scroll overscroll-y-contain scroll-smooth pb-64 [-webkit-overflow-scrolling:touch]">
           <div className="mx-auto block md:max-w-3xl md:gap-5 lg:max-w-[40rem] lg:gap-6 xl:max-w-[48rem]">
             <ChatMessageList>
-              {chat.prompts?.map((prompt) => (
-                <>
-                  <ChatBubble variant="sent">
-                    <ChatBubbleAvatar fallback="Y" />
-                    <ChatBubbleMessage variant="sent">{prompt.mainPrompt}</ChatBubbleMessage>
-                  </ChatBubble>
-                  {/* 分岐とする */}
-                  {prompt.resultType === 'RARE_ITEM_SEARCH' && (
-                    <ChatBubbleProduct products={prompt.result} />
-                  )}
-                  <ChatBubble variant="sent">
-                    <ChatBubbleAvatar fallback="Y" />
-                    <ChatBubbleMessage variant="sent">{prompt.mainPrompt}</ChatBubbleMessage>
-                  </ChatBubble>
-                  {/* 分岐とする */}
-                  {prompt.resultType === 'RARE_ITEM_SEARCH' && (
-                    <ChatBubbleProduct products={prompt.result} />
-                  )}
-                  <ChatBubble variant="sent">
-                    <ChatBubbleAvatar fallback="Y" />
-                    <ChatBubbleMessage variant="sent">{prompt.mainPrompt}</ChatBubbleMessage>
-                  </ChatBubble>
-                  {/* 分岐とする */}
-                  {prompt.resultType === 'RARE_ITEM_SEARCH' && (
-                    <ChatBubbleProduct products={prompt.result} />
-                  )}
-                  {/* <ChatBubble variant="received">
-                <ChatBubbleAvatar fallback="AI" />
-                <ChatBubbleMessage variant="received">
-                  {JSON.stringify(prompt.result)}
-                </ChatBubbleMessage>
-              </ChatBubble> */}
-                </>
-              ))}
+              {chat.prompts?.map((prompt) =>
+                prompt.llmStatus === 'SUCCESS' ? (
+                  <>
+                    <ChatBubble variant="sent">
+                      <ChatBubbleAvatar fallback="Y" />
+                      <ChatBubbleMessage variant="sent">{prompt.mainPrompt}</ChatBubbleMessage>
+                    </ChatBubble>
+                    {prompt.resultType === 'RARE_ITEM_SEARCH' && (
+                      <ChatBubbleProduct products={prompt.result} />
+                    )}
+                  </>
+                ) : prompt.llmStatus === 'PROCESSING' ? (
+                  <>
+                    <ChatBubble variant="sent">
+                      <ChatBubbleAvatar fallback="Y" />
+                      <ChatBubbleMessage variant="sent">{prompt.mainPrompt}</ChatBubbleMessage>
+                    </ChatBubble>
+                    <ChatBubble variant="received">
+                      <ChatBubbleAvatar fallback="AI" />
+                      <ChatBubbleMessage isLoading />
+                    </ChatBubble>
+                  </>
+                ) : (
+                  <></>
+                ),
+              )}
               {/* <ChatBubble variant="sent">
             <ChatBubbleAvatar fallback="Y" />
             <ChatBubbleMessage variant="sent">{chat?.prompts?.[0]?.mainPrompt}</ChatBubbleMessage>
@@ -85,7 +80,7 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
           </div>
         </div>
 
-        <ChatInputSection />
+        <ChatInputSection createChatPrompt={createChatPrompt} />
       </div>
     </>
   )
@@ -127,19 +122,15 @@ const ChatBubbleProduct = ({ products }: { products: ProductEntity[] }) => {
   )
 }
 
-const formSchema = z.object({
-  prompt: z.string().min(1, 'プロンプトを入力してください'),
-})
+type ChatInputSectionProps = {
+  createChatPrompt: (mainPrompt: string) => Promise<any>
+}
 
-const ChatInputSection = () => {
-  const { createChat } = useCreateChat()
-  const handleSubmit = async (prompt: string) => {
+const ChatInputSection = ({ createChatPrompt }: ChatInputSectionProps) => {
+  // const { createChat } = useCreateChat()
+  const handleSubmit = async (mainPrompt: string) => {
     try {
-      const chat = await createChat({
-        json: {
-          mainPrompt: prompt,
-        },
-      })
+      const chat = await createChatPrompt(mainPrompt)
 
       // router.push(getChatUrl(chat.uniqueKey))
     } catch (error) {
