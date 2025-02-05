@@ -36,6 +36,14 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
                     {prompt.resultType === 'RARE_ITEM_SEARCH' && (
                       <ChatBubbleProduct products={prompt.result} />
                     )}
+                    {prompt.resultType === 'INITIAL_RESPONSE' && (
+                      <ChatBubble variant="received">
+                        <ChatBubbleAvatar fallback="AI" />
+                        <ChatBubbleMessage variant="received">
+                          {prompt.mainPrompt}
+                        </ChatBubbleMessage>
+                      </ChatBubble>
+                    )}
                   </>
                 ) : prompt.llmStatus === 'PROCESSING' ? (
                   <>

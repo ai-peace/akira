@@ -18,22 +18,50 @@ const route = createChatPrompt.post(
       const uniqueKey = c.req.param('uniqueKey')
       const { mainPrompt } = c.req.valid('json')
 
-      const prompt = await prisma.prompt.create({
-        data: {
-          uniqueKey: generateUniqueKey('prompt_'),
-          mainPrompt: mainPrompt,
-          llmStatus: LlmStatus.PROCESSING,
-          chat: {
-            connect: {
-              uniqueKey: uniqueKey,
+      // const prompt = await prisma.prompt.create({
+      //   data: {
+      //     uniqueKey: generateUniqueKey('prompt_'),
+      //     mainPrompt: mainPrompt,
+      //     llmStatus: LlmStatus.PROCESSING,
+      //     chat: {
+      //       connect: {
+      //         uniqueKey: uniqueKey,
+      //       },
+      //     },
+      //   },
+      // })
+
+      const [initialResponsePrompt, processingPrompt] = await Promise.all([
+        prisma.prompt.create({
+          data: {
+            uniqueKey: generateUniqueKey('prompt_'),
+            mainPrompt: '検索を開始します...',
+            llmStatus: LlmStatus.SUCCESS,
+            resultType: 'INITIAL_RESPONSE',
+            chat: {
+              connect: {
+                uniqueKey: uniqueKey,
+              },
             },
           },
-        },
-      })
+        }),
+        prisma.prompt.create({
+          data: {
+            uniqueKey: generateUniqueKey('prompt_'),
+            mainPrompt: mainPrompt,
+            llmStatus: LlmStatus.PROCESSING,
+            chat: {
+              connect: {
+                uniqueKey: uniqueKey,
+              },
+            },
+          },
+        }),
+      ])
 
-      askRareItemSearch(prompt.uniqueKey, mainPrompt)
+      askRareItemSearch(initialResponsePrompt.uniqueKey, mainPrompt)
 
-      const promptEntity = promptMapper.toDomain(prompt)
+      const promptEntity = promptMapper.toDomain(initialResponsePrompt)
 
       return c.json({ data: promptEntity }, 201)
     } catch (error) {
