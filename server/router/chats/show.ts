@@ -12,7 +12,15 @@ const route = getChat.get('/chats/:uniqueKey', async (c) => {
         uniqueKey: uniqueKey,
       },
       include: {
-        prompts: true,
+        promptGroups: {
+          include: {
+            prompts: {
+              orderBy: {
+                order: 'asc',
+              },
+            },
+          },
+        },
       },
     })
 

@@ -9,7 +9,8 @@ export type CreateChatPromptGroupInput = InferRequestType<
 
 const create = async (input: CreateChatPromptGroupInput) => {
   const client = hcClient()
-  const res = await client.chats[':uniqueKey'].promptGroups.$post({
+  console.log('input', input)
+  const res = await client.chats[':uniqueKey']['prompt-groups'].$post({
     json: input.json,
     param: {
       uniqueKey: input.param.uniqueKey,

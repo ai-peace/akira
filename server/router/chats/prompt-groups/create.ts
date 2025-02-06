@@ -16,12 +16,12 @@ const route = createChatPromptGroup.post(
   async (c) => {
     try {
       const uniqueKey = c.req.param('uniqueKey')
-      const { mainPrompt } = c.req.valid('json')
+      const { question } = c.req.valid('json')
 
       const promptGroup = await prisma.promptGroup.create({
         data: {
           uniqueKey: generateUniqueKey(),
-          question: mainPrompt,
+          question,
           chat: {
             connect: {
               uniqueKey: uniqueKey,
@@ -34,18 +34,24 @@ const route = createChatPromptGroup.post(
                   uniqueKey: generateUniqueKey(),
                   llmStatus: LlmStatus.PROCESSING,
                   resultType: 'FIRST_RESPONSE',
+                  order: 1,
                 },
                 {
                   uniqueKey: generateUniqueKey(),
                   llmStatus: LlmStatus.PROCESSING,
                   resultType: 'RARE_ITEM_SEARCH',
+                  order: 2,
                 },
               ],
             },
           },
         },
         include: {
-          prompts: true,
+          prompts: {
+            orderBy: {
+              order: 'asc',
+            },
+          },
         },
       })
 
@@ -54,8 +60,8 @@ const route = createChatPromptGroup.post(
 
       if (!searchablePrompt || !firstResponsePrompt) throw new Error('Prompt not found')
 
-      generateFirstResponse(firstResponsePrompt.uniqueKey, `${mainPrompt}を探しています`)
-      askRareItemSearch(searchablePrompt.uniqueKey, mainPrompt)
+      generateFirstResponse(firstResponsePrompt.uniqueKey, `${question}を探しています`)
+      askRareItemSearch(searchablePrompt.uniqueKey, question)
 
       const promptGroupEntity = promptGroupMapper.toDomain(promptGroup)
 

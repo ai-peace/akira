@@ -28,11 +28,13 @@ const route = createChat.post('/chats', zValidator('json', createChatSchema), as
                     uniqueKey: generateUniqueKey(),
                     llmStatus: LlmStatus.PROCESSING,
                     resultType: 'FIRST_RESPONSE',
+                    order: 1,
                   },
                   {
                     uniqueKey: generateUniqueKey(),
                     llmStatus: LlmStatus.PROCESSING,
                     resultType: 'RARE_ITEM_SEARCH',
+                    order: 2,
                   },
                 ],
               },
@@ -43,7 +45,11 @@ const route = createChat.post('/chats', zValidator('json', createChatSchema), as
       include: {
         promptGroups: {
           include: {
-            prompts: true,
+            prompts: {
+              orderBy: {
+                order: 'asc',
+              },
+            },
           },
         },
       },
