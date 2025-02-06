@@ -1,6 +1,8 @@
+import { LLMResponseEntity } from './llm-response.entity'
+
 export interface PromptEntity {
   uniqueKey: string
-  result?: any
+  result?: LLMResponseEntity
   resultType?: string
   llmStatus: string
   llmStatusChangeAt?: Date

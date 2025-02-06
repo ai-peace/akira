@@ -2,7 +2,7 @@ import { Tool } from '@langchain/core/tools'
 import * as cheerio from 'cheerio'
 import puppeteer from 'puppeteer'
 import { saveHtml } from '../utils/save-html'
-import { ProductItem } from '../types/product-item.types'
+import { ProductItemEntity } from '../../domains/entities/product-item.entity'
 
 export class MandarakeCrawlerTool extends Tool {
   name = 'mandarake_crawler'
@@ -20,7 +20,7 @@ export class MandarakeCrawlerTool extends Tool {
     }
   }
 
-  private async searchItems(keyword: string): Promise<ProductItem[]> {
+  private async searchItems(keyword: string): Promise<ProductItemEntity[]> {
     const browser = await puppeteer.launch({
       headless: true,
       args: [
@@ -35,7 +35,7 @@ export class MandarakeCrawlerTool extends Tool {
       ],
     })
     const page = await browser.newPage()
-    const items: ProductItem[] = []
+    const items: ProductItemEntity[] = []
 
     try {
       const url = `https://order.mandarake.co.jp/order/listPage/list?keyword=${encodeURIComponent(keyword)}`

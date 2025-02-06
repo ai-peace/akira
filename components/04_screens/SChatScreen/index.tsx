@@ -67,13 +67,16 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
                           {prompt.llmStatus === 'SUCCESS' ? (
                             <>
                               {prompt.resultType === 'FOUND_PRODUCT_ITEMS' && (
-                                <ChatBubbleProduct products={prompt.result.data} />
+                                <ChatBubbleProduct products={prompt.result?.data} />
                               )}
                               {prompt.resultType === 'FIRST_RESPONSE' && (
                                 <ChatBubble variant="received">
                                   <ChatBubbleAvatar fallback="AI" />
                                   <ChatBubbleMessage variant="received">
-                                    <ETypewriterText text={prompt.result.message} delay={200} />
+                                    <ETypewriterText
+                                      text={prompt.result?.message || ''}
+                                      delay={200}
+                                    />
                                   </ChatBubbleMessage>
                                 </ChatBubble>
                               )}
@@ -81,7 +84,10 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
                                 <ChatBubble variant="received">
                                   <ChatBubbleAvatar fallback="AI" />
                                   <ChatBubbleMessage variant="received">
-                                    <ETypewriterText text={prompt.result.message} delay={200} />
+                                    <ETypewriterText
+                                      text={prompt.result?.message || ''}
+                                      delay={200}
+                                    />
                                   </ChatBubbleMessage>
                                 </ChatBubble>
                               )}

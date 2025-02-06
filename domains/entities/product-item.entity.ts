@@ -1,4 +1,4 @@
-export type ProductItem = {
+export type ProductItemEntity = {
   title: string
   price: number
   priceWithTax: number
