@@ -1,11 +1,12 @@
 'use client'
+import ETypewriterText from '@/components/01_elements/ETypewriterText'
 import { OChatTextarea } from '@/components/02_organisms/OChatTextarea'
 import { Card } from '@/components/ui/card'
 import { ChatBubble, ChatBubbleAvatar, ChatBubbleMessage } from '@/components/ui/chat/chat-bubble'
 import { ChatMessageList } from '@/components/ui/chat/chat-message-list'
 import { ProductEntity } from '@/domains/entities/product.entity'
 import { useChat } from '@/hooks/resources/chats/useChat'
-import { FC, Fragment } from 'react'
+import { FC, Fragment, useRef, useEffect } from 'react'
 
 type Props = {
   chatUniqueKey: string
@@ -15,6 +16,28 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
   const { chat, chatError, chatIsLoading, chatErrorType, createChatPromptGroup } = useChat({
     uniqueKey: chatUniqueKey,
   })
+  const messageListRef = useRef<HTMLDivElement>(null)
+
+  // 初回ロード時のスクロール
+  useEffect(() => {
+    if (!chatIsLoading && chat && messageListRef.current) {
+      messageListRef.current.scrollTo({
+        top: messageListRef.current.scrollHeight,
+        behavior: 'smooth',
+      })
+    }
+  }, [chat, chatIsLoading])
+
+  // 検索開始時のスクロール
+  const handleCreateChatPromptGroup = async (question: string) => {
+    await createChatPromptGroup(question)
+    if (messageListRef.current) {
+      messageListRef.current.scrollTo({
+        top: messageListRef.current.scrollHeight,
+        behavior: 'smooth',
+      })
+    }
+  }
 
   if (chatIsLoading) return <div>Loading...</div>
   if (!chat) return <div>Chat not found</div>
@@ -23,7 +46,10 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
   return (
     <>
       <div className="relative h-full">
-        <div className="scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent relative h-full overflow-y-scroll overscroll-y-contain scroll-smooth pb-64 [-webkit-overflow-scrolling:touch]">
+        <div
+          ref={messageListRef}
+          className="scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent relative h-full overflow-y-scroll overscroll-y-contain scroll-smooth pb-64 [-webkit-overflow-scrolling:touch]"
+        >
           <div className="mx-auto block md:max-w-3xl md:gap-5 lg:max-w-[40rem] lg:gap-6 xl:max-w-[48rem]">
             <ChatMessageList>
               {chat.promptGroups?.map((promptGroup) => {
@@ -40,14 +66,22 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
                         <Fragment key={prompt.uniqueKey}>
                           {prompt.llmStatus === 'SUCCESS' ? (
                             <>
-                              {prompt.resultType === 'RARE_ITEM_SEARCH' && (
-                                <ChatBubbleProduct products={prompt.result} />
+                              {prompt.resultType === 'FOUND_PRODUCT_ITEMS' && (
+                                <ChatBubbleProduct products={prompt.result.data} />
                               )}
                               {prompt.resultType === 'FIRST_RESPONSE' && (
                                 <ChatBubble variant="received">
                                   <ChatBubbleAvatar fallback="AI" />
                                   <ChatBubbleMessage variant="received">
-                                    {prompt.result}
+                                    <ETypewriterText text={prompt.result.message} delay={200} />
+                                  </ChatBubbleMessage>
+                                </ChatBubble>
+                              )}
+                              {prompt.resultType === 'NO_PRODUCT_ITEMS' && (
+                                <ChatBubble variant="received">
+                                  <ChatBubbleAvatar fallback="AI" />
+                                  <ChatBubbleMessage variant="received">
+                                    <ETypewriterText text={prompt.result.message} delay={200} />
                                   </ChatBubbleMessage>
                                 </ChatBubble>
                               )}
@@ -70,7 +104,7 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
           </div>
         </div>
 
-        <ChatInputSection createChatPromptGroup={createChatPromptGroup} />
+        <ChatInputSection createChatPromptGroup={handleCreateChatPromptGroup} />
       </div>
     </>
   )

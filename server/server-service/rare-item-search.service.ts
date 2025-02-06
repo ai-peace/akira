@@ -56,7 +56,8 @@ export class RareItemSearchService {
       // JSON文字列を抽出する
       const jsonMatch = result.output.match(/```json\n([\s\S]*?)\n```/)
       if (!jsonMatch) {
-        throw new Error('No JSON found in response')
+        console.log('jsonMatchが見つかりませんでした')
+        return []
       }
 
       // 抽出したJSON文字列をパースする

@@ -2,19 +2,7 @@ import { Tool } from '@langchain/core/tools'
 import * as cheerio from 'cheerio'
 import puppeteer from 'puppeteer'
 import { saveHtml } from '../utils/save-html'
-
-interface MandarakeItem {
-  title: string
-  price: number
-  priceWithTax: number
-  url: string
-  imageUrl: string
-  status: string
-  shopInfo: string
-  itemCode: string
-  priceRange: string
-  isNewArrival: boolean
-}
+import { ProductItem } from '../types/product-item.types'
 
 export class MandarakeCrawlerTool extends Tool {
   name = 'mandarake_crawler'
@@ -32,7 +20,7 @@ export class MandarakeCrawlerTool extends Tool {
     }
   }
 
-  private async searchItems(keyword: string): Promise<MandarakeItem[]> {
+  private async searchItems(keyword: string): Promise<ProductItem[]> {
     const browser = await puppeteer.launch({
       headless: true,
       args: [
@@ -47,7 +35,7 @@ export class MandarakeCrawlerTool extends Tool {
       ],
     })
     const page = await browser.newPage()
-    const items: MandarakeItem[] = []
+    const items: ProductItem[] = []
 
     try {
       const url = `https://order.mandarake.co.jp/order/listPage/list?keyword=${encodeURIComponent(keyword)}`
@@ -92,9 +80,8 @@ export class MandarakeCrawlerTool extends Tool {
       const $ = cheerio.load(content)
 
       const entries = $('.block')
-      if (entries.length === 0) {
-        throw new Error('商品が見つかりませんでした')
-      }
+
+      if (entries.length === 0) return []
 
       entries.each((_, element) => {
         try {
@@ -136,6 +123,8 @@ export class MandarakeCrawlerTool extends Tool {
           console.error('商品データの解析中にエラーが発生しました:', itemError)
         }
       })
+
+      console.log('items-----------', items, 'items--------|||||||||')
 
       return items
     } catch (error: unknown) {

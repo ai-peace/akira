@@ -79,13 +79,13 @@ const route = createChat.post('/chats', zValidator('json', createChatSchema), as
 
 export type CreateChatRoute = typeof route
 
-const generateFirstResponse = async (promptUniqueKey: string, result: string) => {
+const generateFirstResponse = async (promptUniqueKey: string, message: string) => {
   await prisma.prompt.update({
     where: {
       uniqueKey: promptUniqueKey,
     },
     data: {
-      result: result,
+      result: { message: message },
       llmStatus: LlmStatus.SUCCESS,
       resultType: 'FIRST_RESPONSE',
     },
@@ -96,14 +96,30 @@ const askRareItemSearch = async (promptUniqueKey: string, keyword: string) => {
   const service = await RareItemSearchService.create(applicationServerConst.openai.apiKey)
   const result = await service.searchItems(keyword)
 
-  await prisma.prompt.update({
-    where: {
-      uniqueKey: promptUniqueKey,
-    },
-    data: {
-      result: result,
-      llmStatus: LlmStatus.SUCCESS,
-      resultType: 'RARE_ITEM_SEARCH',
-    },
-  })
+  if (result.length === 0) {
+    await prisma.prompt.update({
+      where: {
+        uniqueKey: promptUniqueKey,
+      },
+      data: {
+        result: { message: `${keyword}が見つかりませんでした` },
+        llmStatus: LlmStatus.SUCCESS,
+        resultType: 'NO_PRODUCT_ITEMS',
+      },
+    })
+  } else {
+    await prisma.prompt.update({
+      where: {
+        uniqueKey: promptUniqueKey,
+      },
+      data: {
+        result: {
+          message: `商品が見つかりました。${result.length}件見つかりました。`,
+          data: result,
+        },
+        llmStatus: LlmStatus.SUCCESS,
+        resultType: 'FOUND_PRODUCT_ITEMS',
+      },
+    })
+  }
 }
