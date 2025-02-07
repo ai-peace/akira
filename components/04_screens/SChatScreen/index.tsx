@@ -58,86 +58,111 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
 
   return (
     <>
-      <div className="relative h-full w-full">
-        <div
-          ref={messageListRef}
-          className="scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent relative h-full overflow-y-scroll overscroll-y-contain scroll-smooth pb-64 [-webkit-overflow-scrolling:touch]"
-        >
-          <div className="mx-auto block md:max-w-3xl md:gap-5 lg:max-w-[40rem] lg:gap-6 xl:max-w-[48rem]">
-            <ChatMessageList>
-              {chat.promptGroups?.map((promptGroup) => {
-                return (
-                  <Fragment key={promptGroup.uniqueKey}>
-                    {/* 質問 */}
-                    <ChatBubble variant="sent">
-                      <ChatBubbleAvatar fallback="Y" />
-                      <ChatBubbleMessage variant="sent">{promptGroup.question}</ChatBubbleMessage>
-                    </ChatBubble>
-                    {/* 回答 */}
-                    {promptGroup.prompts?.map((prompt) => {
-                      return (
-                        <Fragment key={prompt.uniqueKey}>
-                          {prompt.llmStatus === 'SUCCESS' ? (
-                            <>
-                              {prompt.resultType === 'FOUND_PRODUCT_ITEMS' && (
-                                <>
-                                  <ChatBubbleProduct
-                                    products={prompt.result?.data}
-                                    message={prompt.result?.message || ''}
-                                  />
-                                  {prompt.result?.keywords &&
-                                    prompt.result?.keywords.length > 0 && (
-                                      <RelativeKeywords
-                                        keywords={prompt.result.keywords}
-                                        handleCreateChatPromptGroupByKeyword={
-                                          handleCreateChatPromptGroupByKeyword
-                                        }
+      <div className="relative flex h-full w-full">
+        <div className="flex-1">
+          <div
+            ref={messageListRef}
+            className="scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent relative h-full overflow-y-scroll overscroll-y-contain scroll-smooth pb-64 [-webkit-overflow-scrolling:touch]"
+          >
+            <div className="mx-auto block md:max-w-3xl md:gap-5 lg:max-w-[40rem] lg:gap-6 xl:max-w-[48rem]">
+              <ChatMessageList>
+                {chat.promptGroups?.map((promptGroup) => {
+                  return (
+                    <Fragment key={promptGroup.uniqueKey}>
+                      {/* 質問 */}
+                      <div id={promptGroup.uniqueKey} className="flex justify-end">
+                        <ChatBubble variant="sent">
+                          <ChatBubbleAvatar fallback="Y" />
+                          <ChatBubbleMessage variant="sent">
+                            {promptGroup.question}
+                          </ChatBubbleMessage>
+                        </ChatBubble>
+                      </div>
+                      {/* 回答 */}
+                      {promptGroup.prompts?.map((prompt) => {
+                        return (
+                          <Fragment key={prompt.uniqueKey}>
+                            {prompt.llmStatus === 'SUCCESS' ? (
+                              <>
+                                {prompt.resultType === 'FOUND_PRODUCT_ITEMS' && (
+                                  <>
+                                    <ChatBubbleProduct
+                                      products={prompt.result?.data}
+                                      message={prompt.result?.message || ''}
+                                    />
+                                    {prompt.result?.keywords &&
+                                      prompt.result?.keywords.length > 0 && (
+                                        <RelativeKeywords
+                                          keywords={prompt.result.keywords}
+                                          handleCreateChatPromptGroupByKeyword={
+                                            handleCreateChatPromptGroupByKeyword
+                                          }
+                                        />
+                                      )}
+                                  </>
+                                )}
+                                {prompt.resultType === 'FIRST_RESPONSE' && (
+                                  <ChatBubble variant="received">
+                                    <ChatBubbleAvatar fallback="AI" />
+                                    <ChatBubbleMessage variant="received">
+                                      <ETypewriterText
+                                        text={prompt.result?.message || ''}
+                                        delay={200}
                                       />
-                                    )}
-                                </>
-                              )}
-                              {prompt.resultType === 'FIRST_RESPONSE' && (
+                                    </ChatBubbleMessage>
+                                  </ChatBubble>
+                                )}
+                                {prompt.resultType === 'NO_PRODUCT_ITEMS' && (
+                                  <ChatBubble variant="received">
+                                    <ChatBubbleAvatar fallback="AI" />
+                                    <ChatBubbleMessage variant="received">
+                                      <ETypewriterText
+                                        text={prompt.result?.message || ''}
+                                        delay={200}
+                                      />
+                                    </ChatBubbleMessage>
+                                  </ChatBubble>
+                                )}
+                              </>
+                            ) : (
+                              <>
                                 <ChatBubble variant="received">
                                   <ChatBubbleAvatar fallback="AI" />
-                                  <ChatBubbleMessage variant="received">
-                                    <ETypewriterText
-                                      text={prompt.result?.message || ''}
-                                      delay={200}
-                                    />
-                                  </ChatBubbleMessage>
+                                  <ChatBubbleMessage isLoading />
                                 </ChatBubble>
-                              )}
-                              {prompt.resultType === 'NO_PRODUCT_ITEMS' && (
-                                <ChatBubble variant="received">
-                                  <ChatBubbleAvatar fallback="AI" />
-                                  <ChatBubbleMessage variant="received">
-                                    <ETypewriterText
-                                      text={prompt.result?.message || ''}
-                                      delay={200}
-                                    />
-                                  </ChatBubbleMessage>
-                                </ChatBubble>
-                              )}
-                            </>
-                          ) : (
-                            <>
-                              <ChatBubble variant="received">
-                                <ChatBubbleAvatar fallback="AI" />
-                                <ChatBubbleMessage isLoading />
-                              </ChatBubble>
-                            </>
-                          )}
-                        </Fragment>
-                      )
-                    })}
-                  </Fragment>
-                )
-              })}
-            </ChatMessageList>
+                              </>
+                            )}
+                          </Fragment>
+                        )
+                      })}
+                    </Fragment>
+                  )
+                })}
+              </ChatMessageList>
+            </div>
           </div>
+
+          <ChatInputSection createChatPromptGroup={handleCreateChatPromptGroup} />
         </div>
 
-        <ChatInputSection createChatPromptGroup={handleCreateChatPromptGroup} />
+        {/* 目次セクション */}
+        <div className="fixed right-0 top-0 hidden h-full w-64 overflow-y-auto border-l border-gray-200 p-4 lg:block">
+          <div className="mb-4 text-sm font-medium">Chat history</div>
+          <div className="space-y-2">
+            {chat.promptGroups?.map((promptGroup) => (
+              <div
+                key={promptGroup.uniqueKey}
+                className="cursor-pointer truncate text-xs text-gray-500 hover:text-gray-700"
+                onClick={() => {
+                  const element = document.getElementById(promptGroup.uniqueKey)
+                  element?.scrollIntoView({ behavior: 'smooth' })
+                }}
+              >
+                {promptGroup.question}
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </>
   )
