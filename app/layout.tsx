@@ -3,7 +3,8 @@ import '@/styles/globals.css'
 import { RootLayoutClient } from '@/components/99_providers/root-layout-client'
 import { OGlobalSideMenu } from '@/components/02_organisms/OGlobalSideMenu'
 import { Toaster } from '@/components/ui/toaster'
-
+import { EResizablePanel } from '@/components/01_elements/EResizablePanel'
+import { OChatList } from '@/components/02_organisms/OChatList'
 export const metadata: Metadata = {
   title: 'Agent Rare',
   description: 'Agent Rare App',
@@ -45,6 +46,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <RootLayoutClient>
           <section className="flex h-screen bg-background-muted pl-[72px]">
             <OGlobalSideMenu />
+
             <section className="w-full bg-background text-foreground">{children}</section>
           </section>
         </RootLayoutClient>
