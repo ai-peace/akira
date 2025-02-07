@@ -78,7 +78,10 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
                             <>
                               {prompt.resultType === 'FOUND_PRODUCT_ITEMS' && (
                                 <>
-                                  <ChatBubbleProduct products={prompt.result?.data} />
+                                  <ChatBubbleProduct
+                                    products={prompt.result?.data}
+                                    message={prompt.result?.message || ''}
+                                  />
                                   {prompt.result?.keywords &&
                                     prompt.result?.keywords.length > 0 && (
                                       <RelativeKeywords
@@ -139,11 +142,22 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
 
 export { Component as SChatScreen }
 
-const ChatBubbleProduct = ({ products }: { products: ProductEntity[] }) => {
+const ChatBubbleProduct = ({
+  products,
+  message,
+}: {
+  products: ProductEntity[]
+  message: string
+}) => {
   return (
-    <ChatBubble variant="received">
-      <ChatBubbleAvatar fallback="AI" />
-      <div className="grid w-full grid-cols-2 gap-2">
+    <>
+      <ChatBubble variant="received">
+        <ChatBubbleAvatar fallback="AI" />
+        <ChatBubbleMessage variant="received">
+          <ETypewriterText text={message} delay={200} />
+        </ChatBubbleMessage>
+      </ChatBubble>
+      <div className="grid w-full grid-cols-3 gap-2">
         {products.slice(0, 9).map((product) => (
           <>
             <Card key={product.title} className="overflow-hidden shadow-none">
@@ -169,7 +183,7 @@ const ChatBubbleProduct = ({ products }: { products: ProductEntity[] }) => {
           </>
         ))}
       </div>
-    </ChatBubble>
+    </>
   )
 }
 
@@ -204,7 +218,7 @@ const RelativeKeywords = ({
 }) => {
   return (
     <>
-      <div className="ml-12">
+      <div>
         <div className="mb-2 text-xs font-bold">Relative keywords</div>
         <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs">
           {keywords?.slice(0, 10).map((keyword) => (
