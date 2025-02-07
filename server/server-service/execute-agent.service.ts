@@ -80,6 +80,9 @@ const askRareItemSearch = async (promptUniqueKey: string, keyword: string) => {
   const service = await RareItemSearchService.create(applicationServerConst.openai.apiKey)
   const result = await service.searchItems(keyword)
 
+  let keywords: string[] = []
+  if (result.length > 0) keywords = await service.extractKeywords(result)
+
   if (result.length === 0) {
     await prisma.prompt.update({
       where: {
@@ -100,6 +103,7 @@ const askRareItemSearch = async (promptUniqueKey: string, keyword: string) => {
         result: {
           message: `商品が見つかりました。${result.length}件見つかりました。`,
           data: result,
+          keywords: keywords || [],
         },
         llmStatus: LlmStatus.SUCCESS,
         resultType: 'FOUND_PRODUCT_ITEMS',

@@ -39,6 +39,16 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
     }
   }
 
+  const handleCreateChatPromptGroupByKeyword = async (keyword: string) => {
+    await createChatPromptGroup(keyword)
+    if (messageListRef.current) {
+      messageListRef.current.scrollTo({
+        top: messageListRef.current.scrollHeight,
+        behavior: 'smooth',
+      })
+    }
+  }
+
   if (chatIsLoading) return <div>Loading...</div>
   if (!chat) return <div>Chat not found</div>
   if (chatError) return <div>Error: {chatError.message}</div>
@@ -67,7 +77,18 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
                           {prompt.llmStatus === 'SUCCESS' ? (
                             <>
                               {prompt.resultType === 'FOUND_PRODUCT_ITEMS' && (
-                                <ChatBubbleProduct products={prompt.result?.data} />
+                                <>
+                                  <ChatBubbleProduct products={prompt.result?.data} />
+                                  {prompt.result?.keywords &&
+                                    prompt.result?.keywords.length > 0 && (
+                                      <RelativeKeywords
+                                        keywords={prompt.result.keywords}
+                                        handleCreateChatPromptGroupByKeyword={
+                                          handleCreateChatPromptGroupByKeyword
+                                        }
+                                      />
+                                    )}
+                                </>
                               )}
                               {prompt.resultType === 'FIRST_RESPONSE' && (
                                 <ChatBubble variant="received">
@@ -171,5 +192,34 @@ const ChatInputSection = ({ createChatPromptGroup }: ChatInputSectionProps) => {
         <OChatTextarea onSubmit={handleSubmit} />
       </div>
     </div>
+  )
+}
+
+const RelativeKeywords = ({
+  keywords,
+  handleCreateChatPromptGroupByKeyword,
+}: {
+  keywords: string[]
+  handleCreateChatPromptGroupByKeyword: (keyword: string) => void
+}) => {
+  return (
+    <>
+      <div className="ml-12">
+        <div className="mb-2 text-xs font-bold">Relative keywords</div>
+        <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs">
+          {keywords?.slice(0, 10).map((keyword) => (
+            <div
+              key={keyword}
+              className="cursor-pointer underline hover:no-underline hover:opacity-20"
+              onClick={() => {
+                handleCreateChatPromptGroupByKeyword(keyword)
+              }}
+            >
+              {keyword}
+            </div>
+          ))}
+        </div>
+      </div>
+    </>
   )
 }

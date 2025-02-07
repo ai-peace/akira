@@ -1,11 +1,13 @@
 import { ChatOpenAI } from '@langchain/openai'
 import { MandarakeCrawlerTool } from './mandarake-crawler.service'
+import { ExtractKeywordsTool } from './extract-keywords.service'
 import { ChatPromptTemplate, MessagesPlaceholder } from '@langchain/core/prompts'
 import { AgentExecutor, createOpenAIFunctionsAgent } from 'langchain/agents'
 import { ProductEntity } from '@/domains/entities/product.entity'
 
 export class RareItemSearchService {
   private agentExecutor: AgentExecutor | null = null
+  private extractKeywordsTool: ExtractKeywordsTool | null = null
 
   static async create(openAIApiKey: string): Promise<RareItemSearchService> {
     const service = new RareItemSearchService()
@@ -15,6 +17,7 @@ export class RareItemSearchService {
 
   private async initialize(openAIApiKey: string): Promise<void> {
     const tools = [new MandarakeCrawlerTool()]
+    this.extractKeywordsTool = new ExtractKeywordsTool(openAIApiKey)
     const model = new ChatOpenAI({
       modelName: 'gpt-4o-mini',
       temperature: 0,
@@ -75,6 +78,20 @@ export class RareItemSearchService {
     } catch (error) {
       console.error('Failed to parse response:', result.output)
       throw new Error('Failed to parse agent response as JSON')
+    }
+  }
+
+  async extractKeywords(items: ProductEntity[]): Promise<string[]> {
+    if (!this.extractKeywordsTool) {
+      throw new Error('Service not initialized')
+    }
+
+    const result = await this.extractKeywordsTool.invoke(JSON.stringify(items))
+    try {
+      return JSON.parse(result)
+    } catch (error) {
+      console.error('Failed to parse keywords response:', result)
+      return []
     }
   }
 }

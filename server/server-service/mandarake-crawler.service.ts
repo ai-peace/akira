@@ -11,6 +11,7 @@ export class MandarakeCrawlerTool extends Tool {
   async _call(keyword: string): Promise<string> {
     try {
       const items = await this.searchItems(keyword)
+      console.log('items-----------!!!!!!', items, 'items-----------!!!!!!')
       return JSON.stringify(items, null, 2)
     } catch (error: unknown) {
       if (error instanceof Error) {
