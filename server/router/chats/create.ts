@@ -14,6 +14,7 @@ const route = createChat.post('/chats', zValidator('json', createChatSchema), as
 
     const chat = await prisma.chat.create({
       data: {
+        title: data.mainPrompt,
         uniqueKey: generateUniqueKey(),
       },
       include: {

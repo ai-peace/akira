@@ -9,6 +9,21 @@ export type GetChatInput = InferRequestType<(typeof client.chats)[':uniqueKey'][
 export type CreateChatInput = InferRequestType<typeof client.chats.$post>
 
 export const chatRepository = {
+  getCollection: async (): Promise<ChatEntity[]> => {
+    const client = hcClient()
+    const res = await client.chats.$get()
+    const json = await res.json()
+
+    if (!('data' in json)) throw new Error('Failed to fetch chat collection')
+    const data = json.data as any[]
+
+    return data.map((chat) => ({
+      ...chat,
+      updatedAt: new Date(chat.updatedAt),
+      createdAt: new Date(chat.createdAt),
+    }))
+  },
+
   get: async (uniqueKey: string): Promise<ChatEntity | null> => {
     try {
       const client = hcClient()
@@ -22,11 +37,11 @@ export const chatRepository = {
         ...data,
         updatedAt: new Date(data.updatedAt),
         createdAt: new Date(data.createdAt),
-        promptGroups: data.promptGroups.map((promptGroup: PromptGroupEntity) => ({
+        promptGroups: (data.promptGroups as any[]).map((promptGroup) => ({
           ...promptGroup,
           updatedAt: new Date(promptGroup.updatedAt),
           createdAt: new Date(promptGroup.createdAt),
-          prompts: promptGroup.prompts.map((prompt: PromptEntity) => ({
+          prompts: (promptGroup.prompts as any[]).map((prompt) => ({
             ...prompt,
             llmStatusChangeAt: prompt.llmStatusChangeAt
               ? new Date(prompt.llmStatusChangeAt)
@@ -49,17 +64,17 @@ export const chatRepository = {
       const json = await res.json()
 
       if (!('data' in json)) throw new Error('Failed to create chat')
-      const data = json.data as ChatEntity
+      const data = json.data as any
 
       return {
         ...data,
         updatedAt: new Date(data.updatedAt),
         createdAt: new Date(data.createdAt),
-        promptGroups: data.promptGroups?.map((promptGroup: PromptGroupEntity) => ({
+        promptGroups: data.promptGroups?.map((promptGroup: any) => ({
           ...promptGroup,
           updatedAt: new Date(promptGroup.updatedAt),
           createdAt: new Date(promptGroup.createdAt),
-          prompts: promptGroup.prompts?.map((prompt: PromptEntity) => ({
+          prompts: promptGroup.prompts?.map((prompt: any) => ({
             ...prompt,
             llmStatusChangeAt: prompt.llmStatusChangeAt
               ? new Date(prompt.llmStatusChangeAt)
