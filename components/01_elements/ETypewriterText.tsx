@@ -21,9 +21,10 @@ const ETypewriterText: React.FC<Props> = ({
         <span
           key={index}
           style={{
-            display: 'inline-block',
+            display: char === ' ' ? 'inline' : 'inline-block',
             opacity: animate ? 0 : 1,
             animation: animate ? `fadeIn ${speed}ms forwards ${delay + index * speed}ms` : 'none',
+            whiteSpace: 'pre',
           }}
         >
           {char}

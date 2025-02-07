@@ -1,5 +1,7 @@
 'use client'
 
+import ETypewriterText from '@/components/01_elements/ETypewriterText'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -7,6 +9,27 @@ import { ArrowUp, Paperclip } from 'lucide-react'
 import { FC, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
+
+const topPageKeywords = [
+  'アクリルスタンド',
+  '缶バッジ',
+  'ブラインドグッズ',
+  '痛バッグ',
+  'B2タペストリー',
+  'アニメイト限定特典',
+  '公式設定資料集',
+  'ヴァイスシュヴァルツ',
+  'ホロライブ',
+  'Vtuber',
+  'フィギュアーツ',
+  'POP UP PARADE',
+  'プラモ',
+  'カプセルトイ',
+  'デジタルフォトカード',
+  '等身大抱き枕カバー',
+  'ボイスドラマDLカード',
+  'アニメコラボカフェグッズ',
+]
 
 const formSchema = z.object({
   prompt: z.string().min(1, 'プロンプトを入力してください'),
@@ -76,6 +99,20 @@ const Component: FC<Props> = ({ onSubmit }) => {
             </Button>
           </div>
         </div>
+      </div>
+      <div className="mt-4 flex flex-wrap justify-center gap-3">
+        {topPageKeywords.map((keyword, index) => (
+          <Badge
+            key={keyword}
+            variant="secondary"
+            className="cursor-pointer hover:bg-foreground/10"
+            onClick={() => {
+              handleSubmit({ prompt: keyword })
+            }}
+          >
+            <ETypewriterText text={keyword} delay={20 * index} />
+          </Badge>
+        ))}
       </div>
     </form>
   )

@@ -1,5 +1,6 @@
 'use client'
 
+import ETypewriterText from '@/components/01_elements/ETypewriterText'
 import { TCreateDocumentForm } from '@/components/03_templates/TCreateDocumentForm'
 import { useCreateChat } from '@/hooks/resources/chats/useCreateChat'
 import { getChatUrl } from '@/utils/url.helper'
@@ -31,7 +32,7 @@ const Component: FC = () => {
         <div className="w-full">
           <div className="flex-none py-6 text-center">
             <h1 className="mb-0 text-3xl font-semibold text-white">
-              What rare item are you looking for?
+              <ETypewriterText text="What rare item are you looking for?" delay={0} />
             </h1>
           </div>
           <div className="flex-grow">
