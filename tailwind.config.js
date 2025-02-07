@@ -1,5 +1,9 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
+import animate from 'tailwindcss-animate'
+import scrollbarHide from 'tailwind-scrollbar-hide'
+import typography from '@tailwindcss/typography'
+
+export default {
   darkMode: ['class'],
   content: ['./app/**/*.{js,ts,jsx,tsx,mdx}', './components/**/*.{js,ts,jsx,tsx,mdx}'],
   theme: {
@@ -82,10 +86,5 @@ module.exports = {
       },
     },
   },
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  plugins: [
-    require('tailwindcss-animate'),
-    require('tailwind-scrollbar-hide'),
-    require('@tailwindcss/typography'),
-  ],
+  plugins: [animate, scrollbarHide, typography],
 }
