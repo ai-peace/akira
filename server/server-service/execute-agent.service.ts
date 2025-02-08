@@ -57,7 +57,7 @@ const execute = async (chatUniqueKey: string, question: string): Promise<PromptG
     if (!searchablePrompt || !firstResponsePrompt) throw new Error('Prompt not found')
 
     // 非同期に実行
-    generateFirstResponse(firstResponsePrompt.uniqueKey, `${question}を探しています`)
+    generateFirstResponse(firstResponsePrompt.uniqueKey, `Searching for ${question}...`)
     askRareItemSearch(searchablePrompt.uniqueKey, question)
 
     const promptGroupEntity = promptGroupMapper.toDomain(promptGroup)
@@ -99,7 +99,7 @@ const askRareItemSearch = async (promptUniqueKey: string, keyword: string) => {
         uniqueKey: promptUniqueKey,
       },
       data: {
-        result: { message: `${keyword}が見つかりませんでした` },
+        result: { message: `No items found for "${keyword}"` },
         llmStatus: LlmStatus.SUCCESS,
         resultType: 'NO_PRODUCT_ITEMS',
       },
@@ -111,7 +111,7 @@ const askRareItemSearch = async (promptUniqueKey: string, keyword: string) => {
       },
       data: {
         result: {
-          message: `商品が見つかりました。${result.length}件見つかりました。`,
+          message: `Found ${result.length} items matching your search.`,
           data: result,
           keywords: keywords || [],
         },

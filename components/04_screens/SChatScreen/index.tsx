@@ -280,7 +280,7 @@ const ChatInputSection = ({ createChatPromptGroup }: ChatInputSectionProps) => {
       await createChatPromptGroup(question)
     } catch (error) {
       console.error('Error creating chat:', error)
-      throw error // 再スローしてフォーム側でハンドリング可能に
+      throw error
     }
   }
   return (
@@ -310,7 +310,7 @@ const RelativeKeywords = ({
               className="cursor-pointer underline hover:no-underline hover:opacity-20"
               onClick={() => handleCreateChatPromptGroupByKeyword(keyword)}
             >
-              {keyword.en}
+              {keyword.en} <span className="text-xs">({keyword.ja})</span>
             </div>
           ))}
         </div>

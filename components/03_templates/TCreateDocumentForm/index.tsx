@@ -12,24 +12,26 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 
 const topPageKeywords = [
-  'アクリルスタンド',
-  '缶バッジ',
-  'ブラインドグッズ',
-  '痛バッグ',
-  'B2タペストリー',
-  'アニメイト限定特典',
-  '公式設定資料集',
-  'ヴァイスシュヴァルツ',
-  'ホロライブ',
-  'Vtuber',
-  'フィギュアーツ',
-  'POP UP PARADE',
-  'プラモ',
-  'カプセルトイ',
-  'デジタルフォトカード',
-  '等身大抱き枕カバー',
-  'ボイスドラマDLカード',
-  'アニメコラボカフェグッズ',
+  'Jujutsu Kaisen', // 呪術廻戦
+  'One Piece', // ワンピース
+  'My Hero Academia', // 僕のヒーローアカデミア
+  'Chainsaw Man', // チェンソーマン
+  'Spy x Family', // スパイファミリー
+  'Demon Slayer: Kimetsu no Yaiba', // 鬼滅の刃
+  'Blue Lock', // ブルーロック（別誌だがアメリカで人気）
+  'Dr. Stone', // ドクターストーン
+  'Mashle: Magic and Muscles', // マッシュル-MASHLE-
+  'Undead Unluck', // アンデッドアンラック
+  'Kaiju No. 8', // 怪獣8号
+  'Mission: Yozakura Family', // 夜桜さんちの大作戦
+  'Sakamoto Days', // サカモトデイズ
+  'Black Clover', // ブラッククローバー
+  'Dandadan', // ダンダダン（別誌だけど超人気）
+  'The Elusive Samurai', // 逃げ上手の若君
+  'Fabricant 100', // ファブリカント100
+  'Akane-banashi', // あかね噺
+  'Kill Blue', // キルブルー
+  'Cipher Academy', // 暗号学園のいろは
 ]
 
 const formSchema = z.object({
