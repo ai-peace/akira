@@ -18,7 +18,7 @@ export default function manifest(): MetadataRoute.Manifest {
     dir: 'auto',
     lang: 'ja',
     name: 'Agent Rare',
-    short_name: 'LightningWriting',
+    short_name: 'Agent Rare',
     start_url: '/',
     scope: '/',
   }
