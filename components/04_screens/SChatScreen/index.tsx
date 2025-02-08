@@ -6,7 +6,7 @@ import { ChatBubble, ChatBubbleAvatar, ChatBubbleMessage } from '@/components/ui
 import { ChatMessageList } from '@/components/ui/chat/chat-message-list'
 import { ProductEntity } from '@/domains/entities/product.entity'
 import { useChat } from '@/hooks/resources/chats/useChat'
-import { FC, Fragment, useEffect, useRef } from 'react'
+import { FC, Fragment, useEffect, useRef, useState } from 'react'
 import { ECenteredLoadingSpinner } from '@/components/01_elements/ECenteredLoadingSpinner'
 
 type Props = {
@@ -17,6 +17,9 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
   const { chat, chatError, chatIsLoading, chatErrorType, createChatPromptGroup } = useChat({
     uniqueKey: chatUniqueKey,
   })
+  const [optimisticPromptGroup, setOptimisticPromptGroup] = useState<{
+    question: string
+  } | null>(null)
   const messageListRef = useRef<HTMLDivElement>(null)
 
   // 初回ロード時のスクロール
@@ -29,8 +32,14 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
     }
   }, [chat, chatIsLoading])
 
+  // chatに変更がある場合optimistic prompt group を非表示にする
+  useEffect(() => {
+    setOptimisticPromptGroup(null)
+  }, [chat])
+
   // 検索開始時のスクロール
   const handleCreateChatPromptGroup = async (question: string) => {
+    setOptimisticPromptGroup({ question: question })
     await createChatPromptGroup(question)
     if (messageListRef.current) {
       messageListRef.current.scrollTo({
@@ -41,6 +50,7 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
   }
 
   const handleCreateChatPromptGroupByKeyword = async (keyword: string) => {
+    setOptimisticPromptGroup({ question: keyword })
     await createChatPromptGroup(keyword)
     if (messageListRef.current) {
       messageListRef.current.scrollTo({
@@ -141,6 +151,9 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
                     </Fragment>
                   )
                 })}
+                {optimisticPromptGroup && (
+                  <OptimisticPromptGroup question={optimisticPromptGroup.question} />
+                )}
               </ChatMessageList>
             </div>
           </div>
@@ -265,6 +278,23 @@ const RelativeKeywords = ({
           ))}
         </div>
       </div>
+    </>
+  )
+}
+
+const OptimisticPromptGroup = ({ question }: { question: string }) => {
+  return (
+    <>
+      <div className="flex justify-end">
+        <ChatBubble variant="sent">
+          <ChatBubbleAvatar fallback="Y" />
+          <ChatBubbleMessage variant="sent">{question}</ChatBubbleMessage>
+        </ChatBubble>
+      </div>
+      <ChatBubble variant="received">
+        <ChatBubbleAvatar fallback="AI" />
+        <ChatBubbleMessage isLoading />
+      </ChatBubble>
     </>
   )
 }
