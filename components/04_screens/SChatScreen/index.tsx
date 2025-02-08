@@ -98,7 +98,7 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
             ref={messageListRef}
             className="scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent relative h-full overflow-y-scroll overscroll-y-contain scroll-smooth pb-64 [-webkit-overflow-scrolling:touch]"
           >
-            <div className="mx-auto block md:max-w-3xl md:gap-5 lg:max-w-[40rem] lg:gap-6 xl:max-w-[48rem]">
+            <div className="mx-auto block md:max-w-3xl md:gap-5 lg:max-w-[40rem] lg:gap-6 xl:mr-64 xl:max-w-[48rem] 2xl:mx-auto">
               <ChatMessageList>
                 {chat.promptGroups?.map((promptGroup) => {
                   return (
@@ -184,9 +184,9 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
         </div>
 
         {/* 目次セクション */}
-        {/* <div className="fixed right-0 top-0 hidden h-full w-64 overflow-y-auto border-l border-gray-200 p-4 lg:block">
+        <div className="fixed right-0 top-0 hidden h-full w-64 p-4 xl:flex xl:flex-col">
           <div className="mb-4 text-sm font-medium">Chat history</div>
-          <div className="space-y-2">
+          <div className="max-h-[calc(100vh-8rem)] space-y-2 overflow-y-auto">
             {chat.promptGroups?.map((promptGroup) => (
               <div
                 key={promptGroup.uniqueKey}
@@ -200,7 +200,7 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
               </div>
             ))}
           </div>
-        </div> */}
+        </div>
       </div>
     </>
   )
@@ -287,7 +287,7 @@ const ChatInputSection = ({ createChatPromptGroup }: ChatInputSectionProps) => {
   }
   return (
     <div className="absolute bottom-0 left-0 mt-auto w-full bg-background">
-      <div className="mx-auto mb-4 flex flex-1 gap-4 text-base md:max-w-3xl md:gap-5 lg:max-w-[40rem] lg:gap-6 xl:max-w-[48rem]">
+      <div className="mx-auto mb-4 flex flex-1 gap-4 text-base md:max-w-3xl md:gap-5 lg:max-w-[40rem] lg:gap-6 xl:mr-64 xl:max-w-[48rem] 2xl:mx-auto">
         <OChatTextarea onSubmit={handleSubmit} />
       </div>
     </div>
