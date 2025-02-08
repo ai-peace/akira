@@ -1,7 +1,7 @@
 'use client'
 
 import { PanelLeftCloseIcon, PanelRightCloseIcon } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 type Props = {
   minWidth?: string
@@ -16,7 +16,36 @@ const Component = ({
   children,
   position = 'right',
 }: Props) => {
+  const storageKey = `resizable-panel-${position}-visible`
   const [isVisible, setIsVisible] = useState(true)
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+    const stored = localStorage.getItem(storageKey)
+    if (stored !== null) {
+      setIsVisible(stored === 'true')
+    }
+  }, [storageKey])
+
+  useEffect(() => {
+    if (isClient) {
+      localStorage.setItem(storageKey, isVisible.toString())
+    }
+  }, [isVisible, storageKey, isClient])
+
+  if (!isClient) {
+    return (
+      <div
+        className={`relative h-full border-border-subtle bg-background-soft ${
+          position === 'left' ? 'border-l' : 'border-r'
+        }`}
+        style={{ minWidth, maxWidth }}
+      >
+        <div className="relative h-full">{children}</div>
+      </div>
+    )
+  }
 
   if (!isVisible) {
     return (
