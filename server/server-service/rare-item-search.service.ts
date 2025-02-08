@@ -152,10 +152,12 @@ export class RareItemSearchService {
       })
 
       const updatedResult = {
-        ...currentPrompt?.result,
         message: `Found ${items.length} items matching your search.`,
         data: items,
         keywords: keywords,
+        ...(currentPrompt?.result && typeof currentPrompt.result === 'object'
+          ? currentPrompt.result
+          : {}),
       }
 
       await prisma.prompt.update({
