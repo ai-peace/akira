@@ -47,25 +47,17 @@ export class RareItemSearchService {
   }
 
   async searchItems(keyword: string): Promise<ProductEntity[]> {
-    if (!this.agentExecutor) {
-      throw new Error('Service not initialized')
-    }
+    if (!this.agentExecutor) throw new Error('Service not initialized')
 
-    console.log('researching...--------------------------------', keyword)
     const result = await this.agentExecutor.invoke({
       input: `Search for rare items on Mandarake using the keyword "${keyword}". Focus on finding the most interesting and valuable items.`,
     })
-    console.log('result---------------------------', result)
 
     try {
       // JSON文字列を抽出する
       const jsonMatch = result.output.match(/```json\n([\s\S]*?)\n```/)
-      if (!jsonMatch) {
-        console.log('jsonMatchが見つかりませんでした')
-        return []
-      }
+      if (!jsonMatch) return []
 
-      // 抽出したJSON文字列をパースする
       const jsonData = JSON.parse(jsonMatch[1])
 
       return jsonData.items.map((item: any) => ({
