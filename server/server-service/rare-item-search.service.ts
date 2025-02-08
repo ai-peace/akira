@@ -22,7 +22,7 @@ export class RareItemSearchService {
   }
 
   private async initialize(openAIApiKey: string): Promise<void> {
-    const tools = [new MandarakeCrawlerTool()]
+    const tools = [new MandarakeCrawlerTool(openAIApiKey)]
     this.extractKeywordsTool = new ExtractKeywordsTool(openAIApiKey)
     const model = new ChatOpenAI({
       modelName: 'gpt-4o-mini',

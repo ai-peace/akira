@@ -1,10 +1,43 @@
 import { Tool } from '@langchain/core/tools'
 import * as cheerio from 'cheerio'
 import { ProductItemEntity } from '../../domains/entities/product-item.entity'
+import { OpenAI } from 'openai'
 
 export class MandarakeCrawlerTool extends Tool {
+  private openai: OpenAI
+
+  constructor(apiKey: string) {
+    super()
+    this.openai = new OpenAI({ apiKey })
+  }
+
   name = 'mandarake_crawler'
   description = 'Search for rare items on Mandarake'
+
+  private async translateTitle(jaTitle: string): Promise<string> {
+    try {
+      const response = await this.openai.chat.completions.create({
+        model: 'gpt-3.5-turbo',
+        messages: [
+          {
+            role: 'system',
+            content:
+              'You are a translator specializing in Japanese anime, manga, and collectibles. Translate the following Japanese product title to English. Keep proper nouns as is.',
+          },
+          {
+            role: 'user',
+            content: jaTitle,
+          },
+        ],
+        temperature: 0,
+      })
+
+      return response.choices[0]?.message?.content || jaTitle
+    } catch (error) {
+      console.error('Error translating title:', error)
+      return jaTitle
+    }
+  }
 
   async _call(keyword: string): Promise<string> {
     try {
@@ -23,7 +56,7 @@ export class MandarakeCrawlerTool extends Tool {
 
     try {
       const controller = new AbortController()
-      const timeout = setTimeout(() => controller.abort(), 8000) // 8秒でタイムアウト
+      const timeout = setTimeout(() => controller.abort(), 8000)
 
       const response = await fetch(url, {
         headers: {
@@ -43,17 +76,16 @@ export class MandarakeCrawlerTool extends Tool {
           'Sec-Fetch-User': '?1',
           'Upgrade-Insecure-Requests': '1',
         },
-        signal: controller.signal, // AbortControllerを追加
+        signal: controller.signal,
       })
 
-      clearTimeout(timeout) // タイムアウトをクリア
+      clearTimeout(timeout)
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
 
       const contentLength = response.headers.get('content-length')
-
       if (contentLength && parseInt(contentLength) > 4_000_000) {
         throw new Error('Response too large')
       }
@@ -68,7 +100,6 @@ export class MandarakeCrawlerTool extends Tool {
         chunks.push(value)
       }
 
-      // チャンクの結合方法を修正
       const allChunks = new Uint8Array(chunks.reduce((acc, chunk) => acc + chunk.length, 0))
       let position = 0
       for (const chunk of chunks) {
@@ -77,53 +108,61 @@ export class MandarakeCrawlerTool extends Tool {
       }
 
       const content = new TextDecoder().decode(allChunks)
-
       const $ = cheerio.load(content)
       const items: ProductItemEntity[] = []
 
-      $('.block').each((_, element) => {
-        try {
-          const title = $(element).find('.title').text().trim()
-          const priceText = $(element).find('.price').text().trim()
+      const processedItems = await Promise.all(
+        $('.block')
+          .map(async (_, element) => {
+            try {
+              const jaTitle = $(element).find('.title').text().trim()
+              const priceText = $(element).find('.price').text().trim()
 
-          const basePrice = priceText.match(/^[\d,]+/)?.[0] || ''
-          const taxIncludedPrice = priceText.match(/\(税込\s*([\d,]+)円\)/)?.[1] || ''
+              const basePrice = priceText.match(/^[\d,]+/)?.[0] || ''
+              const taxIncludedPrice = priceText.match(/\(税込\s*([\d,]+)円\)/)?.[1] || ''
 
-          const price = parseInt(basePrice.replace(/,/g, '')) || 0
-          const priceWithTax = parseInt(taxIncludedPrice.replace(/,/g, '')) || 0
+              const price = parseInt(basePrice.replace(/,/g, '')) || 0
+              const priceWithTax = parseInt(taxIncludedPrice.replace(/,/g, '')) || 0
 
-          const url = $(element).find('.title a').attr('href') || ''
-          const imageUrl = $(element).find('.thum img').attr('src') || ''
-          const status = $(element).find('.stock').text().trim()
-          const shopInfo = $(element).find('.shop').text().trim()
-          const itemCode = $(element).find('.itemno').text().trim()
-          const priceRange = $(element).find('.price_range').text().trim()
+              const url = $(element).find('.title a').attr('href') || ''
+              const imageUrl = $(element).find('.thum img').attr('src') || ''
+              const status = $(element).find('.stock').text().trim()
+              const shopInfo = $(element).find('.shop').text().trim()
+              const itemCode = $(element).find('.itemno').text().trim()
+              const priceRange = $(element).find('.price_range').text().trim()
 
-          if (title && price) {
-            items.push({
-              title,
-              price,
-              priceWithTax,
-              url: url.startsWith('http') ? url : `https://order.mandarake.co.jp${url}`,
-              imageUrl: imageUrl.startsWith('http')
-                ? imageUrl
-                : `https://order.mandarake.co.jp${imageUrl}`,
-              status,
-              shopInfo,
-              itemCode,
-              priceRange,
-              isNewArrival: $(element).find('.new_arrival').length > 0,
-            })
-          }
-        } catch (itemError) {
-          console.error('商品データの解析中にエラーが発生しました:', itemError)
-        }
-      })
+              if (jaTitle && price) {
+                const enTitle = await this.translateTitle(jaTitle)
+                return {
+                  title: {
+                    en: enTitle,
+                    ja: jaTitle,
+                  },
+                  price,
+                  priceWithTax,
+                  url: url.startsWith('http') ? url : `https://order.mandarake.co.jp${url}`,
+                  imageUrl: imageUrl.startsWith('http')
+                    ? imageUrl
+                    : `https://order.mandarake.co.jp${imageUrl}`,
+                  status,
+                  shopInfo,
+                  itemCode,
+                  priceRange,
+                  isNewArrival: $(element).find('.new_arrival').length > 0,
+                }
+              }
+              return null
+            } catch (itemError) {
+              console.error('Error parsing item data:', itemError)
+              return null
+            }
+          })
+          .get(),
+      )
 
-      return items
+      return processedItems.filter((item): item is ProductItemEntity => item !== null)
     } catch (error: unknown) {
       if (error instanceof Error) throw error
-
       throw new Error('Unknown error occurred during crawling')
     }
   }

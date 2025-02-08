@@ -1,5 +1,8 @@
 export type ProductItemEntity = {
-  title: string
+  title: {
+    en: string
+    ja: string
+  }
   price: number
   priceWithTax: number
   url: string

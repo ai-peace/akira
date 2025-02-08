@@ -225,28 +225,45 @@ const ChatBubbleProduct = ({
       </ChatBubble>
       <div className="grid w-full grid-cols-3 gap-2">
         {products.slice(0, 9).map((product) => (
-          <>
-            <Card key={product.title} className="overflow-hidden shadow-none">
-              <a href={product.url} target="_blank" rel="noopener noreferrer">
-                <div className="relative flex h-40 w-full items-center justify-center">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={product.imageUrl}
-                    alt={product.title}
-                    width={100}
-                    height={100}
-                    className="absolute inset-0 h-full w-full object-cover"
-                  />
+          <Card
+            key={`${product.itemCode}-${product.title.en}`}
+            className="overflow-hidden shadow-none"
+          >
+            <a href={product.url} target="_blank" rel="noopener noreferrer">
+              <div className="relative flex h-40 w-full items-center justify-center">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={product.imageUrl}
+                  alt={product.title.en}
+                  width={100}
+                  height={100}
+                  className="absolute inset-0 h-full w-full object-cover"
+                />
+              </div>
+              <div className="flex flex-col p-2">
+                <div className="group relative text-xs">
+                  <span>{product.title.en}</span>
+                  <span className="invisible absolute -top-8 left-0 whitespace-nowrap rounded bg-gray-800 p-2 text-xs text-white group-hover:visible">
+                    {product.title.ja}
+                  </span>
                 </div>
-                <div className="flex flex-col p-2">
-                  <div className="text-xs">{product.title}</div>
-                  <div className="mt-2 text-sm text-red-500">
-                    ${Math.round(product.price / 150)}
+                <div className="mt-2 flex items-center justify-between">
+                  <div className="text-sm text-red-500">${Math.round(product.price / 150)}</div>
+                  <div
+                    className={`text-xs ${
+                      product.status === 'In Stock'
+                        ? 'text-green-600'
+                        : product.status === 'Out of Stock'
+                          ? 'text-red-600'
+                          : 'text-yellow-600'
+                    }`}
+                  >
+                    {product.status}
                   </div>
                 </div>
-              </a>
-            </Card>
-          </>
+              </div>
+            </a>
+          </Card>
         ))}
       </div>
     </>

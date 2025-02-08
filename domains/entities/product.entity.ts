@@ -1,9 +1,14 @@
 export type ProductEntity = {
-  title: string
+  title: {
+    en: string
+    ja: string
+  }
   price: number
   priceWithTax?: number
   condition?: string
   description?: string
   imageUrl?: string
   url?: string
+  status: string
+  itemCode: string
 }
