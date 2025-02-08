@@ -4,8 +4,9 @@ import ETypewriterText from '@/components/01_elements/ETypewriterText'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
+import { cn } from '@/lib/utils'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ArrowUp, Paperclip } from 'lucide-react'
+import { ArrowUp, Loader2, Paperclip } from 'lucide-react'
 import { FC, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
@@ -43,6 +44,7 @@ type Props = {
 
 const Component: FC<Props> = ({ onSubmit }) => {
   const [textareaHeight, setTextareaHeight] = useState('auto')
+  const [isSubmitting, setIsSubmitting] = useState(false)
   const lineHeight = 24
 
   const form = useForm<FormData>({
@@ -54,16 +56,24 @@ const Component: FC<Props> = ({ onSubmit }) => {
 
   const handleSubmit = async (data: FormData) => {
     try {
+      setIsSubmitting(true)
       await onSubmit(data.prompt)
       form.reset()
     } catch (error) {
       console.error(error)
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
   return (
     <form onSubmit={form.handleSubmit(handleSubmit)} className="flex h-full flex-col">
-      <div className="border-border-muted relative flex-grow rounded-lg border bg-background-muted p-4">
+      <div
+        className={cn(
+          'border-border-muted relative flex-grow rounded-lg border bg-background-muted p-4',
+          isSubmitting && 'opacity-20',
+        )}
+      >
         <Textarea
           {...form.register('prompt')}
           placeholder="Dragon Ball cel animation"
@@ -75,12 +85,15 @@ const Component: FC<Props> = ({ onSubmit }) => {
             e.target.style.height = `${newHeight}px`
             setTextareaHeight(`${newHeight}px`)
           }}
-          className="min-h-[24px] resize-none border-0 bg-transparent p-0 pb-12 text-lg text-foreground-strong shadow-none focus-visible:ring-0"
+          className={
+            'min-h-[24px] resize-none border-0 bg-transparent p-0 pb-12 text-lg text-foreground-strong shadow-none focus-visible:ring-0'
+          }
           style={{
             overflow: parseInt(textareaHeight) >= lineHeight * 18 ? 'auto' : 'hidden',
             lineHeight: '24px',
             height: textareaHeight,
           }}
+          disabled={isSubmitting}
         />
         {form.formState.errors.prompt && (
           <p className="mt-1 text-sm text-red-500">{form.formState.errors.prompt.message}</p>
@@ -95,12 +108,16 @@ const Component: FC<Props> = ({ onSubmit }) => {
               type="submit"
               className="rounded-lg bg-foreground px-4 py-2 hover:bg-foreground/80"
             >
-              <ArrowUp className="h-4 w-4" />
+              {isSubmitting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <ArrowUp className="h-4 w-4" />
+              )}
             </Button>
           </div>
         </div>
       </div>
-      <div className="mt-4 flex flex-wrap justify-center gap-3">
+      <div className={cn('mt-4 flex flex-wrap justify-center gap-3', isSubmitting && 'opacity-10')}>
         {topPageKeywords.map((keyword, index) => (
           <Badge
             key={keyword}
