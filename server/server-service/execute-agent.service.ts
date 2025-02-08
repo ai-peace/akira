@@ -1,10 +1,16 @@
 import { PromptGroupEntity } from '@/domains/entities/prompt-group.entity'
-import { LlmStatus } from '@prisma/client'
 import { applicationServerConst } from '../server-const/appilication.server-const'
 import { prisma } from '../server-lib/prisma'
 import { generateUniqueKey } from '../server-lib/uuid'
 import { promptGroupMapper } from '../server-mappers/prompt-group/index.mapper'
 import { RareItemSearchService } from './rare-item-search.service'
+import { KeywordPair } from '@/server/domains/entities/prompt.entity'
+
+type LlmStatus = 'IDLE' | 'PROCESSING' | 'SUCCESS' | 'FAILED'
+const LlmStatus = {
+  PROCESSING: 'PROCESSING' as const,
+  SUCCESS: 'SUCCESS' as const,
+} as const
 
 const execute = async (chatUniqueKey: string, question: string): Promise<PromptGroupEntity> => {
   try {
@@ -41,8 +47,12 @@ const execute = async (chatUniqueKey: string, question: string): Promise<PromptG
       },
     })
 
-    const searchablePrompt = promptGroup.prompts.find((p) => p.resultType === 'RARE_ITEM_SEARCH')
-    const firstResponsePrompt = promptGroup.prompts.find((p) => p.resultType === 'FIRST_RESPONSE')
+    const searchablePrompt = promptGroup.prompts.find(
+      (p: { resultType: string | null }) => p.resultType === 'RARE_ITEM_SEARCH',
+    )
+    const firstResponsePrompt = promptGroup.prompts.find(
+      (p: { resultType: string | null }) => p.resultType === 'FIRST_RESPONSE',
+    )
 
     if (!searchablePrompt || !firstResponsePrompt) throw new Error('Prompt not found')
 
@@ -80,7 +90,7 @@ const askRareItemSearch = async (promptUniqueKey: string, keyword: string) => {
   const service = await RareItemSearchService.create(applicationServerConst.openai.apiKey)
   const result = await service.searchItems(keyword)
 
-  let keywords: string[] = []
+  let keywords: KeywordPair[] = []
   if (result.length > 0) keywords = await service.extractKeywords(result)
 
   if (result.length === 0) {

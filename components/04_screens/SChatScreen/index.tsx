@@ -8,6 +8,7 @@ import { ProductEntity } from '@/domains/entities/product.entity'
 import { useChat } from '@/hooks/resources/chats/useChat'
 import { FC, Fragment, useEffect, useRef, useState } from 'react'
 import { ECenteredLoadingSpinner } from '@/components/01_elements/ECenteredLoadingSpinner'
+import { KeywordPair } from '@/server/domains/entities/prompt.entity'
 
 type Props = {
   chatUniqueKey: string
@@ -55,7 +56,7 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
         })
       }, 100)
     }
-  }, [chat?.promptGroups?.length])
+  }, [chat?.promptGroups?.length, chat])
 
   const handleCreateChatPromptGroup = async (question: string) => {
     setOptimisticPromptGroup({ question: question })
@@ -68,9 +69,9 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
     }
   }
 
-  const handleCreateChatPromptGroupByKeyword = async (keyword: string) => {
-    setOptimisticPromptGroup({ question: keyword })
-    await createChatPromptGroup(keyword)
+  const handleCreateChatPromptGroupByKeyword = async (keyword: KeywordPair) => {
+    setOptimisticPromptGroup({ question: keyword.en })
+    await createChatPromptGroup(keyword.ja)
     if (messageListRef.current) {
       messageListRef.current.scrollTo({
         top: messageListRef.current.scrollHeight,
@@ -125,7 +126,9 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
                                     {prompt.result?.keywords &&
                                       prompt.result?.keywords.length > 0 && (
                                         <RelativeKeywords
-                                          keywords={prompt.result.keywords}
+                                          keywords={
+                                            prompt.result.keywords as unknown as KeywordPair[]
+                                          }
                                           handleCreateChatPromptGroupByKeyword={
                                             handleCreateChatPromptGroupByKeyword
                                           }
@@ -277,7 +280,7 @@ const RelativeKeywords = ({
   handleCreateChatPromptGroupByKeyword,
 }: {
   keywords: KeywordPair[]
-  handleCreateChatPromptGroupByKeyword: (keyword: string) => void
+  handleCreateChatPromptGroupByKeyword: (keyword: KeywordPair) => void
 }) => {
   return (
     <>
@@ -288,9 +291,7 @@ const RelativeKeywords = ({
             <div
               key={keyword.en}
               className="cursor-pointer underline hover:no-underline hover:opacity-20"
-              onClick={() => {
-                handleCreateChatPromptGroupByKeyword(keyword.ja)
-              }}
+              onClick={() => handleCreateChatPromptGroupByKeyword(keyword)}
             >
               {keyword.en}
             </div>
