@@ -8,6 +8,7 @@ import { ProductEntity } from '@/domains/entities/product.entity'
 export class RareItemSearchService {
   private agentExecutor: AgentExecutor | null = null
   private extractKeywordsTool: ExtractKeywordsTool | null = null
+  private translator: ChatOpenAI | null = null
 
   static async create(openAIApiKey: string): Promise<RareItemSearchService> {
     const service = new RareItemSearchService()
@@ -44,13 +45,42 @@ export class RareItemSearchService {
       tools,
       verbose: false,
     })
+
+    this.translator = new ChatOpenAI({
+      modelName: 'gpt-3.5-turbo',
+      temperature: 0,
+      openAIApiKey,
+    })
+  }
+
+  private async translateToJapanese(text: string): Promise<string> {
+    if (!this.translator) throw new Error('Translator not initialized')
+
+    // 既に日本語の場合はそのまま返す
+    if (/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/.test(text)) {
+      return text
+    }
+
+    const response = await this.translator.invoke([
+      [
+        'system',
+        'You are a translator. Translate the following text to Japanese, keeping product names in their original form.',
+      ],
+      ['human', text],
+    ])
+
+    return response.content as string
   }
 
   async searchItems(keyword: string): Promise<ProductEntity[]> {
     if (!this.agentExecutor) throw new Error('Service not initialized')
 
+    // キーワードを日本語に翻訳
+    const japaneseKeyword = await this.translateToJapanese(keyword)
+    console.log('Translated keyword:', japaneseKeyword)
+
     const result = await this.agentExecutor.invoke({
-      input: `Search for rare items on Mandarake using the keyword "${keyword}". Focus on finding the most interesting and valuable items.`,
+      input: `Search for rare items on Mandarake using the keyword "${japaneseKeyword}". Focus on finding the most interesting and valuable items.`,
     })
 
     try {
