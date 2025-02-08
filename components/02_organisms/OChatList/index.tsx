@@ -11,7 +11,7 @@ const Component = ({ chats }: Props) => {
   return (
     <div className="my-3">
       <div className="mb-2 flex items-center justify-between font-semibold">
-        Users' digg histories
+        Users&apos; digg histories
       </div>
       {chats.map((chat) => (
         <div key={chat.uniqueKey}>

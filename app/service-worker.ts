@@ -1,6 +1,12 @@
 /// <reference lib="webworker" />
 
-export default null
+const serviceWorker = {
+  scope: '/',
+  register: true,
+  sw: '/sw.js',
+}
+
+export default serviceWorker
 
 declare let self: ServiceWorkerGlobalScope
 
