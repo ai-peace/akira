@@ -9,6 +9,7 @@ import { useChat } from '@/hooks/resources/chats/useChat'
 import { FC, Fragment, useEffect, useRef, useState } from 'react'
 import { ECenteredLoadingSpinner } from '@/components/01_elements/ECenteredLoadingSpinner'
 import { KeywordPair } from '@/server/domains/entities/prompt.entity'
+import { Skeleton } from '@/components/ui/skeleton'
 
 type Props = {
   chatUniqueKey: string
@@ -123,17 +124,16 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
                                       products={prompt.result?.data}
                                       message={prompt.result?.message || ''}
                                     />
-                                    {prompt.result?.keywords &&
-                                      prompt.result?.keywords.length > 0 && (
-                                        <RelativeKeywords
-                                          keywords={
-                                            prompt.result.keywords as unknown as KeywordPair[]
-                                          }
-                                          handleCreateChatPromptGroupByKeyword={
-                                            handleCreateChatPromptGroupByKeyword
-                                          }
-                                        />
-                                      )}
+                                    {prompt.result?.keywords && (
+                                      <RelativeKeywords
+                                        keywords={
+                                          prompt.result.keywords as unknown as KeywordPair[]
+                                        }
+                                        handleCreateChatPromptGroupByKeyword={
+                                          handleCreateChatPromptGroupByKeyword
+                                        }
+                                      />
+                                    )}
                                   </>
                                 )}
                                 {prompt.resultType === 'FIRST_RESPONSE' && (
@@ -296,23 +296,31 @@ const RelativeKeywords = ({
   keywords,
   handleCreateChatPromptGroupByKeyword,
 }: {
-  keywords: KeywordPair[]
-  handleCreateChatPromptGroupByKeyword: (keyword: KeywordPair) => void
+  keywords: { en: string; ja: string }[] | null
+  handleCreateChatPromptGroupByKeyword: (keyword: { en: string; ja: string }) => void
 }) => {
   return (
     <>
       <div>
         <div className="mb-2 text-xs font-bold">Relative keywords</div>
         <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs">
-          {keywords?.slice(0, 10).map((keyword) => (
-            <div
-              key={keyword.en}
-              className="cursor-pointer underline hover:no-underline hover:opacity-20"
-              onClick={() => handleCreateChatPromptGroupByKeyword(keyword)}
-            >
-              {keyword.en} <span className="text-xs">({keyword.ja})</span>
+          {keywords && keywords.length > 0 ? (
+            keywords?.slice(0, 10).map((keyword) => (
+              <div
+                key={keyword.en}
+                className="cursor-pointer underline hover:no-underline hover:opacity-20"
+                onClick={() => handleCreateChatPromptGroupByKeyword(keyword)}
+              >
+                {keyword.en} <span className="text-xs">({keyword.ja})</span>
+              </div>
+            ))
+          ) : (
+            <div className="mt-1 flex flex-wrap gap-x-4 gap-y-2">
+              {Array.from({ length: 10 }).map((_, index) => (
+                <Skeleton key={index} className="h-3 w-20 rounded-full" />
+              ))}
             </div>
-          ))}
+          )}
         </div>
       </div>
     </>

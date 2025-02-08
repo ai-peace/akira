@@ -94,6 +94,7 @@ export class RareItemSearchService {
           result: {
             message: `Found ${transformedItems.length} items matching your search.`,
             data: transformedItems,
+            keywords: [],
           },
           llmStatus: 'SUCCESS',
           resultType: transformedItems.length > 0 ? 'FOUND_PRODUCT_ITEMS' : 'NO_PRODUCT_ITEMS',
