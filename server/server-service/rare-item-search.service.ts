@@ -33,7 +33,7 @@ export class RareItemSearchService {
     const prompt = ChatPromptTemplate.fromMessages([
       [
         'system',
-        'You are a helpful assistant that searches for rare items on Mandarake. You will use the mandarake_crawler tool to search for items and analyze the results. JSON format is required.',
+        'You are a helpful assistant that searches for rare items on Mandarake. You will use the mandarake_crawler tool to search for items and return ALL results without filtering or sorting. Return the complete JSON data as is.',
       ],
       ['human', '{input}'],
       new MessagesPlaceholder('agent_scratchpad'),
@@ -82,20 +82,26 @@ export class RareItemSearchService {
 
     // キーワードを日本語に翻訳
     const japaneseKeyword = await this.translateToJapanese(keyword)
-    console.log('Translated keyword:', japaneseKeyword)
+    // console.log('Translated keyword:', japaneseKeyword)
 
     const result = await this.agentExecutor.invoke({
-      input: `Search for rare items on Mandarake using the keyword "${japaneseKeyword}". Focus on finding the most interesting and valuable items.`,
+      input: `Search for items on Mandarake using the keyword "${japaneseKeyword}". Return all items without filtering.`,
     })
+
+    console.log('result--------------------------------', result.output, '||?')
 
     try {
       // JSON文字列を抽出する
       const jsonMatch = result.output.match(/```json\n([\s\S]*?)\n```/)
-      if (!jsonMatch) return []
+      if (!jsonMatch) {
+        console.log('No JSON data found in output:', result.output)
+        return []
+      }
 
       const jsonData = JSON.parse(jsonMatch[1])
+      console.log('Parsed items count:', jsonData.items?.length || 0)
 
-      return jsonData.items.map((item: any) => ({
+      const transformedItems = (jsonData.items || []).map((item: any) => ({
         title: item.title,
         price: item.price,
         priceWithTax: item.priceWithTax,
@@ -103,7 +109,15 @@ export class RareItemSearchService {
         description: `Available at: ${item.shopInfo}${item.priceRange ? ` ${item.priceRange}` : ''}`,
         imageUrl: item.imageUrl,
         url: item.url,
+        status: item.status || 'Unknown',
+        itemCode: item.itemCode || item.url.split('itemCode=')[1]?.split('&')[0] || 'Unknown',
       }))
+
+      // console.log(transformedItems)
+      // console.log('transformedItems--------------------------------', transformedItems.length)
+
+      console.log('Transformed items count:', transformedItems.length)
+      return transformedItems
     } catch (error) {
       console.error('Failed to parse response:', result.output)
       throw new Error('Failed to parse agent response as JSON')

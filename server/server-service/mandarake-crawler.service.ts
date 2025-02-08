@@ -2,6 +2,7 @@ import { Tool } from '@langchain/core/tools'
 import * as cheerio from 'cheerio'
 import { ProductItemEntity } from '../../domains/entities/product-item.entity'
 import { OpenAI } from 'openai'
+import { saveHtml } from '../utils/save-html'
 
 export class MandarakeCrawlerTool extends Tool {
   private openai: OpenAI
@@ -42,6 +43,7 @@ export class MandarakeCrawlerTool extends Tool {
   async _call(keyword: string): Promise<string> {
     try {
       const items = await this.searchItems(keyword)
+      console.log('items--------------------------------', items, '||||||||||||||||||||||||||||')
       return JSON.stringify(items, null, 2)
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -85,11 +87,6 @@ export class MandarakeCrawlerTool extends Tool {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
 
-      const contentLength = response.headers.get('content-length')
-      if (contentLength && parseInt(contentLength) > 4_000_000) {
-        throw new Error('Response too large')
-      }
-
       const chunks = []
       const reader = response.body?.getReader()
       if (!reader) throw new Error('Failed to get response reader')
@@ -108,8 +105,8 @@ export class MandarakeCrawlerTool extends Tool {
       }
 
       const content = new TextDecoder().decode(allChunks)
+      saveHtml('mandarake', content, ['tmp'])
       const $ = cheerio.load(content)
-      const items: ProductItemEntity[] = []
 
       const processedItems = await Promise.all(
         $('.block')
@@ -117,12 +114,18 @@ export class MandarakeCrawlerTool extends Tool {
             try {
               const jaTitle = $(element).find('.title').text().trim()
               const priceText = $(element).find('.price').text().trim()
+              console.log('Processing item:', { jaTitle, priceText })
 
               const basePrice = priceText.match(/^[\d,]+/)?.[0] || ''
               const taxIncludedPrice = priceText.match(/\(税込\s*([\d,]+)円\)/)?.[1] || ''
 
               const price = parseInt(basePrice.replace(/,/g, '')) || 0
               const priceWithTax = parseInt(taxIncludedPrice.replace(/,/g, '')) || 0
+
+              if (!jaTitle || !price) {
+                console.log('Skipping item due to missing title or price:', { jaTitle, price })
+                return null
+              }
 
               const url = $(element).find('.title a').attr('href') || ''
               const imageUrl = $(element).find('.thum img').attr('src') || ''
@@ -131,27 +134,26 @@ export class MandarakeCrawlerTool extends Tool {
               const itemCode = $(element).find('.itemno').text().trim()
               const priceRange = $(element).find('.price_range').text().trim()
 
-              if (jaTitle && price) {
-                const enTitle = await this.translateTitle(jaTitle)
-                return {
-                  title: {
-                    en: enTitle,
-                    ja: jaTitle,
-                  },
-                  price,
-                  priceWithTax,
-                  url: url.startsWith('http') ? url : `https://order.mandarake.co.jp${url}`,
-                  imageUrl: imageUrl.startsWith('http')
-                    ? imageUrl
-                    : `https://order.mandarake.co.jp${imageUrl}`,
-                  status,
-                  shopInfo,
-                  itemCode,
-                  priceRange,
-                  isNewArrival: $(element).find('.new_arrival').length > 0,
-                }
+              const enTitle = await this.translateTitle(jaTitle)
+              console.log('Translated title:', { ja: jaTitle, en: enTitle })
+
+              return {
+                title: {
+                  en: enTitle,
+                  ja: jaTitle,
+                },
+                price,
+                priceWithTax,
+                url: url.startsWith('http') ? url : `https://order.mandarake.co.jp${url}`,
+                imageUrl: imageUrl.startsWith('http')
+                  ? imageUrl
+                  : `https://order.mandarake.co.jp${imageUrl}`,
+                status,
+                shopInfo,
+                itemCode,
+                priceRange,
+                isNewArrival: $(element).find('.new_arrival').length > 0,
               }
-              return null
             } catch (itemError) {
               console.error('Error parsing item data:', itemError)
               return null
@@ -160,7 +162,12 @@ export class MandarakeCrawlerTool extends Tool {
           .get(),
       )
 
-      return processedItems.filter((item): item is ProductItemEntity => item !== null)
+      const filteredItems = processedItems.filter(
+        (item): item is ProductItemEntity => item !== null,
+      )
+      console.log('filteredItems--------------------------------', filteredItems)
+      console.log('Total items after filtering:', filteredItems.length)
+      return filteredItems
     } catch (error: unknown) {
       if (error instanceof Error) throw error
       throw new Error('Unknown error occurred during crawling')
