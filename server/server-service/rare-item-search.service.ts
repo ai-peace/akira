@@ -4,6 +4,7 @@ import { ExtractKeywordsTool } from './extract-keywords.service'
 import { ProductEntity } from '@/domains/entities/product.entity'
 import { prisma } from '../server-lib/prisma'
 import { generateUniqueKey } from '../server-lib/uuid'
+import { MandarakeUrlGeneratorService } from './mandarake-url-generator.service'
 
 type KeywordPair = {
   en: string
@@ -14,6 +15,28 @@ export class RareItemSearchService {
   private mandarakeCrawler: MandarakeCrawlerTool | null = null
   private extractKeywordsTool: ExtractKeywordsTool | null = null
   private translator: ChatOpenAI | null = null
+  private urlGenerator: MandarakeUrlGeneratorService | null = null
+  private readonly YEN_PER_DOLLAR = 150
+
+  private convertPrice(
+    priceInYen: number,
+    originalQuery: string,
+  ): { price: number; currency: string } {
+    // ドル関連のキーワードを検出
+    const dollarKeywords = /(\$|dollar|doller|ドル|USD)/i
+    const isDollarQuery = dollarKeywords.test(originalQuery)
+
+    if (isDollarQuery) {
+      return {
+        price: Math.round(priceInYen / this.YEN_PER_DOLLAR),
+        currency: '$',
+      }
+    }
+    return {
+      price: priceInYen,
+      currency: '¥',
+    }
+  }
 
   static async create(openAIApiKey: string): Promise<RareItemSearchService> {
     const service = new RareItemSearchService()
@@ -29,6 +52,7 @@ export class RareItemSearchService {
       temperature: 0,
       openAIApiKey,
     })
+    this.urlGenerator = new MandarakeUrlGeneratorService(openAIApiKey)
   }
 
   private async translateToJapanese(text: string): Promise<string> {
@@ -51,15 +75,18 @@ export class RareItemSearchService {
   }
 
   async searchItems(keyword: string, promptUniqueKey: string): Promise<ProductEntity[]> {
-    if (!this.mandarakeCrawler) throw new Error('Service not initialized')
+    if (!this.mandarakeCrawler || !this.urlGenerator) throw new Error('Service not initialized')
     if (!promptUniqueKey) throw new Error('promptUniqueKey is required')
 
     try {
       // キーワードを日本語に翻訳
       const japaneseKeyword = await this.translateToJapanese(keyword)
 
+      // 検索URLを生成
+      const searchUrl = await this.urlGenerator.generateSearchUrl(japaneseKeyword)
+
       // クローラーを直接呼び出し
-      const result = await this.mandarakeCrawler._call(japaneseKeyword)
+      const result = await this.mandarakeCrawler._call(searchUrl)
 
       // 結果のパース
       let items: any[] = []
@@ -73,17 +100,26 @@ export class RareItemSearchService {
       }
 
       // 結果を変換
-      const transformedItems = items.map((item: any) => ({
-        title: item.title,
-        price: item.price,
-        priceWithTax: item.priceWithTax,
-        condition: item.status || 'Unknown',
-        description: `Available at: ${item.shopInfo}${item.priceRange ? ` ${item.priceRange}` : ''}`,
-        imageUrl: item.imageUrl,
-        url: item.url,
-        status: item.status || 'Unknown',
-        itemCode: item.itemCode || item.url.split('itemCode=')[1]?.split('&')[0] || 'Unknown',
-      }))
+      const transformedItems = items.map((item: any) => {
+        const { price: convertedPrice, currency } = this.convertPrice(item.price, keyword)
+        const { price: convertedPriceWithTax, currency: taxCurrency } = this.convertPrice(
+          item.priceWithTax || 0,
+          keyword,
+        )
+
+        return {
+          title: item.title,
+          price: convertedPrice,
+          priceWithTax: convertedPriceWithTax,
+          currency,
+          condition: item.status || 'Unknown',
+          description: `Available at: ${item.shopInfo}${item.priceRange ? ` ${item.priceRange}` : ''}`,
+          imageUrl: item.imageUrl,
+          url: item.url,
+          status: item.status || 'Unknown',
+          itemCode: item.itemCode || item.url.split('itemCode=')[1]?.split('&')[0] || 'Unknown',
+        }
+      })
 
       // プロンプトを更新
       await prisma.prompt.update({

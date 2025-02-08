@@ -9,7 +9,7 @@ export class ExtractKeywordsTool extends Tool {
   constructor(openAIApiKey: string) {
     super()
     this.model = new ChatOpenAI({
-      modelName: 'gpt-4',
+      modelName: 'gpt-3.5-turbo',
       temperature: 0,
       openAIApiKey,
     })

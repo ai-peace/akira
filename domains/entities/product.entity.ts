@@ -5,6 +5,7 @@ export type ProductEntity = {
   }
   price: number
   priceWithTax?: number
+  currency: string
   condition?: string
   description?: string
   imageUrl?: string

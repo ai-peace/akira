@@ -53,7 +53,9 @@ export class MandarakeCrawlerTool extends Tool {
   }
 
   private async searchItems(keyword: string): Promise<ProductItemEntity[]> {
-    const url = `https://order.mandarake.co.jp/order/listPage/list?keyword=${encodeURIComponent(keyword)}`
+    const url = keyword.startsWith('http')
+      ? keyword
+      : `https://order.mandarake.co.jp/order/listPage/list?keyword=${encodeURIComponent(keyword)}`
 
     try {
       const controller = new AbortController()
