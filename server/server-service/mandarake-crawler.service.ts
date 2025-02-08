@@ -120,7 +120,6 @@ export class MandarakeCrawlerTool extends Tool {
               const taxIncludedPrice = priceText.match(/\(税込\s*([\d,]+)円\)/)?.[1] || ''
 
               const price = parseInt(basePrice.replace(/,/g, '')) || 0
-              console.log('price', price)
               const priceWithTax = parseInt(taxIncludedPrice.replace(/,/g, '')) || 0
 
               if (!jaTitle || !price) {
