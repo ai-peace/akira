@@ -22,7 +22,6 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
   } | null>(null)
   const messageListRef = useRef<HTMLDivElement>(null)
 
-  // 初回ロード時のスクロール
   useEffect(() => {
     if (!chatIsLoading && chat && messageListRef.current) {
       messageListRef.current.scrollTo({
@@ -32,12 +31,32 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
     }
   }, [chat, chatIsLoading])
 
-  // chatに変更がある場合optimistic prompt group を非表示にする
   useEffect(() => {
     setOptimisticPromptGroup(null)
   }, [chat])
 
-  // 検索開始時のスクロール
+  useEffect(() => {
+    if (optimisticPromptGroup && messageListRef.current) {
+      setTimeout(() => {
+        messageListRef.current?.scrollTo({
+          top: messageListRef.current.scrollHeight,
+          behavior: 'smooth',
+        })
+      }, 100)
+    }
+  }, [optimisticPromptGroup])
+
+  useEffect(() => {
+    if (chat && messageListRef.current) {
+      setTimeout(() => {
+        messageListRef.current?.scrollTo({
+          top: messageListRef.current.scrollHeight,
+          behavior: 'smooth',
+        })
+      }, 100)
+    }
+  }, [chat?.promptGroups?.length])
+
   const handleCreateChatPromptGroup = async (question: string) => {
     setOptimisticPromptGroup({ question: question })
     await createChatPromptGroup(question)
