@@ -76,7 +76,8 @@ export class MandarakeCrawlerTool extends Tool {
       console.log(content)
       console.log('================================================================')
 
-      await saveHtml('mandarake', content, ['tmp', 'cache'])
+      // デバッグ用
+      // await saveHtml('mandarake', content, ['tmp', 'cache'])
 
       const $ = cheerio.load(content)
 
