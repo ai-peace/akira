@@ -1,9 +1,9 @@
 import { ChatOpenAI } from '@langchain/openai'
 import { MandarakeCrawlerTool } from './mandarake-crawler.service'
 import { ExtractKeywordsTool } from './extract-keywords.service'
-import { ChatPromptTemplate, MessagesPlaceholder } from '@langchain/core/prompts'
-import { AgentExecutor, createOpenAIFunctionsAgent } from 'langchain/agents'
 import { ProductEntity } from '@/domains/entities/product.entity'
+import { prisma } from '../server-lib/prisma'
+import { generateUniqueKey } from '../server-lib/uuid'
 
 type KeywordPair = {
   en: string
@@ -11,7 +11,7 @@ type KeywordPair = {
 }
 
 export class RareItemSearchService {
-  private agentExecutor: AgentExecutor | null = null
+  private mandarakeCrawler: MandarakeCrawlerTool | null = null
   private extractKeywordsTool: ExtractKeywordsTool | null = null
   private translator: ChatOpenAI | null = null
 
@@ -22,35 +22,8 @@ export class RareItemSearchService {
   }
 
   private async initialize(openAIApiKey: string): Promise<void> {
-    const tools = [new MandarakeCrawlerTool(openAIApiKey)]
+    this.mandarakeCrawler = new MandarakeCrawlerTool(openAIApiKey)
     this.extractKeywordsTool = new ExtractKeywordsTool(openAIApiKey)
-    const model = new ChatOpenAI({
-      modelName: 'gpt-4o-mini',
-      temperature: 0,
-      openAIApiKey,
-    })
-
-    const prompt = ChatPromptTemplate.fromMessages([
-      [
-        'system',
-        'You are a helpful assistant that searches for rare items on Mandarake. You will use the mandarake_crawler tool to search for items and return ALL results without filtering or sorting. Return the complete JSON data as is.',
-      ],
-      ['human', '{input}'],
-      new MessagesPlaceholder('agent_scratchpad'),
-    ])
-
-    const agent = await createOpenAIFunctionsAgent({
-      llm: model,
-      tools,
-      prompt,
-    })
-
-    this.agentExecutor = new AgentExecutor({
-      agent,
-      tools,
-      verbose: false,
-    })
-
     this.translator = new ChatOpenAI({
       modelName: 'gpt-3.5-turbo',
       temperature: 0,
@@ -77,31 +50,32 @@ export class RareItemSearchService {
     return response.content as string
   }
 
-  async searchItems(keyword: string): Promise<ProductEntity[]> {
-    if (!this.agentExecutor) throw new Error('Service not initialized')
-
-    // キーワードを日本語に翻訳
-    const japaneseKeyword = await this.translateToJapanese(keyword)
-    // console.log('Translated keyword:', japaneseKeyword)
-
-    const result = await this.agentExecutor.invoke({
-      input: `Search for items on Mandarake using the keyword "${japaneseKeyword}". Return all items without filtering.`,
-    })
-
-    console.log('result--------------------------------', result.output, '||?')
+  async searchItems(keyword: string, promptUniqueKey: string): Promise<ProductEntity[]> {
+    if (!this.mandarakeCrawler) throw new Error('Service not initialized')
+    if (!promptUniqueKey) throw new Error('promptUniqueKey is required')
 
     try {
-      // JSON文字列を抽出する
-      const jsonMatch = result.output.match(/```json\n([\s\S]*?)\n```/)
-      if (!jsonMatch) {
-        console.log('No JSON data found in output:', result.output)
+      // キーワードを日本語に翻訳
+      const japaneseKeyword = await this.translateToJapanese(keyword)
+
+      // クローラーを直接呼び出し
+      const result = await this.mandarakeCrawler._call(japaneseKeyword)
+
+      // 結果のパース
+      let items: any[] = []
+      try {
+        const parsed = JSON.parse(result)
+        items = Array.isArray(parsed) ? parsed : parsed.items || []
+      } catch (parseError) {
+        console.error('Failed to parse crawler result:', parseError)
+        await this.updatePromptWithError(promptUniqueKey, 'Failed to parse crawler result')
         return []
       }
 
-      const jsonData = JSON.parse(jsonMatch[1])
-      console.log('Parsed items count:', jsonData.items?.length || 0)
+      console.log('Raw items count:', items.length)
 
-      const transformedItems = (jsonData.items || []).map((item: any) => ({
+      // 結果を変換
+      const transformedItems = items.map((item: any) => ({
         title: item.title,
         price: item.price,
         priceWithTax: item.priceWithTax,
@@ -113,14 +87,98 @@ export class RareItemSearchService {
         itemCode: item.itemCode || item.url.split('itemCode=')[1]?.split('&')[0] || 'Unknown',
       }))
 
-      // console.log(transformedItems)
-      // console.log('transformedItems--------------------------------', transformedItems.length)
+      // プロンプトを更新
+      await prisma.prompt.update({
+        where: {
+          uniqueKey: promptUniqueKey,
+        },
+        data: {
+          result: {
+            message: `Found ${transformedItems.length} items matching your search.`,
+            data: transformedItems,
+          },
+          llmStatus: 'SUCCESS',
+          resultType: transformedItems.length > 0 ? 'FOUND_PRODUCT_ITEMS' : 'NO_PRODUCT_ITEMS',
+        },
+      })
 
-      console.log('Transformed items count:', transformedItems.length)
+      // 非同期でキーワード抽出を開始
+      this.extractAndUpdateKeywords(transformedItems, promptUniqueKey).catch((error) => {
+        console.error('Failed to extract keywords:', error)
+      })
+
       return transformedItems
     } catch (error) {
-      console.error('Failed to parse response:', result.output)
-      throw new Error('Failed to parse agent response as JSON')
+      console.error('Failed to fetch items:', error)
+      await this.updatePromptWithError(promptUniqueKey, 'Failed to fetch items from Mandarake')
+      throw new Error('Failed to fetch items from Mandarake')
+    }
+  }
+
+  private async updatePromptWithError(
+    promptUniqueKey: string,
+    errorMessage: string,
+  ): Promise<void> {
+    try {
+      await prisma.prompt.update({
+        where: {
+          uniqueKey: promptUniqueKey,
+        },
+        data: {
+          result: { message: errorMessage },
+          llmStatus: 'FAILED',
+          resultType: 'ERROR',
+        },
+      })
+    } catch (error) {
+      console.error('Failed to update prompt with error:', error)
+    }
+  }
+
+  private async extractAndUpdateKeywords(
+    items: ProductEntity[],
+    promptUniqueKey: string,
+  ): Promise<void> {
+    if (!this.extractKeywordsTool) {
+      throw new Error('Service not initialized')
+    }
+
+    try {
+      const keywords = await this.extractKeywords(items)
+
+      const currentPrompt = await prisma.prompt.findUnique({
+        where: { uniqueKey: promptUniqueKey },
+        select: { result: true },
+      })
+
+      const updatedResult = {
+        ...currentPrompt?.result,
+        message: `Found ${items.length} items matching your search.`,
+        data: items,
+        keywords: keywords,
+      }
+
+      await prisma.prompt.update({
+        where: { uniqueKey: promptUniqueKey },
+        data: {
+          result: updatedResult,
+        },
+      })
+    } catch (error) {
+      console.error('Failed to extract and update keywords:', error)
+      // キーワード抽出に失敗しても、他のデータは保持する
+      const updatedResult = {
+        message: `Found ${items.length} items matching your search.`,
+        data: items,
+        keywords: [],
+      }
+
+      await prisma.prompt.update({
+        where: { uniqueKey: promptUniqueKey },
+        data: {
+          result: updatedResult,
+        },
+      })
     }
   }
 
@@ -129,11 +187,45 @@ export class RareItemSearchService {
       throw new Error('Service not initialized')
     }
 
-    const result = await this.extractKeywordsTool.invoke(JSON.stringify(items))
     try {
-      return JSON.parse(result)
+      const japaneseItems = items.map((item) => item.title.ja).join('\n')
+
+      const result = await this.extractKeywordsTool.invoke(japaneseItems)
+
+      try {
+        // 文字列が有効なJSONかどうかを確認
+        if (typeof result !== 'string' || !result.trim().startsWith('[')) {
+          console.error('Invalid JSON response:', result)
+          return []
+        }
+
+        const parsedResult = JSON.parse(result)
+
+        // 配列であることを確認し、各要素がKeywordPairの形式に従っているか検証
+        if (!Array.isArray(parsedResult)) {
+          console.error('Response is not an array:', parsedResult)
+          return []
+        }
+
+        const validKeywords = parsedResult.filter((item): item is KeywordPair => {
+          return (
+            item &&
+            typeof item === 'object' &&
+            'en' in item &&
+            'ja' in item &&
+            typeof item.en === 'string' &&
+            typeof item.ja === 'string'
+          )
+        })
+
+        return validKeywords
+      } catch (parseError) {
+        console.error('Failed to parse keywords response:', result)
+        console.error('Parse error:', parseError)
+        return []
+      }
     } catch (error) {
-      console.error('Failed to parse keywords response:', result)
+      console.error('Failed to extract keywords:', error)
       return []
     }
   }

@@ -88,7 +88,7 @@ const generateFirstResponse = async (promptUniqueKey: string, message: string) =
 
 const askRareItemSearch = async (promptUniqueKey: string, keyword: string) => {
   const service = await RareItemSearchService.create(applicationServerConst.openai.apiKey)
-  const result = await service.searchItems(keyword)
+  const result = await service.searchItems(keyword, promptUniqueKey)
 
   let keywords: KeywordPair[] = []
   if (result.length > 0) keywords = await service.extractKeywords(result)

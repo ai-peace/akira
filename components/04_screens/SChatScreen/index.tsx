@@ -224,19 +224,19 @@ const ChatBubbleProduct = ({
         </ChatBubbleMessage>
       </ChatBubble>
       <div className="grid w-full grid-cols-3 gap-2">
-        {products.slice(0, 9).map((product) => (
+        {products.slice(0, 20).map((product) => (
           <Card
             key={`${product.itemCode}-${product.title.en}`}
             className="overflow-hidden shadow-none"
           >
             <a href={product.url} target="_blank" rel="noopener noreferrer">
-              <div className="relative flex h-40 w-full items-center justify-center">
+              <div className="relative flex h-[320px] w-full items-center justify-center">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={product.imageUrl}
                   alt={product.title.en}
                   width={100}
-                  height={100}
+                  height={300}
                   className="absolute inset-0 h-full w-full object-cover"
                 />
               </div>
