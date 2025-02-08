@@ -23,6 +23,32 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
     question: string
   } | null>(null)
   const messageListRef = useRef<HTMLDivElement>(null)
+  const [currentPromptId, setCurrentPromptId] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!messageListRef.current) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setCurrentPromptId(entry.target.id)
+          }
+        })
+      },
+      {
+        root: messageListRef.current,
+        threshold: 0.5,
+      },
+    )
+
+    const elements = document.querySelectorAll('[data-prompt-group]')
+    elements.forEach((element) => observer.observe(element))
+
+    return () => {
+      elements.forEach((element) => observer.unobserve(element))
+    }
+  }, [chat?.promptGroups])
 
   useEffect(() => {
     if (!chatIsLoading && chat && messageListRef.current) {
@@ -104,7 +130,11 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
                   return (
                     <Fragment key={promptGroup.uniqueKey}>
                       {/* 質問 */}
-                      <div id={promptGroup.uniqueKey} className="flex justify-end">
+                      <div
+                        id={promptGroup.uniqueKey}
+                        data-prompt-group
+                        className="flex justify-end"
+                      >
                         <ChatBubble variant="sent">
                           <ChatBubbleAvatar fallback="Y" />
                           <ChatBubbleMessage variant="sent">
@@ -190,7 +220,11 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
             {chat.promptGroups?.map((promptGroup) => (
               <div
                 key={promptGroup.uniqueKey}
-                className="cursor-pointer truncate text-xs text-gray-500 hover:text-gray-700"
+                className={`cursor-pointer truncate text-xs transition-colors ${
+                  currentPromptId === promptGroup.uniqueKey
+                    ? 'bg-gray-100 text-gray-900'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
                 onClick={() => {
                   const element = document.getElementById(promptGroup.uniqueKey)
                   element?.scrollIntoView({ behavior: 'smooth' })
