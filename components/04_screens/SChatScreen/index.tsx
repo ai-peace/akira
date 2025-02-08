@@ -276,7 +276,7 @@ const RelativeKeywords = ({
   keywords,
   handleCreateChatPromptGroupByKeyword,
 }: {
-  keywords: string[]
+  keywords: KeywordPair[]
   handleCreateChatPromptGroupByKeyword: (keyword: string) => void
 }) => {
   return (
@@ -286,13 +286,13 @@ const RelativeKeywords = ({
         <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs">
           {keywords?.slice(0, 10).map((keyword) => (
             <div
-              key={keyword}
+              key={keyword.en}
               className="cursor-pointer underline hover:no-underline hover:opacity-20"
               onClick={() => {
-                handleCreateChatPromptGroupByKeyword(keyword)
+                handleCreateChatPromptGroupByKeyword(keyword.ja)
               }}
             >
-              {keyword}
+              {keyword.en}
             </div>
           ))}
         </div>

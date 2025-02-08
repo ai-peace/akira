@@ -21,15 +21,17 @@ export class ExtractKeywordsTool extends Tool {
       const items: ProductItemEntity[] = JSON.parse(input)
 
       const prompt = `
-以下の商品リストから特徴的なキーワードを20個抽出してください。
+以下の商品リストから特徴的なキーワードを20個抽出し、日本語と英語のペアを作成してください。
 商品のタイトル、状態、ショップ情報などから、コレクターにとって重要な特徴を表すキーワードを選んでください。
-キーワードは配列形式で返してください。
+以下の形式でJSONを返してください：
+
+[
+  { "en": "English Keyword", "ja": "日本語キーワード" },
+  ...
+]
 
 商品リスト:
 ${JSON.stringify(items, null, 2)}
-
-出力形式:
-["キーワード1", "キーワード2", ...]
 `
 
       const response = await this.model.invoke(prompt)

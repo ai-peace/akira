@@ -5,6 +5,11 @@ import { ChatPromptTemplate, MessagesPlaceholder } from '@langchain/core/prompts
 import { AgentExecutor, createOpenAIFunctionsAgent } from 'langchain/agents'
 import { ProductEntity } from '@/domains/entities/product.entity'
 
+type KeywordPair = {
+  en: string
+  ja: string
+}
+
 export class RareItemSearchService {
   private agentExecutor: AgentExecutor | null = null
   private extractKeywordsTool: ExtractKeywordsTool | null = null
@@ -105,7 +110,7 @@ export class RareItemSearchService {
     }
   }
 
-  async extractKeywords(items: ProductEntity[]): Promise<string[]> {
+  async extractKeywords(items: ProductEntity[]): Promise<KeywordPair[]> {
     if (!this.extractKeywordsTool) {
       throw new Error('Service not initialized')
     }
