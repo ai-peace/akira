@@ -248,7 +248,9 @@ const ChatBubbleProduct = ({
                   </span>
                 </div>
                 <div className="mt-2 flex items-center justify-between">
-                  <div className="text-sm text-red-500">${Math.round(product.price / 150)}</div>
+                  <div className="text-sm text-red-500">
+                    ${Math.round(product.price / 150).toLocaleString()}
+                  </div>
                   <div
                     className={`text-xs ${
                       product.status === 'In Stock'

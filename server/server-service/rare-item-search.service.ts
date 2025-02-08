@@ -16,27 +16,6 @@ export class RareItemSearchService {
   private extractKeywordsTool: ExtractKeywordsTool | null = null
   private translator: ChatOpenAI | null = null
   private urlGenerator: MandarakeUrlGeneratorService | null = null
-  private readonly YEN_PER_DOLLAR = 150
-
-  private convertPrice(
-    priceInYen: number,
-    originalQuery: string,
-  ): { price: number; currency: string } {
-    // ドル関連のキーワードを検出
-    const dollarKeywords = /(\$|dollar|doller|ドル|USD)/i
-    const isDollarQuery = dollarKeywords.test(originalQuery)
-
-    if (isDollarQuery) {
-      return {
-        price: Math.round(priceInYen / this.YEN_PER_DOLLAR),
-        currency: '$',
-      }
-    }
-    return {
-      price: priceInYen,
-      currency: '¥',
-    }
-  }
 
   static async create(openAIApiKey: string): Promise<RareItemSearchService> {
     const service = new RareItemSearchService()
@@ -101,17 +80,11 @@ export class RareItemSearchService {
 
       // 結果を変換
       const transformedItems = items.map((item: any) => {
-        const { price: convertedPrice, currency } = this.convertPrice(item.price, keyword)
-        const { price: convertedPriceWithTax, currency: taxCurrency } = this.convertPrice(
-          item.priceWithTax || 0,
-          keyword,
-        )
-
         return {
           title: item.title,
-          price: convertedPrice,
-          priceWithTax: convertedPriceWithTax,
-          currency,
+          price: item.price,
+          priceWithTax: item.priceWithTax,
+          currency: item.currency,
           condition: item.status || 'Unknown',
           description: `Available at: ${item.shopInfo}${item.priceRange ? ` ${item.priceRange}` : ''}`,
           imageUrl: item.imageUrl,

@@ -155,6 +155,7 @@ Price Parameters:
 ${priceRange?.min ? `- Minimum Price: minPrice=${priceRange.min}` : ''}
 ${priceRange?.max ? `- Maximum Price: maxPrice=${priceRange.max}` : ''}
 
+
 Sort Parameters:
 ${sortType ? `- Sort: sort=${sortType}` : ''}
 
@@ -162,7 +163,7 @@ Item Conditions:
 ${sellType ? `- Item Type: goodsSellType=${sellType}` : ''}
 ${stockType ? `- Stock Status: goodsZaiko=${stockType}` : ''}
 
-Base URL: https://order.mandarake.co.jp/order/listPage/list
+Base URL: https://order.mandarake.co.jp/order/listPage/list?dispAdult=0
 
 Return only the URL.
 Do not include categoryCode parameter if categoryHints is empty.
