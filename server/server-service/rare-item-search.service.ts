@@ -72,8 +72,6 @@ export class RareItemSearchService {
         return []
       }
 
-      console.log('Raw items count:', items.length)
-
       // 結果を変換
       const transformedItems = items.map((item: any) => ({
         title: item.title,

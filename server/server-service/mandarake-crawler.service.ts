@@ -43,7 +43,6 @@ export class MandarakeCrawlerTool extends Tool {
   async _call(keyword: string): Promise<string> {
     try {
       const items = await this.searchItems(keyword)
-      console.log('items--------------------------------', items, '||||||||||||||||||||||||||||')
       return JSON.stringify(items, null, 2)
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -114,7 +113,6 @@ export class MandarakeCrawlerTool extends Tool {
             try {
               const jaTitle = $(element).find('.title').text().trim()
               const priceText = $(element).find('.price').text().trim()
-              console.log('Processing item:', { jaTitle, priceText })
 
               const basePrice = priceText.match(/^[\d,]+/)?.[0] || ''
               const taxIncludedPrice = priceText.match(/\(税込\s*([\d,]+)円\)/)?.[1] || ''
@@ -123,7 +121,6 @@ export class MandarakeCrawlerTool extends Tool {
               const priceWithTax = parseInt(taxIncludedPrice.replace(/,/g, '')) || 0
 
               if (!jaTitle || !price) {
-                console.log('Skipping item due to missing title or price:', { jaTitle, price })
                 return null
               }
 
@@ -135,7 +132,6 @@ export class MandarakeCrawlerTool extends Tool {
               const priceRange = $(element).find('.price_range').text().trim()
 
               const enTitle = await this.translateTitle(jaTitle)
-              console.log('Translated title:', { ja: jaTitle, en: enTitle })
 
               return {
                 title: {
@@ -165,8 +161,6 @@ export class MandarakeCrawlerTool extends Tool {
       const filteredItems = processedItems.filter(
         (item): item is ProductItemEntity => item !== null,
       )
-      console.log('filteredItems--------------------------------', filteredItems)
-      console.log('Total items after filtering:', filteredItems.length)
       return filteredItems
     } catch (error: unknown) {
       if (error instanceof Error) throw error
