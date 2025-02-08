@@ -66,6 +66,18 @@ const Component: FC<Props> = ({ onSubmit }) => {
     }
   }
 
+  const handleKeywordClick = (keyword: string) => {
+    form.setValue('prompt', keyword)
+    const textareaElement = document.querySelector('textarea')
+    if (textareaElement) {
+      textareaElement.style.height = 'auto'
+      const maxHeight = lineHeight * 18
+      const newHeight = Math.min(textareaElement.scrollHeight, maxHeight)
+      textareaElement.style.height = `${newHeight}px`
+      setTextareaHeight(`${newHeight}px`)
+    }
+  }
+
   return (
     <form onSubmit={form.handleSubmit(handleSubmit)} className="flex h-full flex-col">
       <div
@@ -123,9 +135,7 @@ const Component: FC<Props> = ({ onSubmit }) => {
             key={keyword}
             variant="secondary"
             className="cursor-pointer hover:bg-foreground/10"
-            onClick={() => {
-              handleSubmit({ prompt: keyword })
-            }}
+            onClick={() => handleKeywordClick(keyword)}
           >
             <ETypewriterText text={keyword} delay={20 * index} />
           </Badge>

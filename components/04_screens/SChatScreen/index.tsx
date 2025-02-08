@@ -1,15 +1,13 @@
 'use client'
-import { EResizablePanel } from '@/components/01_elements/EResizablePanel'
 import ETypewriterText from '@/components/01_elements/ETypewriterText'
-import { OChatList } from '@/components/02_organisms/OChatList'
 import { OChatTextarea } from '@/components/02_organisms/OChatTextarea'
-import { TChatLists } from '@/components/03_templates/TChatLists'
 import { Card } from '@/components/ui/card'
 import { ChatBubble, ChatBubbleAvatar, ChatBubbleMessage } from '@/components/ui/chat/chat-bubble'
 import { ChatMessageList } from '@/components/ui/chat/chat-message-list'
 import { ProductEntity } from '@/domains/entities/product.entity'
 import { useChat } from '@/hooks/resources/chats/useChat'
-import { FC, Fragment, useRef, useEffect } from 'react'
+import { FC, Fragment, useEffect, useRef } from 'react'
+import { ECenteredLoadingSpinner } from '@/components/01_elements/ECenteredLoadingSpinner'
 
 type Props = {
   chatUniqueKey: string
@@ -52,7 +50,12 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
     }
   }
 
-  if (chatIsLoading) return <div>Loading...</div>
+  if (chatIsLoading)
+    return (
+      <div className="relative flex h-full w-full">
+        <ECenteredLoadingSpinner />
+      </div>
+    )
   if (!chat) return <div>Chat not found</div>
   if (chatError) return <div>Error: {chatError.message}</div>
 
@@ -146,7 +149,7 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
         </div>
 
         {/* 目次セクション */}
-        <div className="fixed right-0 top-0 hidden h-full w-64 overflow-y-auto border-l border-gray-200 p-4 lg:block">
+        {/* <div className="fixed right-0 top-0 hidden h-full w-64 overflow-y-auto border-l border-gray-200 p-4 lg:block">
           <div className="mb-4 text-sm font-medium">Chat history</div>
           <div className="space-y-2">
             {chat.promptGroups?.map((promptGroup) => (
@@ -162,7 +165,7 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
               </div>
             ))}
           </div>
-        </div>
+        </div> */}
       </div>
     </>
   )

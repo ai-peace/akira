@@ -46,7 +46,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <section className="flex h-screen bg-background-muted pl-[72px]">
             <OGlobalSideMenu />
             <section className="w-full bg-background text-foreground">
-              <div className="flex h-full">
+              <div className="relative flex h-full">
                 <TChatLists />
                 {children}
               </div>
