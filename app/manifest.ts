@@ -17,8 +17,8 @@ export default function manifest(): MetadataRoute.Manifest {
     display: 'standalone',
     dir: 'auto',
     lang: 'ja',
-    name: 'Agent Rare',
-    short_name: 'Agent Rare',
+    name: 'AKIRA',
+    short_name: 'AKIRA',
     start_url: '/',
     scope: '/',
   }

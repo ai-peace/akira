@@ -5,13 +5,13 @@ import { Toaster } from '@/components/ui/toaster'
 import '@/styles/globals.css'
 import type { Metadata } from 'next'
 export const metadata: Metadata = {
-  title: 'Agent Rare',
-  description: 'Agent Rare App',
+  title: 'AKIRA',
+  description: 'AKIRA App',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'Agent Rare',
+    title: 'AKIRA',
   },
   formatDetection: {
     telephone: false,
@@ -34,10 +34,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
         <meta name="theme-color" content="#0A0A0A" media="(prefers-color-scheme: dark)" />
-        <meta name="application-name" content="Agent Rare" />
+        <meta name="application-name" content="AKIRA" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="Agent Rare" />
+        <meta name="apple-mobile-web-app-title" content="AKIRA" />
         <meta name="mobile-web-app-capable" content="yes" />
         <link rel="apple-touch-icon" href="/icon-192x192.png" />
       </head>
