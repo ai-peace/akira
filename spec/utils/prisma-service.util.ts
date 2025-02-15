@@ -4,7 +4,10 @@ export class PrismaService extends PrismaClient {
   private static instance: PrismaService
 
   private constructor() {
-    super()
+    super({
+      log: [], // すべてのログを完全に無効化
+      errorFormat: 'minimal',
+    })
   }
 
   public static getInstance(): PrismaService {
@@ -22,5 +25,4 @@ export class PrismaService extends PrismaClient {
     await this.$disconnect()
   }
 }
-
 export const prisma = PrismaService.getInstance()

@@ -88,36 +88,5 @@ const generateFirstResponse = async (promptUniqueKey: string, message: string) =
 
 const askRareItemSearch = async (promptUniqueKey: string, keyword: string) => {
   const service = await RareItemSearchService.create(applicationServerConst.openai.apiKey)
-  const result = await service.searchItems(keyword, promptUniqueKey)
-
-  let keywords: KeywordPair[] = []
-  if (result.length > 0) keywords = await service.extractKeywords(result)
-
-  if (result.length === 0) {
-    await prisma.prompt.update({
-      where: {
-        uniqueKey: promptUniqueKey,
-      },
-      data: {
-        result: { message: `No items found for "${keyword}"` },
-        llmStatus: LlmStatus.SUCCESS,
-        resultType: 'NO_PRODUCT_ITEMS',
-      },
-    })
-  } else {
-    await prisma.prompt.update({
-      where: {
-        uniqueKey: promptUniqueKey,
-      },
-      data: {
-        result: {
-          message: `Found ${result.length} items matching your search.`,
-          data: result,
-          keywords: keywords || [],
-        },
-        llmStatus: LlmStatus.SUCCESS,
-        resultType: 'FOUND_PRODUCT_ITEMS',
-      },
-    })
-  }
+  await service.searchItems(keyword, promptUniqueKey)
 }
