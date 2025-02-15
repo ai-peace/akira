@@ -1,13 +1,13 @@
 import { ProductEntity } from '@/domains/entities/product.entity'
 import { prisma } from '../server-lib/prisma'
-import { NewMandarakeCrawlerTool } from '../server-service/refactor/new-mandarake-crawler.service'
+import { MandarakeCrawlerTool } from '../server-service/mandarake-crawler.service'
 
 export class SearchProductItemUsecase {
   private promptUniqueKey: string
-  private searchService: NewMandarakeCrawlerTool
+  private searchService: MandarakeCrawlerTool
   private jpKeywords: string
 
-  constructor(promptUniqueKey: string, searchService: NewMandarakeCrawlerTool, jpKeywords: string) {
+  constructor(promptUniqueKey: string, searchService: MandarakeCrawlerTool, jpKeywords: string) {
     this.promptUniqueKey = promptUniqueKey
     this.searchService = searchService
     this.jpKeywords = jpKeywords

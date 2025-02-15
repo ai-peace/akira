@@ -1,7 +1,7 @@
 import { ProductEntity } from '@/domains/entities/product.entity'
 import { prisma } from '@/server/server-lib/prisma'
 import { BaseChatModel } from '@langchain/core/language_models/chat_models'
-import { ExtractKeywordsTool } from '../extract-keywords.service'
+import { ExtractKeywordsTool } from './extract-keywords.service'
 
 export const extractAndUpdateKeywordsService = async (
   promptUniqueKey: string,

@@ -2,7 +2,6 @@ import { getChatCollection } from '@/server/router/chats'
 import { createChat } from '@/server/router/chats/create'
 import { createChatPromptGroup } from '@/server/router/chats/prompt-groups/create'
 import { getChat } from '@/server/router/chats/show'
-import { searchRareItems } from '@/server/router/rare-items/search'
 import { Hono } from 'hono'
 import { handle } from 'hono/vercel'
 
@@ -11,7 +10,6 @@ const hono = new Hono().basePath('/api')
 hono.route('/', getChat)
 hono.route('/', getChatCollection)
 hono.route('/', createChat)
-hono.route('/', searchRareItems)
 hono.route('/', createChatPromptGroup)
 
 export const GET = handle(hono)

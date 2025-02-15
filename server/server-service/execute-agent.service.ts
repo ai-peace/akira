@@ -5,9 +5,9 @@ import { prisma } from '../server-lib/prisma'
 import { generateUniqueKey } from '../server-lib/uuid'
 import { promptGroupMapper } from '../server-mappers/prompt-group/index.mapper'
 import { SearchProductItemUsecase } from '../server-usecase/search-product-item.usecase'
-import { extractAndUpdateKeywordsService } from './refactor/extract-and-update-keywords.service'
-import { NewMandarakeCrawlerTool } from './refactor/new-mandarake-crawler.service'
-import { translateToJpService } from './refactor/translate-to-jp.service'
+import { extractAndUpdateKeywordsService } from './extract-and-update-keywords.service'
+import { MandarakeCrawlerTool } from './mandarake-crawler.service'
+import { translateToJpService } from './translate-to-jp.service'
 
 type LlmStatus = 'IDLE' | 'PROCESSING' | 'SUCCESS' | 'FAILED'
 const LlmStatus = {
@@ -104,7 +104,7 @@ const askRareItemSearch = async (promptUniqueKey: string, keyword: string) => {
     temperature: 0,
     openAIApiKey: applicationServerConst.openai.apiKey,
   })
-  const crawler = new NewMandarakeCrawlerTool(crawlerModel)
+  const crawler = new MandarakeCrawlerTool(crawlerModel)
 
   // 商品を検索
   const usecase = new SearchProductItemUsecase(promptUniqueKey, crawler, translatedKeyword)
