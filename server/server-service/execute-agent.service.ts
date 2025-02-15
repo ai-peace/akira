@@ -1,9 +1,13 @@
 import { PromptGroupEntity } from '@/domains/entities/prompt-group.entity'
+import { ChatOpenAI } from '@langchain/openai'
 import { applicationServerConst } from '../server-const/appilication.server-const'
 import { prisma } from '../server-lib/prisma'
 import { generateUniqueKey } from '../server-lib/uuid'
 import { promptGroupMapper } from '../server-mappers/prompt-group/index.mapper'
-import { RareItemSearchService } from './rare-item-search.service'
+import { SearchProductItemUsecase } from '../server-usecase/search-product-item.usecase'
+import { extractAndUpdateKeywordsService } from './refactor/extract-and-update-keywords.service'
+import { NewMandarakeCrawlerTool } from './refactor/new-mandarake-crawler.service'
+import { translateToJpService } from './refactor/translate-to-jp.service'
 
 type LlmStatus = 'IDLE' | 'PROCESSING' | 'SUCCESS' | 'FAILED'
 const LlmStatus = {
@@ -86,6 +90,35 @@ const generateFirstResponse = async (promptUniqueKey: string, message: string) =
 }
 
 const askRareItemSearch = async (promptUniqueKey: string, keyword: string) => {
-  const service = await RareItemSearchService.create(applicationServerConst.openai.apiKey)
-  await service.searchItems(keyword, promptUniqueKey)
+  // キーワードを日本語に変換
+  const translatorModel = new ChatOpenAI({
+    modelName: 'gpt-3.5-turbo',
+    temperature: 0,
+    openAIApiKey: applicationServerConst.openai.apiKey,
+  })
+  const translatedKeyword = await translateToJpService(keyword, translatorModel)
+
+  // クローラーの設定
+  const crawlerModel = new ChatOpenAI({
+    modelName: 'gpt-4o-mini',
+    temperature: 0,
+    openAIApiKey: applicationServerConst.openai.apiKey,
+  })
+  const crawler = new NewMandarakeCrawlerTool(crawlerModel)
+
+  // 商品を検索
+  const usecase = new SearchProductItemUsecase(promptUniqueKey, crawler, translatedKeyword)
+  const productEntities = await usecase.execute()
+
+  // キーワードを抽出する　？これってここの責務？
+  const extractorModel = new ChatOpenAI({
+    modelName: 'gpt-3.5-turbo',
+    temperature: 0,
+    openAIApiKey: applicationServerConst.openai.apiKey,
+  })
+  extractAndUpdateKeywordsService(promptUniqueKey, productEntities, extractorModel).catch(
+    (error) => {
+      console.error('Failed to extract keywords:', error)
+    },
+  )
 }

@@ -1,39 +1,29 @@
 import { ProductEntity } from '@/domains/entities/product.entity'
 import { prisma } from '../server-lib/prisma'
 import { NewMandarakeCrawlerTool } from '../server-service/refactor/new-mandarake-crawler.service'
-import { translateToJpService } from '../server-service/refactor/translate-to-jp.service'
-import { BaseChatModel } from '@langchain/core/language_models/chat_models'
-import { extractAndUpdateKeywordsService } from '../server-service/refactor/extract-and-update-keywords.service'
 
 export class SearchProductItemUsecase {
   private promptUniqueKey: string
-  private llmModel: BaseChatModel
   private searchService: NewMandarakeCrawlerTool
+  private jpKeywords: string
 
-  constructor(
-    promptUniqueKey: string,
-    llmModel: BaseChatModel,
-    searchService: NewMandarakeCrawlerTool,
-  ) {
+  constructor(promptUniqueKey: string, searchService: NewMandarakeCrawlerTool, jpKeywords: string) {
     this.promptUniqueKey = promptUniqueKey
-    this.llmModel = llmModel
     this.searchService = searchService
+    this.jpKeywords = jpKeywords
   }
 
-  async execute(keyword: string, promptUniqueKey: string) {
-    // 1. キーワードを日本語に変換する
-    const japaneseKeyword = await translateToJpService(keyword, this.llmModel)
+  async execute(): Promise<ProductEntity[]> {
+    // 検索サービスを実行する
+    const searchResults = await this.searchService._call(this.jpKeywords)
 
-    // 2. 検索サービスを実行する
-    const searchResults = await this.searchService._call(japaneseKeyword)
-
-    // 3. 検索結果をパースする
+    // 検索結果をパースする
     const productEntities = await this.parseResult(searchResults)
 
-    // 4. 検索結果を元にプロンプトを更新する
+    // 検索結果を元にプロンプトを更新する
     await prisma.prompt.update({
       where: {
-        uniqueKey: promptUniqueKey,
+        uniqueKey: this.promptUniqueKey,
       },
       data: {
         result: {
@@ -46,12 +36,7 @@ export class SearchProductItemUsecase {
       },
     })
 
-    // 5. キーワードを抽出する
-    extractAndUpdateKeywordsService(promptUniqueKey, productEntities, this.llmModel).catch(
-      (error) => {
-        console.error('Failed to extract keywords:', error)
-      },
-    )
+    return productEntities
   }
 
   private async parseResult(result: any): Promise<ProductEntity[]> {
