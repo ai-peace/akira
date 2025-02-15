@@ -1,8 +1,8 @@
-import { ChatOpenAI } from '@langchain/openai'
+import { BaseChatModel } from '@langchain/core/language_models/chat_models'
 
 export const translateToJpService = async (
   text: string,
-  translator: ChatOpenAI,
+  translator: BaseChatModel,
 ): Promise<string> => {
   if (!translator) throw new Error('Translator not initialized')
 

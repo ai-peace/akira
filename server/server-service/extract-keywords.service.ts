@@ -1,18 +1,14 @@
 import { Tool } from '@langchain/core/tools'
-import { ChatOpenAI } from '@langchain/openai'
+import { BaseChatModel } from '@langchain/core/language_models/chat_models'
 
 export class ExtractKeywordsTool extends Tool {
   name = 'extract_keywords'
   description = 'Extract 20 characteristic keywords from Mandarake items'
-  private model: ChatOpenAI
+  private model: BaseChatModel
 
-  constructor(openAIApiKey: string) {
+  constructor(model: BaseChatModel) {
     super()
-    this.model = new ChatOpenAI({
-      modelName: 'gpt-3.5-turbo',
-      temperature: 0,
-      openAIApiKey,
-    })
+    this.model = model
   }
 
   async _call(input: string): Promise<string> {

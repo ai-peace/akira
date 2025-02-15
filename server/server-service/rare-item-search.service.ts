@@ -2,18 +2,13 @@ import { ProductEntity } from '@/domains/entities/product.entity'
 import { ChatOpenAI } from '@langchain/openai'
 import { prisma } from '../server-lib/prisma'
 import { ExtractKeywordsTool } from './extract-keywords.service'
-import { MandarakeCrawlerTool } from './mandarake-crawler.service'
 import { MandarakeUrlGeneratorService } from './mandarake-url-generator.service'
 import { extractAndUpdateKeywordsService } from './refactor/extract-and-update-keywords.service'
 import { translateToJpService } from './refactor/translate-to-jp.service'
-
-type KeywordPair = {
-  en: string
-  ja: string
-}
+import { NewMandarakeCrawlerTool } from './refactor/new-mandarake-crawler.service'
 
 export class RareItemSearchService {
-  private mandarakeCrawler: MandarakeCrawlerTool | null = null
+  private mandarakeCrawler: NewMandarakeCrawlerTool | null = null
   private extractKeywordsTool: ExtractKeywordsTool | null = null
   private translator: ChatOpenAI | null = null
   private urlGenerator: MandarakeUrlGeneratorService | null = null
@@ -25,13 +20,20 @@ export class RareItemSearchService {
   }
 
   private async initialize(openAIApiKey: string): Promise<void> {
-    this.mandarakeCrawler = new MandarakeCrawlerTool(openAIApiKey)
-    this.extractKeywordsTool = new ExtractKeywordsTool(openAIApiKey)
+    // this.mandarakeCrawler = new MandarakeCrawlerTool(openAIApiKey)
+    const translator = new ChatOpenAI({
+      modelName: 'gpt-3.5-turbo',
+      temperature: 0,
+      openAIApiKey,
+    })
+    this.mandarakeCrawler = new NewMandarakeCrawlerTool(translator)
+    this.extractKeywordsTool = new ExtractKeywordsTool(translator)
     this.translator = new ChatOpenAI({
       modelName: 'gpt-3.5-turbo',
       temperature: 0,
       openAIApiKey,
     })
+
     this.urlGenerator = new MandarakeUrlGeneratorService(openAIApiKey)
   }
 
@@ -44,11 +46,8 @@ export class RareItemSearchService {
       if (!this.translator) throw new Error('Translator not initialized')
       const japaneseKeyword = await translateToJpService(keyword, this.translator)
 
-      // 検索URLを生成
-      const searchUrl = await this.urlGenerator.generateSearchUrl(japaneseKeyword)
-
       // クローラーを直接呼び出し
-      const result = await this.mandarakeCrawler._call(searchUrl)
+      const result = await this.mandarakeCrawler._call(japaneseKeyword)
 
       // 結果のパース
       let items: any[] = []

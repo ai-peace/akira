@@ -4,7 +4,6 @@ import { prisma } from '../server-lib/prisma'
 import { generateUniqueKey } from '../server-lib/uuid'
 import { promptGroupMapper } from '../server-mappers/prompt-group/index.mapper'
 import { RareItemSearchService } from './rare-item-search.service'
-import { KeywordPair } from '@/server/domains/entities/prompt.entity'
 
 type LlmStatus = 'IDLE' | 'PROCESSING' | 'SUCCESS' | 'FAILED'
 const LlmStatus = {

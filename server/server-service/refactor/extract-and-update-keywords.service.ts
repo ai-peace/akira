@@ -1,24 +1,22 @@
 import { ProductEntity } from '@/domains/entities/product.entity'
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '@/server/server-lib/prisma'
+import { BaseChatModel } from '@langchain/core/language_models/chat_models'
 import { ExtractKeywordsTool } from '../extract-keywords.service'
 
 export const extractAndUpdateKeywordsService = async (
-  items: ProductEntity[],
   promptUniqueKey: string,
-  extractKeywordsTool: ExtractKeywordsTool,
-  prisma: PrismaClient,
+  productEntities: ProductEntity[],
+  llmModel: BaseChatModel,
 ): Promise<void> => {
-  if (!extractKeywordsTool) {
-    throw new Error('Service not initialized')
-  }
-
   try {
-    const japaneseItems = items.map((item) => item.title.ja).join('\n')
+    const extractKeywordsTool = new ExtractKeywordsTool(llmModel)
+
+    const japaneseItems = productEntities.map((item) => item.title.ja).join('\n')
     const keywords = await extractKeywordsTool.invoke(japaneseItems)
 
     const updatedResult = {
-      message: `Found ${items.length} items matching your search.`,
-      data: items,
+      message: `Found ${productEntities.length} items matching your search.`,
+      data: productEntities,
       keywords: JSON.parse(keywords),
     }
     await prisma.prompt.update({
@@ -31,8 +29,8 @@ export const extractAndUpdateKeywordsService = async (
     console.error('Failed to extract and update keywords:', error)
     // キーワード抽出に失敗しても、他のデータは保持する
     const updatedResult = {
-      message: `Found ${items.length} items matching your search.`,
-      data: items,
+      message: `Found ${productEntities.length} items matching your search.`,
+      data: productEntities,
       keywords: [],
     }
 
