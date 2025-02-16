@@ -1,7 +1,7 @@
 import { prisma } from '@/server/server-lib/prisma'
 import { generateUniqueKey } from '@/server/server-lib/uuid'
 import { chatMapper } from '@/server/server-mappers/chat/index.mapper'
-import { executeAgentService } from '@/server/server-service/execute-agent.service'
+import { generateUserResponseUsecase } from '@/server/server-usecase/generate-user-response.usecase'
 import { zValidator } from '@hono/zod-validator'
 import { Hono } from 'hono'
 import { createChatSchema } from './schema/create.schema'
@@ -26,7 +26,7 @@ const route = createChat.post('/chats', zValidator('json', createChatSchema), as
       },
     })
 
-    await executeAgentService.execute(chat.uniqueKey, data.mainPrompt)
+    await generateUserResponseUsecase.execute(chat.uniqueKey, data.mainPrompt)
 
     const chatEntity = chatMapper.toDomain(chat)
 

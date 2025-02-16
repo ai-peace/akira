@@ -1,4 +1,4 @@
-import { executeAgentService } from '@/server/server-service/execute-agent.service'
+import { generateUserResponseUsecase } from '@/server/server-usecase/generate-user-response.usecase'
 import { zValidator } from '@hono/zod-validator'
 import { Hono } from 'hono'
 import { createChatPromptGroupSchema } from './schema/create.schema'
@@ -13,7 +13,7 @@ const route = createChatPromptGroup.post(
       const uniqueKey = c.req.param('uniqueKey')
       const { question } = c.req.valid('json')
 
-      const promptGroupEntity = await executeAgentService.execute(uniqueKey, question)
+      const promptGroupEntity = await generateUserResponseUsecase.execute(uniqueKey, question)
 
       return c.json({ data: promptGroupEntity }, 201)
     } catch (error) {
