@@ -16,7 +16,11 @@ export class ExtractKeywordsTool extends Tool {
   async _call(input: string): Promise<string> {
     try {
       const prompt = extractKeywordsPrompts.extractKeywords(input)
-      const response = await this.model.invoke(prompt)
+      const response = await this.model.invoke([
+        ['system', extractKeywordsPrompts.extractKeywordsSystemPrompt],
+        ['human', prompt],
+      ])
+
       return response.content as string
     } catch (error: unknown) {
       if (error instanceof Error) {

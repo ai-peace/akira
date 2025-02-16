@@ -6,6 +6,7 @@ import { prisma } from '../server-lib/prisma'
 import { ExtractKeywordsTool } from '../server-service/tools/extract-keywords/index.tool'
 import { MandarakeCrawlerTool } from '../server-service/tools/mandarake-crawler/index.tool'
 import { TranslateToJapaneseTool } from '../server-service/tools/translate-to-japanese/index.tool'
+import { GeminiChatModel } from '../server-lib/llm/gemini.adapter'
 
 const execute = async (promptUniqueKey: string, query: string) => {
   // キーワードを日本語に変換
@@ -14,6 +15,10 @@ const execute = async (promptUniqueKey: string, query: string) => {
     temperature: 0,
     openAIApiKey: applicationServerConst.openai.apiKey,
   })
+  // const translatorModel = new GeminiChatModel({
+  //   apiKey: applicationServerConst.gemini.apiKey,
+  //   modelName: 'gemini-2.0-flash',
+  // })
   const translateToJapaneseTool = new TranslateToJapaneseTool(translatorModel)
   const translatedKeyword = await translateToJapaneseTool.invoke(query)
 
@@ -23,6 +28,11 @@ const execute = async (promptUniqueKey: string, query: string) => {
     temperature: 0,
     openAIApiKey: applicationServerConst.openai.apiKey,
   })
+  // const crawlerModel = new GeminiChatModel({
+  //   apiKey: applicationServerConst.gemini.apiKey,
+  //   modelName: 'gemini-1.5-flash',
+  //   temperature: 0,
+  // })
   const crawlerTool = new MandarakeCrawlerTool(crawlerModel)
   const result = await crawlerTool._call(translatedKeyword)
 
@@ -35,6 +45,7 @@ const execute = async (promptUniqueKey: string, query: string) => {
     temperature: 0,
     openAIApiKey: applicationServerConst.openai.apiKey,
   })
+  // const crawlerModel
   extractAndUpdateKeywords(promptUniqueKey, productEntities, extractorModel).catch((error) => {
     console.error('Failed to extract keywords:', error)
   })
@@ -120,11 +131,14 @@ const extractAndUpdateKeywords = async (
 
     const japaneseItems = productEntities.map((item) => item.title.ja).join('\n')
     const keywords = await extractKeywordsTool.invoke(japaneseItems)
-
+    console.log('keywords???????-1---------------', keywords)
+    const cleanText = keywords.replace(/^```json\n|\n```$/g, '')
+    const parsedKeywords = JSON.parse(cleanText)
+    console.log('parsedKeywords???????-2---------------', parsedKeywords)
     const updatedResult = {
       message: `Found ${productEntities.length} items matching your search.`,
       data: productEntities,
-      keywords: JSON.parse(keywords),
+      keywords: parsedKeywords,
     }
     await prisma.prompt.update({
       where: { uniqueKey: promptUniqueKey },

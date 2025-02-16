@@ -1,15 +1,20 @@
-const extractKeywords = (input: string) => `
-以下の商品リストから特徴的なキーワードを20個抽出し、日本語と英語のペアを作成してください。
-商品のタイトル、状態、ショップ情報などから、コレクターにとって重要な特徴を表すキーワードを選んでください。
-以下の形式でJSONを返してください：
+const extractKeywordsSystemPrompt = `You are a helpful assistant that extracts keywords from product listings.
+Your task is to extract 20 characteristic keywords and create Japanese-English pairs.
+Select keywords that represent important features for collectors from product titles, conditions, and shop information.
 
+IMPORTANT: You must respond with ONLY a valid JSON array in the following format, with no additional text or explanation:
 [
-  { "en": "English Keyword", "ja": "日本語キーワード" },
-  ...
+  { "en": "English Keyword", "ja": "Japanese Keyword" }
 ]
-
-商品リスト:
-${input}
 `
 
-export const extractKeywordsPrompts = { extractKeywords }
+const extractKeywords = (
+  input: string,
+) => `Analyze this product list and respond with only the JSON array:
+
+${input}`
+
+export const extractKeywordsPrompts = {
+  extractKeywords,
+  extractKeywordsSystemPrompt,
+}
