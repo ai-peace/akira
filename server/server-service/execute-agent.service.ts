@@ -100,7 +100,6 @@ const askRareItemSearch = async (promptUniqueKey: string, keyword: string) => {
     temperature: 0,
     openAIApiKey: applicationServerConst.openai.apiKey,
   })
-  const translateTool = new TranslateToJapaneseTool(translatorModel)
   const translatedKeyword = await translateToJpService(keyword, translatorModel)
 
   // クローラーの設定
@@ -110,23 +109,11 @@ const askRareItemSearch = async (promptUniqueKey: string, keyword: string) => {
     openAIApiKey: applicationServerConst.openai.apiKey,
   })
   const crawlerTool = new MandarakeCrawlerTool(crawlerModel)
-  // const result = await crawlerTool._call(translatedKeyword)
-
-  const agentExecutor = await initializeAgentExecutorWithOptions(
-    [translateTool, crawlerTool],
-    crawlerModel,
-    {
-      agentType: 'zero-shot-react-description',
-    },
-  )
-
-  const result = await agentExecutor.invoke({
-    input: keyword,
-  })
+  const result = await crawlerTool._call(translatedKeyword)
 
   console.log('-------------------', result)
 
-  const productEntities = await parseResult(promptUniqueKey, result.output)
+  const productEntities = await parseResult(promptUniqueKey, result)
   await savePromptAsSuccess(promptUniqueKey, productEntities)
 
   // ここまでがtools-------------------------------------------------------
