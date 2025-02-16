@@ -12,7 +12,8 @@ export class MandarakeCrawlerTool extends Tool {
   }
 
   name = 'mandarake_crawler'
-  description = 'Search for rare items on Mandarake'
+  description =
+    'Search for rare items on Mandarake. 検索ワードは日本語のみのため、事前に日本語に翻訳して利用する必要がある。'
 
   async _call(prompt: string): Promise<string> {
     try {

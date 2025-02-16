@@ -9,6 +9,8 @@ import { extractAndUpdateKeywordsService } from './extract-and-update-keywords.s
 import { MandarakeCrawlerTool } from './tools/mandarake-crawler.tool'
 import { translateToJpService } from './translate-to-jp.service'
 import { ProductEntity } from '@/domains/entities/product.entity'
+import { initializeAgentExecutorWithOptions } from 'langchain/agents'
+import { TranslateToJapaneseTool } from './tools/translate-to-japanese.tool'
 
 type LlmStatus = 'IDLE' | 'PROCESSING' | 'SUCCESS' | 'FAILED'
 const LlmStatus = {
@@ -98,6 +100,7 @@ const askRareItemSearch = async (promptUniqueKey: string, keyword: string) => {
     temperature: 0,
     openAIApiKey: applicationServerConst.openai.apiKey,
   })
+  const translateTool = new TranslateToJapaneseTool(translatorModel)
   const translatedKeyword = await translateToJpService(keyword, translatorModel)
 
   // クローラーの設定
@@ -106,10 +109,24 @@ const askRareItemSearch = async (promptUniqueKey: string, keyword: string) => {
     temperature: 0,
     openAIApiKey: applicationServerConst.openai.apiKey,
   })
-  const crawler = new MandarakeCrawlerTool(crawlerModel)
-  const result = await crawler._call(translatedKeyword)
+  const crawlerTool = new MandarakeCrawlerTool(crawlerModel)
+  // const result = await crawlerTool._call(translatedKeyword)
 
-  const productEntities = await parseResult(promptUniqueKey, result)
+  const agentExecutor = await initializeAgentExecutorWithOptions(
+    [translateTool, crawlerTool],
+    crawlerModel,
+    {
+      agentType: 'zero-shot-react-description',
+    },
+  )
+
+  const result = await agentExecutor.invoke({
+    input: keyword,
+  })
+
+  console.log('-------------------', result)
+
+  const productEntities = await parseResult(promptUniqueKey, result.output)
   await savePromptAsSuccess(promptUniqueKey, productEntities)
 
   // ここまでがtools-------------------------------------------------------
