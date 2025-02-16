@@ -1,5 +1,6 @@
 import { BaseChatModel } from '@langchain/core/language_models/chat_models'
 import { Tool } from 'langchain/tools'
+import { translateToJapanesePrompts } from './prompts'
 
 export class TranslateToJapaneseTool extends Tool {
   name = 'translate_to_japanese'
@@ -20,10 +21,7 @@ export class TranslateToJapaneseTool extends Tool {
     if (/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/.test(input)) return input
 
     const response = await this.translator.invoke([
-      [
-        'system',
-        'You are a translator. Translate the following text to Japanese, keeping product names in their original form.',
-      ],
+      ['system', translateToJapanesePrompts.translateSystemPrompt],
       ['human', input],
     ])
 

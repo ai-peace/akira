@@ -1,9 +1,11 @@
-import { Tool } from '@langchain/core/tools'
 import { BaseChatModel } from '@langchain/core/language_models/chat_models'
+import { Tool } from '@langchain/core/tools'
+import { extractKeywordsPrompts } from './prompts'
 
 export class ExtractKeywordsTool extends Tool {
   name = 'extract_keywords'
   description = 'Extract 20 characteristic keywords from Mandarake items'
+
   private model: BaseChatModel
 
   constructor(model: BaseChatModel) {
@@ -13,20 +15,7 @@ export class ExtractKeywordsTool extends Tool {
 
   async _call(input: string): Promise<string> {
     try {
-      const prompt = `
-以下の商品リストから特徴的なキーワードを20個抽出し、日本語と英語のペアを作成してください。
-商品のタイトル、状態、ショップ情報などから、コレクターにとって重要な特徴を表すキーワードを選んでください。
-以下の形式でJSONを返してください：
-
-[
-  { "en": "English Keyword", "ja": "日本語キーワード" },
-  ...
-]
-
-商品リスト:
-${input}
-`
-
+      const prompt = extractKeywordsPrompts.extractKeywords(input)
       const response = await this.model.invoke(prompt)
       return response.content as string
     } catch (error: unknown) {

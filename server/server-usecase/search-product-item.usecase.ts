@@ -3,9 +3,9 @@ import { BaseChatModel } from '@langchain/core/language_models/chat_models'
 import { ChatOpenAI } from '@langchain/openai'
 import { applicationServerConst } from '../server-const/appilication.server-const'
 import { prisma } from '../server-lib/prisma'
-import { ExtractKeywordsTool } from '../server-service/tools/extract-keywords.tool'
-import { MandarakeCrawlerTool } from '../server-service/tools/mandarake-crawler.tool'
-import { TranslateToJapaneseTool } from '../server-service/tools/translate-to-japanese.tool'
+import { ExtractKeywordsTool } from '../server-service/tools/extract-keywords/index.tool'
+import { MandarakeCrawlerTool } from '../server-service/tools/mandarake-crawler/index.tool'
+import { TranslateToJapaneseTool } from '../server-service/tools/translate-to-japanese/index.tool'
 
 const execute = async (promptUniqueKey: string, query: string) => {
   // キーワードを日本語に変換
