@@ -1,10 +1,11 @@
 import { ProductEntity } from '@/domains/entities/product.entity'
+import { BaseChatModel } from '@langchain/core/language_models/chat_models'
 import { ChatOpenAI } from '@langchain/openai'
 import { applicationServerConst } from '../server-const/appilication.server-const'
 import { prisma } from '../server-lib/prisma'
-import { extractAndUpdateKeywordsService } from '../server-service/extract-and-update-keywords.service'
+import { ExtractKeywordsTool } from '../server-service/tools/extract-keywords.tool'
 import { MandarakeCrawlerTool } from '../server-service/tools/mandarake-crawler.tool'
-import { translateToJpService } from '../server-service/translate-to-jp.service'
+import { TranslateToJapaneseTool } from '../server-service/tools/translate-to-japanese.tool'
 
 const execute = async (promptUniqueKey: string, query: string) => {
   // キーワードを日本語に変換
@@ -13,7 +14,8 @@ const execute = async (promptUniqueKey: string, query: string) => {
     temperature: 0,
     openAIApiKey: applicationServerConst.openai.apiKey,
   })
-  const translatedKeyword = await translateToJpService(query, translatorModel)
+  const translateToJapaneseTool = new TranslateToJapaneseTool(translatorModel)
+  const translatedKeyword = await translateToJapaneseTool.invoke(query)
 
   // クローラーの設定
   const crawlerModel = new ChatOpenAI({
@@ -33,11 +35,9 @@ const execute = async (promptUniqueKey: string, query: string) => {
     temperature: 0,
     openAIApiKey: applicationServerConst.openai.apiKey,
   })
-  extractAndUpdateKeywordsService(promptUniqueKey, productEntities, extractorModel).catch(
-    (error) => {
-      console.error('Failed to extract keywords:', error)
-    },
-  )
+  extractAndUpdateKeywords(promptUniqueKey, productEntities, extractorModel).catch((error) => {
+    console.error('Failed to extract keywords:', error)
+  })
 }
 
 export const searchProductItemUsecase = { execute }
@@ -107,5 +107,45 @@ const updatePromptWithError = async (
     })
   } catch (error) {
     console.error('Failed to update prompt with error:', error)
+  }
+}
+
+const extractAndUpdateKeywords = async (
+  promptUniqueKey: string,
+  productEntities: ProductEntity[],
+  llmModel: BaseChatModel,
+): Promise<void> => {
+  try {
+    const extractKeywordsTool = new ExtractKeywordsTool(llmModel)
+
+    const japaneseItems = productEntities.map((item) => item.title.ja).join('\n')
+    const keywords = await extractKeywordsTool.invoke(japaneseItems)
+
+    const updatedResult = {
+      message: `Found ${productEntities.length} items matching your search.`,
+      data: productEntities,
+      keywords: JSON.parse(keywords),
+    }
+    await prisma.prompt.update({
+      where: { uniqueKey: promptUniqueKey },
+      data: {
+        result: updatedResult,
+      },
+    })
+  } catch (error) {
+    console.error('Failed to extract and update keywords:', error)
+    // キーワード抽出に失敗しても、他のデータは保持する
+    const updatedResult = {
+      message: `Found ${productEntities.length} items matching your search.`,
+      data: productEntities,
+      keywords: [],
+    }
+
+    await prisma.prompt.update({
+      where: { uniqueKey: promptUniqueKey },
+      data: {
+        result: updatedResult,
+      },
+    })
   }
 }
