@@ -83,7 +83,6 @@ Generate a Mandarake search URL based on the following information:
 
 Search Keywords: ${keywords}
 Suggested Categories: ${categoryHints.join(', ')}
-Original User Query: ${prompt}
 
 Use these parameters to generate the URL:
 
