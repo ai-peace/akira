@@ -1,6 +1,6 @@
 import { ProductEntity } from '@/domains/entities/product.entity'
 import { prisma } from '../server-lib/prisma'
-import { MandarakeCrawlerTool } from '../server-service/mandarake-crawler.service'
+import { MandarakeCrawlerTool } from '../server-service/tools/mandarake-crawler.tool'
 
 export class SearchProductItemUsecase {
   private promptUniqueKey: string
