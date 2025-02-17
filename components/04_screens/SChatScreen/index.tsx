@@ -193,6 +193,7 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
                                   <EMdxRenderer
                                     content={prompt.result?.message || ''}
                                     className="mt-4"
+                                    onSearch={handleCreateChatPromptGroup}
                                   />
                                 )}
                               </>

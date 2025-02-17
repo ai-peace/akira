@@ -82,14 +82,16 @@ export class ConversationAgent {
   private async handleSearch(promptUniqueKey: string, query: string) {
     // 既存の検索機能を利用
     const result = await searchProductItemUsecase.execute(promptUniqueKey, query)
-    console.log('result---------------------', result)
     this.context.history.push({ role: 'assistant', content: `検索結果: ${JSON.stringify(result)}` })
     return result
   }
 
   private async handleChat(promptUniqueKey: string, input: string) {
     const chatPrompt = ChatPromptTemplate.fromMessages([
-      { role: 'system', content: 'あなたは親切で丁寧な日本語アシスタントです。' },
+      {
+        role: 'system',
+        content: conversationAgentPrompt.systemBuyerChat,
+      },
       ...this.context.history.map(({ role, content }) => ({ role, content })),
       { role: 'user', content: input },
     ])
