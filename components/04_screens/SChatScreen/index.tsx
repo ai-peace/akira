@@ -10,6 +10,7 @@ import { FC, Fragment, useEffect, useRef, useState } from 'react'
 import { ECenteredLoadingSpinner } from '@/components/01_elements/ECenteredLoadingSpinner'
 import { KeywordPair } from '@/server/domains/entities/prompt.entity'
 import { Skeleton } from '@/components/ui/skeleton'
+import { EMdxRenderer } from '@/components/01_elements/EMdxRenderer'
 
 type Props = {
   chatUniqueKey: string
@@ -187,6 +188,12 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
                                       />
                                     </ChatBubbleMessage>
                                   </ChatBubble>
+                                )}
+                                {prompt.resultType === 'AGENT_RESPONSE' && (
+                                  <EMdxRenderer
+                                    content={prompt.result?.message || ''}
+                                    className="mt-4"
+                                  />
                                 )}
                               </>
                             ) : (

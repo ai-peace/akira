@@ -6,7 +6,6 @@ import { prisma } from '../server-lib/prisma'
 import { ExtractKeywordsTool } from '../server-service/tools/extract-keywords/index.tool'
 import { MandarakeCrawlerTool } from '../server-service/tools/mandarake-crawler/index.tool'
 import { TranslateToJapaneseTool } from '../server-service/tools/translate-to-japanese/index.tool'
-import { GeminiChatModel } from '../server-lib/llm/gemini.adapter'
 
 const execute = async (promptUniqueKey: string, query: string) => {
   // キーワードを日本語に変換

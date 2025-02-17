@@ -2,7 +2,7 @@ import { PromptGroupEntity } from '@/domains/entities/prompt-group.entity'
 import { prisma } from '../server-lib/prisma'
 import { generateUniqueKey } from '../server-lib/uuid'
 import { promptGroupMapper } from '../server-mappers/prompt-group/index.mapper'
-import { searchProductItemUsecase } from '../server-usecase/search-product-item.usecase'
+import { conversationAgent } from '../server-service/tools/conversation-agent/index.tool'
 
 type LlmStatus = 'IDLE' | 'PROCESSING' | 'SUCCESS' | 'FAILED'
 const LlmStatus = {
@@ -12,28 +12,24 @@ const LlmStatus = {
 
 const execute = async (chatUniqueKey: string, question: string): Promise<PromptGroupEntity> => {
   try {
-    const { searchablePrompt, firstResponsePrompt, promptGroup } = await initializePrompts(
-      chatUniqueKey,
-      question,
-    )
+    const promptGroup = await initializePromptGroup(chatUniqueKey, question)
 
-    // 非同期に実行
-    generateFirstResponse(firstResponsePrompt.uniqueKey, `Searching for ${question}...`)
-    searchProductItemUsecase.execute(searchablePrompt.uniqueKey, question)
+    // 非同期で会話エージェントを実行
+    processConversation(promptGroup.prompts[0].uniqueKey, question)
 
     const promptGroupEntity = promptGroupMapper.toDomain(promptGroup)
     return promptGroupEntity
   } catch (error) {
-    console.error('Error creating prompt group:', error)
-    throw new Error('Failed to create prompt group')
+    console.error('Error processing conversation:', error)
+    throw new Error('Failed to process conversation')
   }
 }
 
 export const generateUserResponseUsecase = { execute }
 
 // private
-const initializePrompts = async (chatUniqueKey: string, question: string) => {
-  const promptGroup = await prisma.promptGroup.create({
+const initializePromptGroup = async (chatUniqueKey: string, question: string) => {
+  return await prisma.promptGroup.create({
     data: {
       chat: {
         connect: {
@@ -43,21 +39,11 @@ const initializePrompts = async (chatUniqueKey: string, question: string) => {
       uniqueKey: generateUniqueKey(),
       question,
       prompts: {
-        createMany: {
-          data: [
-            {
-              uniqueKey: generateUniqueKey(),
-              llmStatus: LlmStatus.PROCESSING,
-              resultType: 'FIRST_RESPONSE',
-              order: 1,
-            },
-            {
-              uniqueKey: generateUniqueKey(),
-              llmStatus: LlmStatus.PROCESSING,
-              resultType: 'RARE_ITEM_SEARCH',
-              order: 2,
-            },
-          ],
+        create: {
+          uniqueKey: generateUniqueKey(),
+          llmStatus: LlmStatus.PROCESSING,
+          resultType: 'AGENT_RESPONSE',
+          order: 1,
         },
       },
     },
@@ -65,28 +51,21 @@ const initializePrompts = async (chatUniqueKey: string, question: string) => {
       prompts: true,
     },
   })
-
-  const searchablePrompt = promptGroup.prompts.find(
-    (p: { resultType: string | null }) => p.resultType === 'RARE_ITEM_SEARCH',
-  )
-  const firstResponsePrompt = promptGroup.prompts.find(
-    (p: { resultType: string | null }) => p.resultType === 'FIRST_RESPONSE',
-  )
-
-  if (!searchablePrompt || !firstResponsePrompt) throw new Error('Prompt not found')
-
-  return { searchablePrompt, firstResponsePrompt, promptGroup }
 }
 
-const generateFirstResponse = async (promptUniqueKey: string, message: string) => {
-  await prisma.prompt.update({
-    where: {
-      uniqueKey: promptUniqueKey,
-    },
-    data: {
-      result: { message: message },
-      llmStatus: LlmStatus.SUCCESS,
-      resultType: 'FIRST_RESPONSE',
-    },
-  })
+const processConversation = async (promptUniqueKey: string, question: string) => {
+  try {
+    await conversationAgent.processInput(promptUniqueKey, question)
+  } catch (error) {
+    console.error('Error processing conversation:', error)
+    await prisma.prompt.update({
+      where: {
+        uniqueKey: promptUniqueKey,
+      },
+      data: {
+        result: { message: 'エラーが発生しました。もう一度お試しください。' },
+        llmStatus: 'FAILED',
+      },
+    })
+  }
 }
