@@ -58,6 +58,10 @@ export class ConversationAgent {
   }
 
   async processInput(promptUniqueKey: string, input: string) {
+    console.log(
+      '??????????????processInput',
+      ...this.context.history.map(({ role, content }) => ({ role, content })),
+    )
     const prompt = ChatPromptTemplate.fromMessages([
       { role: 'system', content: conversationAgentPrompt.systemPersonality },
       ...this.context.history.map(({ role, content }) => ({ role, content })),
