@@ -6,6 +6,7 @@ import { prisma } from '../server-lib/prisma'
 import { ExtractKeywordsTool } from '../server-service/tools/extract-keywords/index.tool'
 import { MandarakeCrawlerTool } from '../server-service/tools/mandarake-crawler/index.tool'
 import { TranslateToJapaneseTool } from '../server-service/tools/translate-to-japanese/index.tool'
+import { SurugayaCrawlerTool } from '../server-service/tools/surugaya-crawler/index.tool'
 
 const execute = async (promptUniqueKey: string, query: string) => {
   // キーワードを日本語に変換
@@ -32,10 +33,16 @@ const execute = async (promptUniqueKey: string, query: string) => {
   //   modelName: 'gemini-1.5-flash',
   //   temperature: 0,
   // })
-  const crawlerTool = new MandarakeCrawlerTool(crawlerModel)
-  const result = await crawlerTool._call(translatedKeyword)
+  const crawlerTool1 = new MandarakeCrawlerTool(crawlerModel)
+  const crawlerTool2 = new SurugayaCrawlerTool(crawlerModel)
+  const result1 = await crawlerTool1._call(translatedKeyword)
+  const result2 = await crawlerTool2._call(translatedKeyword)
 
-  const productEntities = await parseResult(promptUniqueKey, result)
+  const productEntities1 = await parseResult(promptUniqueKey, result1)
+  const productEntities2 = await parseResult(promptUniqueKey, result2)
+  const productEntities = [...productEntities1, ...productEntities2].sort(
+    (a, b) => a.price - b.price,
+  )
   await savePromptAsSuccess(promptUniqueKey, productEntities)
 
   // キーワードを抽出する
