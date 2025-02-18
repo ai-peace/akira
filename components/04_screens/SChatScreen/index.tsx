@@ -11,6 +11,7 @@ import { ECenteredLoadingSpinner } from '@/components/01_elements/ECenteredLoadi
 import { KeywordPair } from '@/server/domains/entities/prompt.entity'
 import { Skeleton } from '@/components/ui/skeleton'
 import { EMdxRenderer } from '@/components/01_elements/EMdxRenderer'
+import OProductListItem from '@/components/02_organisms/OProductListItem'
 
 type Props = {
   chatUniqueKey: string
@@ -257,6 +258,13 @@ const ChatBubbleProduct = ({
   products: ProductEntity[]
   message: string
 }) => {
+  const [showModal, setShowModal] = useState(false)
+  const [displayCount] = useState(8)
+
+  const handleShowMore = () => {
+    setShowModal(true)
+  }
+
   return (
     <>
       <ChatBubble variant="received">
@@ -266,61 +274,41 @@ const ChatBubbleProduct = ({
         </ChatBubbleMessage>
       </ChatBubble>
       <div className="grid w-full grid-cols-4 gap-2">
-        {products.slice(0, 20).map((product) => (
-          <Card
-            key={`${product.itemCode}-${product.title.en}`}
-            className="overflow-hidden shadow-none transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
-          >
-            <a href={product.url} target="_blank" rel="noopener noreferrer">
-              <div className="flex h-full flex-col justify-between">
-                <div>
-                  <div className="relative flex h-[200px] w-full items-center justify-center">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={product.imageUrl}
-                      alt={product.title.en}
-                      width={100}
-                      height={300}
-                      className="absolute inset-0 h-full w-full object-cover"
-                    />
-                  </div>
-                  <div className="flex flex-col p-2">
-                    <div className="group relative text-xs">
-                      <span>{product.title.en}</span>
-                      <span className="invisible absolute -top-8 left-0 whitespace-nowrap rounded bg-gray-800 p-2 text-xs text-white group-hover:visible">
-                        {product.title.ja}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-                {/* 価格・店舗情報 */}
-                <div className="flex flex-col p-2">
-                  <div className="mt-2 flex items-center justify-between">
-                    <div className="text-sm font-bold text-red-500">
-                      ${Math.round(product.price / 150).toLocaleString()}
-                    </div>
-                    <div
-                      className={`text-xs ${
-                        product.status === 'In Stock'
-                          ? 'text-green-600'
-                          : product.status === 'Out of Stock'
-                            ? 'text-red-600'
-                            : 'text-yellow-600'
-                      }`}
-                    >
-                      {product.status}
-                    </div>
-                  </div>
-                  <div className="mt-2 flex items-center">
-                    <img src={product.shopIconUrl} alt={product.shopName} width={16} height={16} />
-                    <div className="ml-1 text-[10px] text-gray-500">{product.shopName}</div>
-                  </div>
-                </div>
-              </div>
-            </a>
-          </Card>
+        {products.slice(0, displayCount).map((product) => (
+          <OProductListItem key={product.itemCode} product={product} />
         ))}
       </div>
+      {products.length > displayCount && (
+        <div className="mt-4 flex justify-center">
+          <button
+            onClick={handleShowMore}
+            className="rounded-md bg-blue-500 px-4 py-2 text-sm text-white transition-all hover:bg-blue-600"
+          >
+            Show all ({products.length} items)
+          </button>
+        </div>
+      )}
+
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="max-h-[90vh] w-[90vw] overflow-y-auto rounded-lg bg-white p-6">
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-xl font-bold">All products ({products.length} items)</h2>
+              <button
+                onClick={() => setShowModal(false)}
+                className="rounded-full p-2 hover:bg-gray-100"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="grid grid-cols-6 gap-4">
+              {products.map((product) => (
+                <OProductListItem key={product.itemCode} product={product} />
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }
