@@ -98,6 +98,7 @@ export class ConversationAgent {
       },
       ...this.context.history.map(({ role, content }) => ({ role, content })),
       { role: 'user', content: input },
+      { role: 'system', content: conversationAgentPrompt.systemLanguage },
     ])
 
     const chain = RunnableSequence.from([chatPrompt, this.model])
