@@ -79,6 +79,8 @@ const parseResult = async (promptUniqueKey: string, result: any): Promise<Produc
         url: item.url,
         status: item.status || 'Unknown',
         itemCode: item.itemCode || item.url.split('itemCode=')[1]?.split('&')[0] || 'Unknown',
+        shopName: item.shopName,
+        shopIconUrl: item.shopIconUrl,
       }
     })
 

@@ -12,4 +12,6 @@ export type ProductEntity = {
   url?: string
   status: string
   itemCode: string
+  shopName: string
+  shopIconUrl: string
 }

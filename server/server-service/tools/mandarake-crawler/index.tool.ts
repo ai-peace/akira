@@ -161,6 +161,8 @@ export class MandarakeCrawlerTool extends Tool {
               itemCode,
               priceRange,
               isNewArrival: $(element).find('.new_arrival').length > 0,
+              shopName: 'mandarake',
+              shopIconUrl: 'https://www.mandarake.co.jp/favicon.ico',
             }
           } catch (itemError) {
             console.error('Error parsing item data:', itemError)

@@ -197,6 +197,8 @@ export class SurugayaCrawlerTool extends Tool {
               itemCode,
               isNewArrival,
               priceRange: '',
+              shopName: 'surugaya(駿河屋)',
+              shopIconUrl: 'https://www.suruga-ya.jp/drupal/themes/surugaya/favicon.ico',
             } satisfies ProductItemEntity
           } catch (itemError) {
             console.error('Error parsing item data:', itemError)

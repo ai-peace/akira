@@ -12,4 +12,6 @@ export type ProductItemEntity = {
   itemCode: string
   priceRange: string
   isNewArrival: boolean
+  shopName: string
+  shopIconUrl: string
 }
