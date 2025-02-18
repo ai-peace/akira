@@ -15,6 +15,7 @@ Optimization Rules:
 4. Convert nicknames and abbreviations to official names
 
 Category Codes:
+These codes are only used if the genre is explicitly included in the keywords.
 - 映像ソフト: category = 3
 - 音楽ソフト: category = 4
 - おもちゃ・ホビー: category = 5
