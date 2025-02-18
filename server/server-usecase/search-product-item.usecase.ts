@@ -41,7 +41,7 @@ const execute = async (promptUniqueKey: string, query: string) => {
   const productEntities1 = await parseResult(promptUniqueKey, result1)
   const productEntities2 = await parseResult(promptUniqueKey, result2)
   const productEntities = [...productEntities1, ...productEntities2].sort(
-    (a, b) => a.price - b.price,
+    (a, b) => b.price - a.price,
   )
   await savePromptAsSuccess(promptUniqueKey, productEntities)
 
