@@ -236,14 +236,15 @@ export class SurugayaCrawlerTool extends Tool {
       console.log('- Price:', price)
       console.log('- In Stock:', inStock)
       console.log('- Release Year:', release_year)
-      console.log('- Sale Type:', saleClassified)
-      console.log('- Sort Order:', rankBy)
+      console.log('- Sale Classified:', saleClassified)
+      console.log('- Rank By:', rankBy)
       console.log('- Brand:', brand)
-      console.log('- Price Change:', hendou)
+      console.log('- Hendou:', hendou)
 
       const response = await llmModel.invoke([
+        ['system', surugayaCrawlerPrompts.generateSearchUrlSystemPrompt],
         [
-          'system',
+          'human',
           surugayaCrawlerPrompts.urlGeneration(
             keywords,
             category,
@@ -260,29 +261,22 @@ export class SurugayaCrawlerTool extends Tool {
 
       const url = (response.content as string).trim()
 
-      console.log('\n🌐 Generated URL:')
-      console.log('Encoded:')
-      console.log(url)
-      console.log('\nDecoded:')
-      console.log(decodeURIComponent(url))
-
-      // URLパラメータを解析して表示
-      try {
-        const urlObj = new URL(url)
-        console.log('\n📊 URL Parameters:')
-        for (const [key, value] of urlObj.searchParams.entries()) {
-          console.log(`- ${key}: ${decodeURIComponent(value)}`)
-        }
-      } catch (error) {
-        console.log('Failed to parse URL parameters')
+      // URLの基本検証
+      if (!url.startsWith('https://www.suruga-ya.jp/search')) {
+        throw new Error('Invalid URL generated')
       }
 
-      console.log('\n=== End of URL Generation ===\n')
+      console.log('\n🌐 Generated URL:')
+      console.log('Encoded:', url)
+      console.log('\nDecoded:', decodeURIComponent(url))
 
       return url
     } catch (error) {
       console.error('\n❌ Error generating URL:', error)
-      const fallbackUrl = `https://www.suruga-ya.jp/search?search_word=${encodeURIComponent(prompt)}`
+      // フォールバックURL - 基本的な検索のみ
+      const fallbackUrl = `https://www.suruga-ya.jp/search?search_word=${encodeURIComponent(
+        prompt,
+      )}&rankBy=price:descending`
       console.log('⚠️ Using fallback URL:', fallbackUrl)
       return fallbackUrl
     }
@@ -292,15 +286,15 @@ export class SurugayaCrawlerTool extends Tool {
     llmModel: BaseChatModel,
     prompt: string,
   ): Promise<{
-    keywords: string | null // 検索ワード
-    category: number[] | null // カテゴリ
-    price: { min: number | null; max: number | null } | null // 価格
-    inStock: boolean | null // 在庫
-    release_year: number | null // 発売年
-    saleClassified: 'new' | 'used' | 'reserve' | null // 販売区分
-    rankBy: string | null // 並び替え
-    brand: string | null // ブランド
-    hendou: string | null // 変動
+    keywords: string | null
+    category: number[] | null
+    price: { min: number | null; max: number | null } | null
+    inStock: boolean | null
+    release_year: number | null
+    saleClassified: 'new' | 'used' | 'reserve' | null
+    rankBy: string | null
+    brand: string | null
+    hendou: string | null
   }> {
     const systemPrompt = surugayaCrawlerPrompts.optimizeSearchQuery
     const response = await llmModel.invoke([

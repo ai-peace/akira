@@ -139,8 +139,10 @@ ${keywords ? `- Keywords: search_word=${encodeURIComponent(keywords)}` : ''}
 ${category ? `- Category: category=${category.join(',')}` : ''}
 
 Price Parameters:
-${price?.min ? `- Minimum Price: price_min=${price.min}` : ''}
-${price?.max ? `- Maximum Price: price_max=${price.max}` : ''}
+
+${price?.min && price?.max ? `- Minimum Price: price=[${price.min},${price.max}]` : ''}
+${price?.min && !price?.max ? `- Minimum Price: price=[${price.min},]` : ''}
+${price?.max && !price?.min ? `- Maximum Price: price=[0,${price.max}]` : ''}
 
 Additional Parameters:
 ${inStock !== null ? `- In Stock: in_stock=${inStock ? 'true' : 'false'}` : ''}
