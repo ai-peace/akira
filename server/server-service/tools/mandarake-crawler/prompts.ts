@@ -6,10 +6,8 @@ Optimization Rules:
 1. Keywords should only include:
    - Work titles (official names)
    - Character names
-   Note: Product categories (figures, doujinshi, etc.) should be handled in categoryHints
 
 2. Do not include in keywords:
-   - Product categories
    - Price-related expressions
    - Condition-related expressions
    - Popularity/rarity expressions
@@ -33,7 +31,6 @@ Price and Condition Processing:
 Output Format:
 {
   "keywords": "optimized search keywords (proper nouns only)",
-  "categoryHints": ["category codes"],
   "priceRange": {
     "min": number | null,  // amount in JPY
     "max": number | null   // amount in JPY
@@ -47,7 +44,6 @@ Examples:
 Input: "Find Evangelion figures between $100-$500"
 Output: {
   "keywords": "エヴァンゲリオン",
-  "categoryHints": ["20101", "20102"],
   "priceRange": {
     "min": 15000,
     "max": 75000
@@ -60,7 +56,6 @@ Output: {
 Input: "Gundam figure over $100"
 Output: {
   "keywords": "ガンダム",
-  "categoryHints": ["20103"],
   "priceRange": {
     "min": 15000,
     "max": null
@@ -73,7 +68,6 @@ Output: {
 
 const urlGeneration = (
   keywords: string,
-  categoryHints: string[],
   priceRange: { min: number | null; max: number | null },
   sortType: string | null,
   sellType: string | null,
@@ -82,7 +76,6 @@ const urlGeneration = (
 Generate a Mandarake search URL based on the following information:
 
 Search Keywords: ${keywords}
-Suggested Categories: ${categoryHints.join(', ')}
 
 Use these parameters to generate the URL:
 
@@ -104,7 +97,6 @@ ${stockType ? `- Stock Status: goodsZaiko=${stockType}` : ''}
 Base URL: https://order.mandarake.co.jp/order/listPage/list?dispAdult=0
 
 Return only the URL.
-Do not include categoryCode parameter if categoryHints is empty.
 `
 
 const translateTitleSystemPrompt =

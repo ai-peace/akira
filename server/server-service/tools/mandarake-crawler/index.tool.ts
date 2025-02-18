@@ -185,7 +185,6 @@ export class MandarakeCrawlerTool extends Tool {
 
       console.log('\n📝 Optimized Parameters:')
       console.log('- Keywords:', keywords)
-      console.log('- Category Hints:', categoryHints)
       console.log('- Price Range:', priceRange)
       console.log('- Sort Type:', sortType)
       console.log('- Sell Type:', sellType)
@@ -198,7 +197,6 @@ export class MandarakeCrawlerTool extends Tool {
           'human',
           mandarakeCrawlerPrompts.urlGeneration(
             keywords,
-            categoryHints,
             priceRange,
             sortType,
             sellType,
