@@ -6,4 +6,8 @@ export const applicationServerConst = {
   gemini: {
     apiKey: process.env.GEMINI_API_KEY || '',
   },
+  privy: {
+    appId: process.env.NEXT_PUBLIC_PRIVY_APP_ID || '',
+    clientId: process.env.PRIVY_APP_CLIENT_ID || '',
+  },
 } as const

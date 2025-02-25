@@ -6,6 +6,7 @@ import { RootLayoutClient } from '@/components/99_providers/root-layout-client'
 import { Toaster } from '@/components/ui/toaster'
 import '@/styles/globals.css'
 import type { Metadata } from 'next'
+import { Providers } from './providers'
 
 export const metadata: Metadata = {
   title: 'AKIRA',
@@ -45,20 +46,22 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="apple-touch-icon" href="/icon-192x192.png" />
       </head>
       <body>
-        <RootLayoutClient>
-          <section className="flex h-screen bg-background-muted">
-            <section className="w-full bg-background text-foreground">
-              <div className="relative flex h-full">
-                <TChatLists />
-                <div className="relative flex h-full w-full">
-                  <OMainSpaceHeader />
-                  {children}
+        <Providers>
+          <RootLayoutClient>
+            <section className="flex h-screen bg-background-muted">
+              <section className="w-full bg-background text-foreground">
+                <div className="relative flex h-full">
+                  <TChatLists />
+                  <div className="relative flex h-full w-full">
+                    <OMainSpaceHeader />
+                    {children}
+                  </div>
                 </div>
-              </div>
+              </section>
             </section>
-          </section>
-        </RootLayoutClient>
-        <Toaster />
+          </RootLayoutClient>
+          <Toaster />
+        </Providers>
       </body>
     </html>
   )
