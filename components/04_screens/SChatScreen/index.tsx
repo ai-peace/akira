@@ -13,6 +13,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { EMdxRenderer } from '@/components/01_elements/EMdxRenderer'
 import OProductListItem from '@/components/02_organisms/OProductListItem'
 import { OChatHistorySection } from '@/components/02_organisms/OChatHistorySection'
+import Image from 'next/image'
 
 type Props = {
   chatUniqueKey: string
@@ -171,7 +172,10 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
                                 )}
                                 {prompt.resultType === 'FIRST_RESPONSE' && (
                                   <ChatBubble variant="received">
-                                    <ChatBubbleAvatar fallback="AI" />
+                                    <ChatBubbleAvatar
+                                      fallback="AI"
+                                      src="/images/picture/picture_akira-kun.png"
+                                    />
                                     <ChatBubbleMessage variant="received">
                                       <ETypewriterText
                                         text={prompt.result?.message || ''}
@@ -182,7 +186,10 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
                                 )}
                                 {prompt.resultType === 'NO_PRODUCT_ITEMS' && (
                                   <ChatBubble variant="received">
-                                    <ChatBubbleAvatar fallback="AI" />
+                                    <ChatBubbleAvatar
+                                      fallback="AI"
+                                      src="/images/picture/picture_akira-kun.png"
+                                    />
                                     <ChatBubbleMessage variant="received">
                                       <ETypewriterText
                                         text={prompt.result?.message || ''}
@@ -202,7 +209,10 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
                             ) : (
                               <>
                                 <ChatBubble variant="received">
-                                  <ChatBubbleAvatar fallback="AI" />
+                                  <ChatBubbleAvatar
+                                    fallback="AI"
+                                    src="/images/picture/picture_akira-kun.png"
+                                  />
                                   <ChatBubbleMessage isLoading />
                                 </ChatBubble>
                               </>
@@ -300,7 +310,7 @@ const ChatBubbleProduct = ({
   return (
     <>
       <ChatBubble variant="received">
-        <ChatBubbleAvatar fallback="AI" />
+        <ChatBubbleAvatar fallback="AI" src="/images/picture/picture_akira-kun.png" />
         <ChatBubbleMessage variant="received">
           <ETypewriterText text={message} delay={200} />
         </ChatBubbleMessage>
