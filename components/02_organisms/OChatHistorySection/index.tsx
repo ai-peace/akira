@@ -36,8 +36,8 @@ const Component: FC<Props> = ({ chat, currentPromptId }) => {
             key={promptGroup.uniqueKey}
             className={`h-4 w-1 cursor-pointer rounded-full transition-all duration-200 ${
               currentPromptId === promptGroup.uniqueKey
-                ? 'bg-gray-800'
-                : 'bg-gray-200 hover:bg-gray-300'
+                ? 'bg-foreground-strong'
+                : 'bg-foreground-subtle hover:bg-foreground-strong'
             }`}
             onClick={() => {
               const element = document.getElementById(promptGroup.uniqueKey)
@@ -49,7 +49,7 @@ const Component: FC<Props> = ({ chat, currentPromptId }) => {
 
       {/* ビッグメニュー（オーバーレイ） */}
       <div
-        className={`absolute right-4 top-1/2 w-64 -translate-y-1/2 transform overflow-hidden rounded-lg border border-gray-200 bg-white transition-all duration-300 ${
+        className={`absolute right-4 top-1/2 w-64 -translate-y-1/2 transform overflow-hidden rounded-lg border border-border-subtle bg-background shadow-sm transition-all duration-300 ${
           isMenuOpen ? 'visible translate-x-0 opacity-100' : 'invisible translate-x-4 opacity-0'
         }`}
       >
@@ -60,8 +60,8 @@ const Component: FC<Props> = ({ chat, currentPromptId }) => {
                 key={promptGroup.uniqueKey}
                 className={`group cursor-pointer rounded-md p-2 text-xs transition-all ${
                   currentPromptId === promptGroup.uniqueKey
-                    ? 'bg-gray-100 text-gray-900'
-                    : 'text-gray-500 hover:bg-gray-50'
+                    ? 'bg-background-muted text-foreground'
+                    : 'text-muted-foreground hover:bg-background-muted'
                 }`}
                 onClick={() => {
                   const element = document.getElementById(promptGroup.uniqueKey)
