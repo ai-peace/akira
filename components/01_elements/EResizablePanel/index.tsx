@@ -1,5 +1,6 @@
 'use client'
 
+import { ONewChatButton } from '@/components/02_organisms/ONewChatButton'
 import { PanelLeftCloseIcon, PanelRightCloseIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
@@ -62,6 +63,7 @@ const Component = ({
               <PanelRightCloseIcon className="h-5 w-5" />
             )}
           </button>
+          <ONewChatButton />
         </div>
       </div>
     )
@@ -87,6 +89,7 @@ const Component = ({
               <PanelLeftCloseIcon className="h-5 w-5 text-foreground" />
             )}
           </button>
+          <ONewChatButton />
         </div>
       </div>
       <div className="relative mb-20 mt-0">{children}</div>

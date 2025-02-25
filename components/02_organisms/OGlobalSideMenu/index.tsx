@@ -1,6 +1,7 @@
 import { OThemeChangeButton } from '../OThemeChangeButton'
 import { PlusCircle } from 'lucide-react'
 import Link from 'next/link'
+import { ONewChatButton } from '../ONewChatButton'
 
 const Component = () => {
   return (
