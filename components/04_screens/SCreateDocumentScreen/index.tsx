@@ -1,5 +1,6 @@
 'use client'
 
+import EDotFont from '@/components/01_elements/EDotFont'
 import ETypewriterText from '@/components/01_elements/ETypewriterText'
 import { TCreateDocumentForm } from '@/components/03_templates/TCreateDocumentForm'
 import { useCreateChat } from '@/hooks/resources/chats/useCreateChat'
@@ -32,7 +33,12 @@ const Component: FC = () => {
         <div className="w-full">
           <div className="flex-none py-6 text-center">
             <h1 className="mb-0 text-3xl font-semibold text-white">
-              <ETypewriterText text="What rare item are you looking for?" delay={0} />
+              <EDotFont
+                text="What rare item are you looking for?"
+                className="font-[400]"
+                animate={true}
+              />
+              {/* <ETypewriterText text="What rare item are you looking for?" delay={0} /> */}
             </h1>
           </div>
           <div className="flex-grow">

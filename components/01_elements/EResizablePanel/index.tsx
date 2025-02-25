@@ -1,7 +1,19 @@
 'use client'
 
 import { ONewChatButton } from '@/components/02_organisms/ONewChatButton'
-import { PanelLeftCloseIcon, PanelRightCloseIcon } from 'lucide-react'
+import { OWalletConnectButton } from '@/components/02_organisms/OWalletConnectButton'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import { Button } from '@/components/ui/button'
+import { AlertDialogTrigger } from '@radix-ui/react-alert-dialog'
+import { PanelLeftCloseIcon, PanelRightCloseIcon, WalletIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 type Props = {
@@ -93,6 +105,9 @@ const Component = ({
         </div>
       </div>
       <div className="relative mb-20 mt-0">{children}</div>
+      <div className="sticky bottom-0 left-0 right-0 bg-background-soft px-4 py-4">
+        <OWalletConnectButton />
+      </div>
     </div>
   )
 }
