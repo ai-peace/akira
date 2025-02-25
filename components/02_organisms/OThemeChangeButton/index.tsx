@@ -14,7 +14,7 @@ const Component = () => {
   // マウント前は何も表示しない（またはスケルトンを表示）
   if (!mounted) {
     return (
-      <button className="group flex w-full cursor-pointer flex-col items-center gap-1 rounded-md p-2 hover:bg-background-muted">
+      <button className="cursor-pointer rounded-md p-2 hover:bg-background-muted">
         <div className="h-5 w-5" />
       </button>
     )
@@ -25,16 +25,12 @@ const Component = () => {
       onClick={() => {
         setTheme(theme === 'dark' ? 'light' : 'dark')
       }}
-      className="group flex w-full cursor-pointer flex-col items-center gap-1 rounded-md p-2 hover:bg-background-muted"
+      className="cursor-pointer rounded-md p-2 hover:bg-background-muted"
     >
       {theme === 'dark' ? (
-        <>
-          <MoonIcon className="h-5 w-5 text-foreground" />
-        </>
+        <MoonIcon className="h-5 w-5 text-foreground" />
       ) : (
-        <>
-          <SunIcon className="h-5 w-5 text-foreground" />
-        </>
+        <SunIcon className="h-5 w-5 text-foreground" />
       )}
     </button>
   )

@@ -223,9 +223,8 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
         </div>
 
         {/* 目次セクション */}
-        <div className="fixed right-0 top-0 hidden h-full w-64 p-4 xl:flex xl:flex-col">
-          <div className="mb-4 text-sm font-medium">Chat history</div>
-          <div className="max-h-[calc(100vh-8rem)] space-y-2 overflow-y-auto">
+        <div className="fixed right-0 top-1/2 hidden h-auto w-64 -translate-y-1/2 p-4 xl:flex xl:flex-col">
+          <div className="scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent max-h-[400px] space-y-2 overflow-y-auto">
             {chat.promptGroups?.map((promptGroup) => (
               <div
                 key={promptGroup.uniqueKey}

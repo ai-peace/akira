@@ -1,9 +1,12 @@
 import { OGlobalSideMenu } from '@/components/02_organisms/OGlobalSideMenu'
+import { OMainSpaceHeader } from '@/components/02_organisms/OMainSpaceHeader'
+import { OThemeChangeButton } from '@/components/02_organisms/OThemeChangeButton'
 import { TChatLists } from '@/components/03_templates/TChatLists'
 import { RootLayoutClient } from '@/components/99_providers/root-layout-client'
 import { Toaster } from '@/components/ui/toaster'
 import '@/styles/globals.css'
 import type { Metadata } from 'next'
+
 export const metadata: Metadata = {
   title: 'AKIRA',
   description: 'AKIRA App',
@@ -43,12 +46,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <RootLayoutClient>
-          <section className="flex h-screen bg-background-muted pl-[72px]">
-            <OGlobalSideMenu />
+          <section className="flex h-screen bg-background-muted">
             <section className="w-full bg-background text-foreground">
               <div className="relative flex h-full">
                 <TChatLists />
-                {children}
+                <div className="relative flex h-full w-full">
+                  <OMainSpaceHeader />
+                  {children}
+                </div>
               </div>
             </section>
           </section>
