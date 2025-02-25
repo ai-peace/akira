@@ -50,17 +50,19 @@ const Component = ({
   if (!isVisible) {
     return (
       <div className="flex h-full">
-        <button
-          onClick={() => setIsVisible(true)}
-          className="flex h-12 w-12 items-center justify-center hover:bg-background-muted"
-          aria-label="サイドバーを開く"
-        >
-          {position === 'left' ? (
-            <PanelLeftCloseIcon className="h-4 w-4" />
-          ) : (
-            <PanelRightCloseIcon className="h-4 w-4" />
-          )}
-        </button>
+        <div className="relative flex h-12 w-full items-center px-2">
+          <button
+            onClick={() => setIsVisible(true)}
+            className="flex h-9 w-9 items-center justify-center rounded-md hover:bg-background-muted"
+            aria-label="サイドバーを開く"
+          >
+            {position === 'left' ? (
+              <PanelLeftCloseIcon className="h-5 w-5" />
+            ) : (
+              <PanelRightCloseIcon className="h-5 w-5" />
+            )}
+          </button>
+        </div>
       </div>
     )
   }
@@ -69,25 +71,25 @@ const Component = ({
     <div
       className={`relative h-full border-border-subtle bg-background-soft ${
         position === 'left' ? 'border-l' : 'border-r'
-      }`}
+      } overflow-y-scroll`}
       style={{ minWidth, maxWidth }}
     >
-      <div
-        className={`absolute top-0 mt-0.5 px-2 ${position === 'left' ? '-left-14 -ml-1' : '-right-14 -mr-1'} z-10`}
-      >
-        <button
-          onClick={() => setIsVisible(false)}
-          className="flex h-12 w-12 items-center justify-center rounded-md hover:bg-background-muted"
-          aria-label="サイドバーを閉じる"
-        >
-          {position === 'left' ? (
-            <PanelRightCloseIcon className="h-4 w-4" />
-          ) : (
-            <PanelLeftCloseIcon className="h-4 w-4" />
-          )}
-        </button>
+      <div className="sticky left-0 top-0 z-10 w-full bg-background-soft px-2">
+        <div className="relative flex h-12 w-full items-center">
+          <button
+            onClick={() => setIsVisible(false)}
+            className="h-9 cursor-pointer rounded-md px-2 hover:bg-background-muted"
+            aria-label="サイドバーを閉じる"
+          >
+            {position === 'left' ? (
+              <PanelRightCloseIcon className="h-5 w-5 text-foreground" />
+            ) : (
+              <PanelLeftCloseIcon className="h-5 w-5 text-foreground" />
+            )}
+          </button>
+        </div>
       </div>
-      <div className="relative h-full">{children}</div>
+      <div className="relative mb-20 mt-0">{children}</div>
     </div>
   )
 }
