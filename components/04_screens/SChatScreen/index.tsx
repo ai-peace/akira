@@ -12,6 +12,7 @@ import { KeywordPair } from '@/server/domains/entities/prompt.entity'
 import { Skeleton } from '@/components/ui/skeleton'
 import { EMdxRenderer } from '@/components/01_elements/EMdxRenderer'
 import OProductListItem from '@/components/02_organisms/OProductListItem'
+import { OChatHistorySection } from '@/components/02_organisms/OChatHistorySection'
 
 type Props = {
   chatUniqueKey: string
@@ -222,27 +223,7 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
           <ChatInputSection createChatPromptGroup={handleCreateChatPromptGroup} />
         </div>
 
-        {/* 目次セクション */}
-        <div className="fixed right-0 top-1/2 hidden h-auto w-64 -translate-y-1/2 p-4 xl:flex xl:flex-col">
-          <div className="scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent max-h-[400px] space-y-2 overflow-y-auto">
-            {chat.promptGroups?.map((promptGroup) => (
-              <div
-                key={promptGroup.uniqueKey}
-                className={`cursor-pointer truncate text-xs transition-colors ${
-                  currentPromptId === promptGroup.uniqueKey
-                    ? 'bg-gray-100 text-gray-900'
-                    : 'text-gray-500 hover:text-gray-700'
-                }`}
-                onClick={() => {
-                  const element = document.getElementById(promptGroup.uniqueKey)
-                  element?.scrollIntoView({ behavior: 'smooth' })
-                }}
-              >
-                {promptGroup.question}
-              </div>
-            ))}
-          </div>
-        </div>
+        <OChatHistorySection chat={chat} currentPromptId={currentPromptId} />
       </div>
     </>
   )
