@@ -25,12 +25,12 @@ const Component: FC<Props> = ({ chat, currentPromptId }) => {
   return (
     <div
       ref={menuRef}
-      className="fixed right-0 top-1/2 hidden h-auto -translate-y-1/2 xl:block"
+      className="fixed right-0 top-1/2 hidden h-auto w-20 -translate-y-1/2 xl:block"
       onMouseEnter={() => setIsMenuOpen(true)}
       onMouseLeave={() => setIsMenuOpen(false)}
     >
       {/* ミニマルバー表示 */}
-      <div className="relative flex flex-col gap-2 px-4">
+      <div className="relative flex flex-col items-end gap-2 px-4">
         {chat.promptGroups?.map((promptGroup: any) => (
           <div
             key={promptGroup.uniqueKey}
