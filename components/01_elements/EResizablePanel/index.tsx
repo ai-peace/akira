@@ -17,18 +17,11 @@ import { PanelLeftCloseIcon, PanelRightCloseIcon, WalletIcon } from 'lucide-reac
 import { useEffect, useState } from 'react'
 
 type Props = {
-  minWidth?: string
-  maxWidth?: string
   position?: 'left' | 'right'
   children: React.ReactNode
 }
 
-const Component = ({
-  minWidth = '16rem',
-  maxWidth = '20rem',
-  children,
-  position = 'right',
-}: Props) => {
+const Component = ({ children, position = 'right' }: Props) => {
   const storageKey = `resizable-panel-${position}-visible`
   const [isVisible, setIsVisible] = useState(true)
   const [isClient, setIsClient] = useState(false)
@@ -50,10 +43,9 @@ const Component = ({
   if (!isClient) {
     return (
       <div
-        className={`relative h-full border-border-subtle bg-background-soft ${
+        className={`relative h-full w-[320px] border-border-subtle bg-background-soft ${
           position === 'left' ? 'border-l' : 'border-r'
         }`}
-        style={{ minWidth, maxWidth }}
       >
         <div className="relative h-full">{children}</div>
       </div>
@@ -83,10 +75,9 @@ const Component = ({
 
   return (
     <div
-      className={`relative h-full border-border-subtle bg-background-soft ${
+      className={`relative h-full w-[320px] border-border-subtle bg-background-soft ${
         position === 'left' ? 'border-l' : 'border-r'
       } overflow-y-scroll`}
-      style={{ minWidth, maxWidth }}
     >
       <div className="sticky left-0 top-0 z-10 w-full bg-background-soft px-2">
         <div className="relative flex h-12 w-full items-center">
@@ -104,8 +95,8 @@ const Component = ({
           <ONewChatButton />
         </div>
       </div>
-      <div className="relative mb-20 mt-0">{children}</div>
-      <div className="sticky bottom-0 left-0 right-0 bg-background-soft px-4 py-4">
+      <div className="relative mb-20 mt-0 w-full overflow-x-hidden">{children}</div>
+      <div className="sticky bottom-0 left-0 right-0 w-full overflow-x-hidden bg-background-soft px-4 py-4">
         <OWalletConnectButton />
       </div>
     </div>
