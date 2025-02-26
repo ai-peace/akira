@@ -26,7 +26,6 @@ model User {
 
   @@unique([uniqueKey])
   @@unique([privyId])
-  @@unique([email])
   @@index([uniqueKey], name: "users_unique_key")
   @@index([privyId], name: "users_privyid_unique")
   @@index([email])
