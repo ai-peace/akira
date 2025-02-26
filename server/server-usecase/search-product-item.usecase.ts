@@ -7,6 +7,7 @@ import { ExtractKeywordsTool } from '../server-service/tools/extract-keywords/in
 import { MandarakeCrawlerTool } from '../server-service/tools/mandarake-crawler/index.tool'
 import { TranslateToJapaneseTool } from '../server-service/tools/translate-to-japanese/index.tool'
 import { SurugayaCrawlerTool } from '../server-service/tools/surugaya-crawler/index.tool'
+import { logLLMCost } from '../server-lib/llm-cost-logger'
 
 const execute = async (promptUniqueKey: string, query: string) => {
   // キーワードを日本語に変換
@@ -14,6 +15,18 @@ const execute = async (promptUniqueKey: string, query: string) => {
     modelName: 'gpt-4o-mini',
     temperature: 0,
     openAIApiKey: applicationServerConst.openai.apiKey,
+    callbacks: [
+      {
+        handleLLMEnd: (output) => {
+          logLLMCost(
+            'gpt-4o-mini',
+            output.llmOutput?.tokenUsage?.promptTokens || 0,
+            output.llmOutput?.tokenUsage?.completionTokens || 0,
+            'Japanese Translator',
+          )
+        },
+      },
+    ],
   })
   const translateToJapaneseTool = new TranslateToJapaneseTool(translatorModel)
   const translatedKeyword = await translateToJapaneseTool.invoke(query)
@@ -23,6 +36,18 @@ const execute = async (promptUniqueKey: string, query: string) => {
     modelName: 'gpt-4o-mini',
     temperature: 0,
     openAIApiKey: applicationServerConst.openai.apiKey,
+    callbacks: [
+      {
+        handleLLMEnd: (output) => {
+          logLLMCost(
+            'gpt-4o-mini',
+            output.llmOutput?.tokenUsage?.promptTokens || 0,
+            output.llmOutput?.tokenUsage?.completionTokens || 0,
+            'Product Crawler',
+          )
+        },
+      },
+    ],
   })
 
   const crawlerTool1 = new MandarakeCrawlerTool(crawlerModel)
@@ -60,6 +85,18 @@ const execute = async (promptUniqueKey: string, query: string) => {
         modelName: 'gpt-4o-mini',
         temperature: 0,
         openAIApiKey: applicationServerConst.openai.apiKey,
+        callbacks: [
+          {
+            handleLLMEnd: (output) => {
+              logLLMCost(
+                'gpt-4o-mini',
+                output.llmOutput?.tokenUsage?.promptTokens || 0,
+                output.llmOutput?.tokenUsage?.completionTokens || 0,
+                'Keyword Extractor',
+              )
+            },
+          },
+        ],
       })
       extractAndUpdateKeywords(promptUniqueKey, accumulatedProducts, extractorModel).catch(
         (error) => {

@@ -1,17 +1,5 @@
 import ETypewriterText from '@/components/01_elements/ETypewriterText'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog'
-import { Button } from '@/components/ui/button'
 import { ChatEntity } from '@/domains/entities/chat.entity'
-import { WalletIcon } from 'lucide-react'
 import Link from 'next/link'
 
 type Props = {

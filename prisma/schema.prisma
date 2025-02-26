@@ -7,9 +7,37 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id        Int    @id @default(autoincrement())
+  uniqueKey String @map("unique_key") @db.VarChar(255)
+
+  privyId String @map("privy_id") @db.VarChar(255)
+
+  solanaSystemAccountAddress String? @map("solana_system_account_address") @db.VarChar(255)
+
+  name        String? @db.VarChar(255)
+  email       String? @db.VarChar(255)
+  loginMethod String  @map("login_method") @db.VarChar(255) //ログイン方法
+
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  chats Chat[]
+
+  @@unique([uniqueKey])
+  @@unique([privyId])
+  @@unique([email])
+  @@index([uniqueKey], name: "users_unique_key")
+  @@index([privyId], name: "users_privyid_unique")
+  @@index([email])
+  @@map("users")
+}
+
 model Chat {
   id        Int    @id @default(autoincrement()) @map("id")
   uniqueKey String @map("unique_key")
+
+  userId Int? @map("user_id")
 
   title      String? @map("title")
   mdxContent String? @map("mdx_content") @db.Text
@@ -18,6 +46,7 @@ model Chat {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   promptGroups PromptGroup[]
+  user         User?         @relation(fields: [userId], references: [id])
 
   @@unique([uniqueKey])
   @@index([uniqueKey])

@@ -7,6 +7,8 @@ import { z } from 'zod'
 import { searchProductItemUsecase } from '../../../server-usecase/search-product-item.usecase'
 import { conversationAgentPrompt } from './prompt'
 import { prisma } from '@/server/server-lib/prisma'
+import { logLLMCost } from '../../../server-lib/llm-cost-logger'
+import { applicationServerConst } from '../../../server-const/appilication.server-const'
 
 const actionSchema = z.object({
   action: z.enum(['CHAT', 'SEARCH']),
@@ -52,6 +54,19 @@ export class ConversationAgent {
     this.model = new ChatOpenAI({
       modelName: 'gpt-4o-mini',
       temperature: 0,
+      openAIApiKey: applicationServerConst.openai.apiKey,
+      callbacks: [
+        {
+          handleLLMEnd: (output) => {
+            logLLMCost(
+              'gpt-4o-mini',
+              output.llmOutput?.tokenUsage?.promptTokens || 0,
+              output.llmOutput?.tokenUsage?.completionTokens || 0,
+              'Conversation Agent',
+            )
+          },
+        },
+      ],
     })
     this.context = { history: [] }
     this.parser = new SafeStructuredOutputParser()
@@ -101,7 +116,25 @@ export class ConversationAgent {
       { role: 'system', content: conversationAgentPrompt.systemLanguage },
     ])
 
-    const chain = RunnableSequence.from([chatPrompt, this.model])
+    const chatModel = new ChatOpenAI({
+      modelName: 'gpt-4o-mini',
+      temperature: 0,
+      openAIApiKey: applicationServerConst.openai.apiKey,
+      callbacks: [
+        {
+          handleLLMEnd: (output) => {
+            logLLMCost(
+              'gpt-4o-mini',
+              output.llmOutput?.tokenUsage?.promptTokens || 0,
+              output.llmOutput?.tokenUsage?.completionTokens || 0,
+              'Conversation Chat',
+            )
+          },
+        },
+      ],
+    })
+
+    const chain = RunnableSequence.from([chatPrompt, chatModel])
     const response = await chain.invoke({})
     const content = String(response.content || response)
     this.context.history.push({ role: 'assistant', content })
