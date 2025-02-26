@@ -5,6 +5,7 @@ import { errorUrl, rootUrl } from '@/utils/url.helper'
 import { useLogin, useLogout, usePrivy } from '@privy-io/react-auth'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
+import { toast } from 'sonner'
 
 type Variables = {
   redirectUrl?: string
@@ -16,7 +17,6 @@ export const usePrivyAuthentication = ({ redirectUrl }: Variables = {}) => {
 
   const { login } = useLogin({
     onComplete: async ({ user, isNewUser, wasAlreadyAuthenticated }) => {
-      console.log('1')
       const accessToken = await PrivyAccessTokenRepository.get()
       if (!accessToken) {
         logout()
@@ -24,28 +24,29 @@ export const usePrivyAuthentication = ({ redirectUrl }: Variables = {}) => {
         return
       }
 
-      console.log('2')
-      if (wasAlreadyAuthenticated) {
-        if (redirectUrl) router.push(redirectUrl)
-        return
-      }
+      if (wasAlreadyAuthenticated) return
 
-      console.log('3')
       const userPrivate = await userPrivateRepository.get(`${accessToken}`)
       if (!userPrivate) {
-        console.log('4')
         const userPrivate = await userPrivateRepository.create(`${accessToken}`)
         if (!userPrivate) {
           window.location.href = errorUrl()
         } else {
-          window.location.href = redirectUrl || rootUrl()
+          toast('ログイン成功', {
+            description: 'アカウントが作成されました',
+          })
         }
       } else {
-        router.push(redirectUrl || rootUrl())
+        toast('ログイン成功', {
+          description: 'おかえりなさい！',
+        })
       }
     },
     onError: (error: any) => {
       console.error(error)
+      toast.error('エラー', {
+        description: 'ログインに失敗しました',
+      })
     },
   })
 

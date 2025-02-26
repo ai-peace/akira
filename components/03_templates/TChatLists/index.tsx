@@ -1,6 +1,6 @@
 'use client'
 
-import { EResizablePanel } from '@/components/01_elements/EResizablePanel'
+import { EResizablePanel } from '@/components/02_organisms/OResizablePanel'
 import { OChatList } from '@/components/02_organisms/OChatList'
 
 import { Suspense } from 'react'

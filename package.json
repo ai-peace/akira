@@ -67,6 +67,7 @@
     "slate": "^0.112.0",
     "slate-history": "^0.110.3",
     "slate-react": "^0.112.0",
+    "sonner": "^2.0.1",
     "swr": "^2.2.5",
     "tailwind-merge": "^2.5.5",
     "tailwind-scrollbar-hide": "^1.1.7",

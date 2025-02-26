@@ -1,4 +1,4 @@
-import { EResizablePanel } from '@/components/01_elements/EResizablePanel'
+import { EResizablePanel } from '@/components/02_organisms/OResizablePanel'
 import { Skeleton } from '@/components/ui/skeleton'
 
 const Component = () => {
