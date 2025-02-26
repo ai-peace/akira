@@ -22,6 +22,7 @@ const get = async (token: string): Promise<UserPrivateEntity | null> => {
 }
 
 const create = async (token: string): Promise<UserPrivateEntity | null> => {
+  console.log('create', token)
   const client = hcClient({
     headers: {
       Authorization: `Bearer ${token}`,

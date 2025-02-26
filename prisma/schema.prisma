@@ -13,6 +13,8 @@ model User {
 
   privyId String @map("privy_id") @db.VarChar(255)
 
+  solanaSystemAccountAddress String? @map("solana_system_account_address") @db.VarChar(255)
+
   name        String? @db.VarChar(255)
   email       String? @db.VarChar(255)
   loginMethod String  @map("login_method") @db.VarChar(255) //ログイン方法

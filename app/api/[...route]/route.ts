@@ -2,6 +2,7 @@ import { getChatCollection } from '@/server/router/chats'
 import { createChat } from '@/server/router/chats/create'
 import { createChatPromptGroup } from '@/server/router/chats/prompt-groups/create'
 import { getChat } from '@/server/router/chats/show'
+import { createUserPrivate } from '@/server/router/user-privates/create'
 import { getUserPrivate } from '@/server/router/user-privates/show'
 import { Hono } from 'hono'
 import { handle } from 'hono/vercel'
@@ -13,6 +14,7 @@ hono.route('/', getChatCollection)
 hono.route('/', createChat)
 hono.route('/', createChatPromptGroup)
 hono.route('/', getUserPrivate)
+hono.route('/', createUserPrivate)
 
 export const GET = handle(hono)
 export const POST = handle(hono)

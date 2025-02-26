@@ -8,6 +8,6 @@ export const applicationServerConst = {
   },
   privy: {
     appId: process.env.NEXT_PUBLIC_PRIVY_APP_ID || '',
-    clientId: process.env.PRIVY_APP_CLIENT_ID || '',
+    secret: process.env.PRIVY_APP_SECRET || '',
   },
 } as const
