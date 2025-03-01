@@ -3,6 +3,7 @@ import { generateUniqueKey } from '@/server/server-lib/uuid'
 import { userPrivateMapper } from '@/server/server-mappers/user-private/user-private.mapper'
 import { Hono } from 'hono'
 import { privyAuthMiddleware } from '../../server-middleware/privy-auth.middleware'
+import { faker } from '@faker-js/faker'
 
 export const createUserPrivate = new Hono()
 
@@ -15,7 +16,9 @@ const route = createUserPrivate.post('/users', privyAuthMiddleware, async (c) =>
     const email =
       typeof privyUser.email === 'string' ? privyUser.email : privyUser.email?.address || ''
     const loginMethod = privyUser.linkedAccounts?.[0]?.type || 'email'
-    const name = privyUser.wallet?.address || ''
+
+    // ランダムなニックネームを生成
+    const name = faker.internet.userName()
 
     // solana privy接続ができるまでの暫定
     const walletAddress = privyUser.wallet?.address || ''

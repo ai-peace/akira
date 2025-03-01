@@ -88,8 +88,10 @@ const Component = () => {
             </div>
           )}
           <div className="min-w-0 flex-1">
-            <div className="text-foreground-soft text-md">User Profile</div>
-            <div className="truncate text-xs">{userPrivate?.name}</div>
+            <div className="text-foreground-soft text-md">{userPrivate?.name}</div>
+            <div className="truncate text-xs">
+              {userPrivate?.solanaSystemAccountAddress || userPrivate?.email}
+            </div>
           </div>
         </div>
       </AlertDialogTrigger>
@@ -117,7 +119,7 @@ const Component = () => {
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="name" className="text-right">
-              Display Name
+              Name
             </Label>
             <Input
               id="name"
