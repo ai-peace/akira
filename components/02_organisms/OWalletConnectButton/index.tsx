@@ -2,7 +2,7 @@ import EDotFont from '@/components/01_elements/EDotFont'
 import { Button } from '@/components/ui/button'
 import useUserPrivate from '@/hooks/resources/user-private/useUserPrivate'
 import { usePrivyAuthentication } from '@/hooks/usePrivyAuthentication'
-import { WalletIcon } from 'lucide-react'
+import { Loader, Loader2, WalletIcon } from 'lucide-react'
 import Image from 'next/image'
 
 const Component = () => {
@@ -13,9 +13,8 @@ const Component = () => {
   // Privyが準備できていない場合は工事中ダイアログを表示
   if (!ready) {
     return (
-      <Button className="w-full bg-[#AB9FF2] text-white transition-colors hover:bg-[#9F91E7]">
-        <WalletIcon className="mr-2 h-4 w-4" />
-        <EDotFont text="Wallet Connect" />
+      <Button className="w-full bg-foreground text-background-soft transition-colors hover:bg-foreground/80">
+        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
       </Button>
     )
   }
@@ -27,7 +26,7 @@ const Component = () => {
   return (
     <Button
       onClick={() => login()}
-      className="w-full bg-foreground text-white transition-colors hover:bg-foreground/80"
+      className="w-full bg-foreground text-background-soft transition-colors hover:bg-foreground/80"
     >
       <WalletIcon className="mr-1 h-4 w-4" />
       <EDotFont text="Login" />
