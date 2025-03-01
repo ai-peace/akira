@@ -2,18 +2,7 @@
 
 import { ONewChatButton } from '@/components/02_organisms/ONewChatButton'
 import { OWalletConnectButton } from '@/components/02_organisms/OWalletConnectButton'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
-import { Button } from '@/components/ui/button'
-import { AlertDialogTrigger } from '@radix-ui/react-alert-dialog'
-import { PanelLeftCloseIcon, PanelRightCloseIcon, WalletIcon } from 'lucide-react'
+import { PanelLeftCloseIcon, PanelRightCloseIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 type Props = {
