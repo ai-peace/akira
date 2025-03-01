@@ -12,8 +12,6 @@ const route = createUserPrivate.post('/users', privyAuthMiddleware, async (c) =>
     const privyId = c.get('privyId')
     const privyUser = c.get('privyUser')
 
-    console.log('privyUser------------', privyUser)
-
     const email =
       typeof privyUser.email === 'string' ? privyUser.email : privyUser.email?.address || ''
     const loginMethod = privyUser.linkedAccounts?.[0]?.type || 'email'

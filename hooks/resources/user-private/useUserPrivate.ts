@@ -10,7 +10,7 @@ const useUserPrivate = () => {
   const [_, setErrorType] = useState<string | undefined>()
   const { logout } = usePrivy()
 
-  const { data, error, isLoading } = useSWR<UserPrivateEntity | null>(
+  const { data, error, isLoading, mutate } = useSWR<UserPrivateEntity | null>(
     [`users`],
     async () => {
       const accessToken = await PrivyAccessTokenRepository.get()
@@ -28,6 +28,22 @@ const useUserPrivate = () => {
     },
   )
 
+  const updateUserPrivate = async (data: UserPrivateEntity) => {
+    const accessToken = await PrivyAccessTokenRepository.get()
+    if (!accessToken) {
+      logout()
+      return
+    }
+
+    try {
+      const updatedUserPrivate = await userPrivateRepository.update(accessToken, data)
+      mutate(updatedUserPrivate, false)
+    } catch (error) {
+      console.error('Error updating user private:', error)
+      throw error
+    }
+  }
+
   useEffect(() => {
     if (!error) return
     if (`${error}`.includes('NotFoundError')) {
@@ -41,6 +57,7 @@ const useUserPrivate = () => {
     userPrivate: data,
     userPrivateError: error,
     userPrivateIsLoading: isLoading,
+    updateUserPrivate,
   }
 }
 
