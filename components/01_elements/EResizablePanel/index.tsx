@@ -85,7 +85,7 @@ const Component = ({
     <div
       className={`relative h-full border-border-subtle bg-background-soft ${
         position === 'left' ? 'border-l' : 'border-r'
-      } overflow-y-scroll`}
+      } flex flex-col overflow-y-scroll`}
       style={{ minWidth, maxWidth }}
     >
       <div className="sticky left-0 top-0 z-10 w-full bg-background-soft px-2">
@@ -104,8 +104,8 @@ const Component = ({
           <ONewChatButton />
         </div>
       </div>
-      <div className="relative mb-20 mt-0">{children}</div>
-      <div className="sticky bottom-0 left-0 right-0 bg-background-soft px-4 py-4">
+      <div className="flex-grow">{children}</div>
+      <div className="sticky bottom-0 left-0 right-0 mt-auto bg-background-soft px-4 py-4">
         <OWalletConnectButton />
       </div>
     </div>
