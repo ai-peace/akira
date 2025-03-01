@@ -1,6 +1,7 @@
 export type UserPrivateEntity = {
   name: string
   privyId: string
-  email: string
+  email?: string
+  solanaSystemAccountAddress?: string
   loginMethod: string
 }

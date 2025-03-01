@@ -8,6 +8,7 @@ export const userPrivateMapper = {
       name: prismaUser.name ?? '',
       email: prismaUser.email ?? '',
       loginMethod: prismaUser.loginMethod,
+      solanaSystemAccountAddress: prismaUser.solanaSystemAccountAddress ?? '',
     }
   },
 }
