@@ -2,11 +2,10 @@ import EDotFont from '@/components/01_elements/EDotFont'
 import { Button } from '@/components/ui/button'
 import useUserPrivate from '@/hooks/resources/user-private/useUserPrivate'
 import { usePrivyAuthentication } from '@/hooks/usePrivyAuthentication'
-import { Loader, Loader2, WalletIcon } from 'lucide-react'
-import Image from 'next/image'
+import { Loader2, WalletIcon } from 'lucide-react'
 
 const Component = () => {
-  const { login, loginned, ready, logout } = usePrivyAuthentication({
+  const { login, loginned, ready } = usePrivyAuthentication({
     redirectUrl: '/',
   })
 

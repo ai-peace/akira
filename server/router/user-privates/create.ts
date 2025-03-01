@@ -12,9 +12,15 @@ const route = createUserPrivate.post('/users', privyAuthMiddleware, async (c) =>
     const privyId = c.get('privyId')
     const privyUser = c.get('privyUser')
 
-    const email = privyUser.email?.address || ''
+    console.log('privyUser------------', privyUser)
+
+    const email =
+      typeof privyUser.email === 'string' ? privyUser.email : privyUser.email?.address || ''
     const loginMethod = privyUser.linkedAccounts?.[0]?.type || 'email'
-    const name = privyUser.email?.address || ''
+    const name = privyUser.wallet?.address || ''
+
+    // solana privy接続ができるまでの暫定
+    const walletAddress = privyUser.wallet?.address || ''
 
     const userPrivate = await prisma.user.create({
       data: {
@@ -23,6 +29,7 @@ const route = createUserPrivate.post('/users', privyAuthMiddleware, async (c) =>
         loginMethod,
         privyId,
         name,
+        solanaSystemAccountAddress: walletAddress,
       },
     })
 
