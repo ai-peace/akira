@@ -66,7 +66,7 @@ const Component = ({ children, position = 'right' }: Props) => {
     <div
       className={`relative h-full w-[320px] border-border-subtle bg-background-soft ${
         position === 'left' ? 'border-l' : 'border-r'
-      } overflow-y-scroll`}
+      } flex flex-col overflow-y-scroll`}
     >
       <div className="sticky left-0 top-0 z-10 w-full bg-background-soft px-2">
         <div className="relative flex h-12 w-full items-center">
@@ -84,8 +84,8 @@ const Component = ({ children, position = 'right' }: Props) => {
           <ONewChatButton />
         </div>
       </div>
-      <div className="relative mb-20 mt-0 w-full overflow-x-hidden">{children}</div>
-      <div className="sticky bottom-0 left-0 right-0 w-full overflow-x-hidden bg-background-soft px-4 py-4">
+      <div className="relative mt-0 w-full flex-grow overflow-x-hidden">{children}</div>
+      <div className="sticky bottom-0 left-0 right-0 mt-auto bg-background-soft px-4 py-4">
         <OWalletConnectButton />
       </div>
     </div>
