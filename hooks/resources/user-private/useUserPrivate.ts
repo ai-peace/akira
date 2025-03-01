@@ -1,14 +1,14 @@
 import { UserPrivateEntity } from '@/domains/entities/user-private.entity'
-import { usePrivyAuthentication } from '@/hooks/usePrivyAuthentication'
 import { PrivyAccessTokenRepository } from '@/repository/privy-access-token.repository'
 import { userPrivateRepository } from '@/repository/user-private.repository'
+import { usePrivy } from '@privy-io/react-auth'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import useSWR from 'swr'
 
 const useUserPrivate = () => {
   const [_, setErrorType] = useState<string | undefined>()
-  const { logout } = usePrivyAuthentication()
+  const { logout } = usePrivy()
 
   const { data, error, isLoading } = useSWR<UserPrivateEntity | null>(
     [`users`],

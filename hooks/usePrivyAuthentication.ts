@@ -13,7 +13,6 @@ type Variables = {
 
 export const usePrivyAuthentication = ({ redirectUrl }: Variables = {}) => {
   const { ready, authenticated } = usePrivy()
-  const router = useRouter()
 
   const { login } = useLogin({
     onComplete: async ({ user, isNewUser, wasAlreadyAuthenticated }) => {
@@ -27,10 +26,11 @@ export const usePrivyAuthentication = ({ redirectUrl }: Variables = {}) => {
       if (wasAlreadyAuthenticated) return
 
       const userPrivate = await userPrivateRepository.get(`${accessToken}`)
+
       if (!userPrivate) {
         const userPrivate = await userPrivateRepository.create(`${accessToken}`)
         if (!userPrivate) {
-          window.location.href = errorUrl()
+          // window.location.href = errorUrl()
         } else {
           toast('ログイン成功', {
             description: 'アカウントが作成されました',
