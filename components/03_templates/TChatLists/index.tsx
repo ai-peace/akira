@@ -1,42 +1,37 @@
 'use client'
 
-import { EResizablePanel } from '@/components/02_organisms/OResizablePanel'
 import { OChatList } from '@/components/02_organisms/OChatList'
+import { EResizablePanel } from '@/components/02_organisms/OResizablePanel'
 
-import { Suspense } from 'react'
-import { TDocumentTreeSkeleton } from './skeleton'
 import { useChats } from '@/hooks/resources/chats/useChats'
-import { ChatEntity } from '@/domains/entities/chat.entity'
+import { TChatListsSkeleton } from './skeleton'
+import { Loader2 } from 'lucide-react'
 
 type Props = {
   openAll?: boolean
   animation?: boolean
 }
 
-const Component = ({ openAll = false, animation = false }: Props) => {
-  const { chats } = useChats()
-
-  if (!chats) return <TDocumentTreeSkeleton />
-
-  return <BaseComponent chats={chats} openAll={openAll} animation={animation} />
-}
-
 export { Component as TChatLists }
 
-type BaseComponentProps = {
-  chats: ChatEntity[]
-  openAll?: boolean
-  animation?: boolean
+const Component = ({ openAll = false, animation = false }: Props) => {
+  return (
+    <EResizablePanel>
+      <BaseComponent />
+    </EResizablePanel>
+  )
 }
 
-const BaseComponent = ({ chats, openAll = false, animation = false }: BaseComponentProps) => {
+const BaseComponent = () => {
+  const { chats, chatsIsLoading, chatsError } = useChats()
+
+  if (!chats) return <TChatListsSkeleton />
+  if (chatsIsLoading) return <TChatListsSkeleton />
+  if (chatsError) return <div>Error</div>
+
   return (
-    <Suspense fallback={<TDocumentTreeSkeleton />}>
-      <EResizablePanel>
-        <div className="h-full overflow-x-auto overflow-y-auto px-4 py-3">
-          <OChatList chats={chats} />
-        </div>
-      </EResizablePanel>
-    </Suspense>
+    <div className="h-full overflow-x-auto overflow-y-auto px-4 py-3">
+      <OChatList chats={chats} />
+    </div>
   )
 }

@@ -5,6 +5,7 @@ import { GetChatCollectionRoute } from './chats'
 import { GetUserPrivateRoute } from './user-privates/show'
 import { CreateUserPrivateRoute } from './user-privates/create'
 import { UpdateUserPrivateRoute } from './user-privates/update'
+import { GetUserPrivateChatCollectionRoute } from './user-privates/chats'
 
 export type ApiRoutes =
   | CreateChatRoute
@@ -14,3 +15,4 @@ export type ApiRoutes =
   | GetUserPrivateRoute
   | CreateUserPrivateRoute
   | UpdateUserPrivateRoute
+  | GetUserPrivateChatCollectionRoute

@@ -2,6 +2,7 @@ import { getChatCollection } from '@/server/router/chats'
 import { createChat } from '@/server/router/chats/create'
 import { createChatPromptGroup } from '@/server/router/chats/prompt-groups/create'
 import { getChat } from '@/server/router/chats/show'
+import { getUserPrivateChatCollection } from '@/server/router/user-privates/chats'
 import { createUserPrivate } from '@/server/router/user-privates/create'
 import { getUserPrivate } from '@/server/router/user-privates/show'
 import { updateUserPrivate } from '@/server/router/user-privates/update'
@@ -17,6 +18,7 @@ hono.route('/', createChatPromptGroup)
 hono.route('/', getUserPrivate)
 hono.route('/', createUserPrivate)
 hono.route('/', updateUserPrivate)
+hono.route('/', getUserPrivateChatCollection)
 
 export const GET = handle(hono)
 export const POST = handle(hono)

@@ -3,7 +3,6 @@ import { ChatEntity } from '@/domains/entities/chat.entity'
 import type { InferRequestType } from 'hono/client'
 
 const client = hcClient()
-export type GetChatInput = InferRequestType<(typeof client.chats)[':uniqueKey']['$get']>
 export type CreateChatInput = InferRequestType<typeof client.chats.$post>
 
 const getCollection = async (): Promise<ChatEntity[]> => {
@@ -87,8 +86,28 @@ const create = async (input: CreateChatInput): Promise<ChatEntity> => {
   }
 }
 
+const getLoginedUsersCollection = async (token: string): Promise<ChatEntity[]> => {
+  const client = hcClient({
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+  const res = await client['user-privates']['chats'].$get()
+  const json = await res.json()
+
+  if (!('data' in json)) throw new Error('Failed to fetch chat collection')
+  const data = json.data as any[]
+
+  return data.map((chat) => ({
+    ...chat,
+    updatedAt: new Date(chat.updatedAt),
+    createdAt: new Date(chat.createdAt),
+  }))
+}
+
 export const chatRepository = {
   getCollection,
+  getLoginedUsersCollection,
   get,
   create,
 }

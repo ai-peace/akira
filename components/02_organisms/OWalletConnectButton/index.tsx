@@ -3,8 +3,13 @@ import { Button } from '@/components/ui/button'
 import { usePrivyAuthentication } from '@/hooks/usePrivyAuthentication'
 import { Loader2, WalletIcon } from 'lucide-react'
 import { OUserProfile } from '../OUserProfile'
+import { cn } from '@/lib/utils'
 
-const Component = () => {
+type Props = {
+  className?: string
+}
+
+const Component = ({ className }: Props) => {
   const { login, loginned, ready } = usePrivyAuthentication({
     redirectUrl: '/',
   })
@@ -25,7 +30,10 @@ const Component = () => {
   return (
     <Button
       onClick={() => login()}
-      className="w-full bg-foreground text-background-soft transition-colors hover:bg-foreground/80"
+      className={cn(
+        'w-full bg-foreground text-background-soft transition-colors hover:bg-foreground/80',
+        className,
+      )}
     >
       <WalletIcon className="mr-1 h-4 w-4" />
       <EDotFont text="Login" />

@@ -67,6 +67,7 @@ const update = async (token: string, data: UserPrivateEntity): Promise<UserPriva
     throw error
   }
 }
+
 export const userPrivateRepository = {
   get,
   create,

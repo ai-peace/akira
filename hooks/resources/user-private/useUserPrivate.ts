@@ -3,7 +3,6 @@ import { PrivyAccessTokenRepository } from '@/repository/privy-access-token.repo
 import { userPrivateRepository } from '@/repository/user-private.repository'
 import { usePrivy } from '@privy-io/react-auth'
 import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
 import useSWR from 'swr'
 
 const useUserPrivate = () => {
@@ -14,13 +13,7 @@ const useUserPrivate = () => {
     [`users`],
     async () => {
       const accessToken = await PrivyAccessTokenRepository.get()
-      if (!accessToken) {
-        logout()
-        toast.error('Login required', {
-          description: 'Please login to continue',
-        })
-        return null
-      }
+      if (!accessToken) return null
       return await userPrivateRepository.get(accessToken)
     },
     {

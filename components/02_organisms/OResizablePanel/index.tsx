@@ -2,8 +2,9 @@
 
 import { ONewChatButton } from '@/components/02_organisms/ONewChatButton'
 import { OWalletConnectButton } from '@/components/02_organisms/OWalletConnectButton'
+import useUserPrivate from '@/hooks/resources/user-private/useUserPrivate'
 import { PanelLeftCloseIcon, PanelRightCloseIcon } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 type Props = {
   position?: 'left' | 'right'
@@ -12,34 +13,10 @@ type Props = {
 
 const Component = ({ children, position = 'right' }: Props) => {
   const storageKey = `resizable-panel-${position}-visible`
+  const { userPrivate } = useUserPrivate()
   const [isVisible, setIsVisible] = useState(true)
-  const [isClient, setIsClient] = useState(false)
 
-  useEffect(() => {
-    setIsClient(true)
-    const stored = localStorage.getItem(storageKey)
-    if (stored !== null) {
-      setIsVisible(stored === 'true')
-    }
-  }, [storageKey])
-
-  useEffect(() => {
-    if (isClient) {
-      localStorage.setItem(storageKey, isVisible.toString())
-    }
-  }, [isVisible, storageKey, isClient])
-
-  if (!isClient) {
-    return (
-      <div
-        className={`relative h-full w-[320px] border-border-subtle bg-background-soft ${
-          position === 'left' ? 'border-l' : 'border-r'
-        }`}
-      >
-        <div className="relative h-full">{children}</div>
-      </div>
-    )
-  }
+  if (!userPrivate) return null
 
   if (!isVisible) {
     return (
