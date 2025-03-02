@@ -10,15 +10,13 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import useUserPrivate from '@/hooks/resources/user-private/useUserPrivate'
-import { usePrivyAuthentication } from '@/hooks/usePrivyAuthentication'
+import { usePrivy } from '@privy-io/react-auth'
 import { Loader2, LogOut } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
 const Component = () => {
-  const { logout } = usePrivyAuthentication({
-    redirectUrl: '/',
-  })
+  const { logout } = usePrivy()
   const { userPrivate, userPrivateError, userPrivateIsLoading, updateUserPrivate } =
     useUserPrivate()
   const [isOpen, setIsOpen] = useState(false)

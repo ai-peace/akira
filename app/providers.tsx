@@ -3,6 +3,7 @@
 import { clientApplicationProperties } from '@/consts/client-application-properties'
 import { PrivyProvider } from '@privy-io/react-auth'
 import { PropsWithChildren } from 'react'
+import PrivyCallback from './privy-callback'
 
 export function Providers({ children }: PropsWithChildren) {
   return (
@@ -16,7 +17,7 @@ export function Providers({ children }: PropsWithChildren) {
         },
       }}
     >
-      {children}
+      <PrivyCallback>{children}</PrivyCallback>
     </PrivyProvider>
   )
 }

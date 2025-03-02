@@ -16,9 +16,6 @@ const useUserPrivate = () => {
       if (!accessToken) return null
       return await userPrivateRepository.get(accessToken)
     },
-    {
-      refreshInterval: 1000,
-    },
   )
 
   const updateUserPrivate = async (data: UserPrivateEntity) => {

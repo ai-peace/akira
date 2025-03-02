@@ -1,18 +1,16 @@
 import EDotFont from '@/components/01_elements/EDotFont'
 import { Button } from '@/components/ui/button'
-import { usePrivyAuthentication } from '@/hooks/usePrivyAuthentication'
 import { Loader2, WalletIcon } from 'lucide-react'
 import { OUserProfile } from '../OUserProfile'
 import { cn } from '@/lib/utils'
+import { usePrivy } from '@privy-io/react-auth'
 
 type Props = {
   className?: string
 }
 
 const Component = ({ className }: Props) => {
-  const { login, loginned, ready } = usePrivyAuthentication({
-    redirectUrl: '/',
-  })
+  const { login, authenticated, ready } = usePrivy()
 
   // Privyが準備できていない場合は工事中ダイアログを表示
   if (!ready) {
@@ -24,7 +22,7 @@ const Component = ({ className }: Props) => {
   }
 
   // ログイン済みの場合はログイン済みボタンを表示
-  if (loginned) return <OUserProfile />
+  if (authenticated) return <OUserProfile />
 
   // ログインボタンを表示
   return (

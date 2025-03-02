@@ -11,6 +11,9 @@ type Variables = {
   redirectUrl?: string
 }
 
+// このコンポーネントはSingletonである必要がある
+// ログインの際のcallbackがあるため、複数のコンポーネントで使用すると
+// ログインのcallbackが複数実行される
 export const usePrivyAuthentication = ({ redirectUrl }: Variables = {}) => {
   const { ready, authenticated } = usePrivy()
 

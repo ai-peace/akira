@@ -1,6 +1,4 @@
-import { OGlobalSideMenu } from '@/components/02_organisms/OGlobalSideMenu'
 import { OMainSpaceHeader } from '@/components/02_organisms/OMainSpaceHeader'
-import { OThemeChangeButton } from '@/components/02_organisms/OThemeChangeButton'
 import { TChatLists } from '@/components/03_templates/TChatLists'
 import { RootLayoutClient } from '@/components/99_providers/root-layout-client'
 import { Toaster } from '@/components/ui/toaster'

@@ -5,7 +5,9 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
+import { PrivyAccessTokenRepository } from '@/repository/privy-access-token.repository'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { usePrivy } from '@privy-io/react-auth'
 import { ArrowUp, Loader2 } from 'lucide-react'
 import { FC, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -48,6 +50,7 @@ const Component: FC<Props> = ({ onSubmit }) => {
   const [textareaHeight, setTextareaHeight] = useState('auto')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const lineHeight = 24
+  const { login } = usePrivy()
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
@@ -58,6 +61,11 @@ const Component: FC<Props> = ({ onSubmit }) => {
 
   const handleSubmit = async (data: FormData) => {
     try {
+      const accessToken = await PrivyAccessTokenRepository.get()
+      if (!accessToken) {
+        login()
+        return
+      }
       setIsSubmitting(true)
       await onSubmit(data.prompt)
       form.reset()

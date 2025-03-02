@@ -5,21 +5,6 @@ import type { InferRequestType } from 'hono/client'
 const client = hcClient()
 export type CreateChatInput = InferRequestType<typeof client.chats.$post>
 
-const getCollection = async (): Promise<ChatEntity[]> => {
-  const client = hcClient()
-  const res = await client.chats.$get()
-  const json = await res.json()
-
-  if (!('data' in json)) throw new Error('Failed to fetch chat collection')
-  const data = json.data as any[]
-
-  return data.map((chat) => ({
-    ...chat,
-    updatedAt: new Date(chat.updatedAt),
-    createdAt: new Date(chat.createdAt),
-  }))
-}
-
 const get = async (uniqueKey: string): Promise<ChatEntity | null> => {
   try {
     const client = hcClient()
@@ -53,9 +38,13 @@ const get = async (uniqueKey: string): Promise<ChatEntity | null> => {
   }
 }
 
-const create = async (input: CreateChatInput): Promise<ChatEntity> => {
+const create = async (input: CreateChatInput, token: string): Promise<ChatEntity> => {
   try {
-    const client = hcClient()
+    const client = hcClient({
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
     const res = await client.chats.$post({ json: input.json })
     const json = await res.json()
 
@@ -106,7 +95,6 @@ const getLoginedUsersCollection = async (token: string): Promise<ChatEntity[]> =
 }
 
 export const chatRepository = {
-  getCollection,
   getLoginedUsersCollection,
   get,
   create,
