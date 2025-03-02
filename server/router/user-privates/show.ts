@@ -7,7 +7,7 @@ export const getUserPrivate = new Hono()
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const route = getUserPrivate.get(
-  '/users',
+  '/user-privates',
   privyAuthMiddleware,
   requireUserMiddleware,
   async (c) => {

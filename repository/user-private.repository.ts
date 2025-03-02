@@ -8,7 +8,7 @@ const get = async (token: string): Promise<UserPrivateEntity | null> => {
     },
   })
 
-  const res = await client.users.$get()
+  const res = await client['user-privates'].$get()
   const json = await res.json()
 
   if ('data' in json) {
@@ -22,7 +22,6 @@ const get = async (token: string): Promise<UserPrivateEntity | null> => {
 }
 
 const create = async (token: string): Promise<UserPrivateEntity | null> => {
-  console.log('create', token)
   const client = hcClient({
     headers: {
       Authorization: `Bearer ${token}`,
