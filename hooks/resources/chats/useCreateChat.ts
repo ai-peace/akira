@@ -1,4 +1,4 @@
-import { CreateChatInput, chatRepository } from '@/repository/chat'
+import { CreateChatInput, chatRepository } from '@/repository/chat.repository'
 
 export const useCreateChat = () => {
   const createChat = async (input: CreateChatInput) => {

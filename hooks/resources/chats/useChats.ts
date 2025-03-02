@@ -1,5 +1,5 @@
 import { ChatEntity } from '@/domains/entities/chat.entity'
-import { chatRepository } from '@/repository/chat'
+import { chatRepository } from '@/repository/chat.repository'
 import { useEffect, useState } from 'react'
 import useSWR from 'swr'
 
