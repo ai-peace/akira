@@ -2,19 +2,12 @@
 
 import { OChatList } from '@/components/02_organisms/OChatList'
 import { EResizablePanel } from '@/components/02_organisms/OResizablePanel'
-
 import { useChats } from '@/hooks/resources/chats/useChats'
 import { TChatListsSkeleton } from './skeleton'
-import { Loader2 } from 'lucide-react'
-
-type Props = {
-  openAll?: boolean
-  animation?: boolean
-}
 
 export { Component as TChatLists }
 
-const Component = ({ openAll = false, animation = false }: Props) => {
+const Component = () => {
   return (
     <EResizablePanel>
       <BaseComponent />

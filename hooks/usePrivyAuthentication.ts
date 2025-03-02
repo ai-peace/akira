@@ -6,6 +6,8 @@ import { useLogin, useLogout, usePrivy } from '@privy-io/react-auth'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
+import useUserPrivate from './resources/user-private/useUserPrivate'
+import { useChats } from './resources/chats/useChats'
 
 type Variables = {
   redirectUrl?: string
@@ -16,6 +18,8 @@ type Variables = {
 // ログインのcallbackが複数実行される
 export const usePrivyAuthentication = ({ redirectUrl }: Variables = {}) => {
   const { ready, authenticated } = usePrivy()
+  const { userPrivateMutate } = useUserPrivate()
+  const { chatsMutate } = useChats()
 
   const { login } = useLogin({
     onComplete: async ({ user, isNewUser, wasAlreadyAuthenticated }) => {
@@ -29,6 +33,8 @@ export const usePrivyAuthentication = ({ redirectUrl }: Variables = {}) => {
       if (wasAlreadyAuthenticated) return
 
       const userPrivate = await userPrivateRepository.get(`${accessToken}`)
+      userPrivateMutate(userPrivate)
+      chatsMutate()
 
       if (!userPrivate) {
         const userPrivate = await userPrivateRepository.create(`${accessToken}`)

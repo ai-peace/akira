@@ -7,7 +7,7 @@ import useSWR from 'swr'
 
 const useUserPrivate = () => {
   const [_, setErrorType] = useState<string | undefined>()
-  const { logout } = usePrivy()
+  const { logout, authenticated, ready } = usePrivy()
 
   const { data, error, isLoading, mutate } = useSWR<UserPrivateEntity | null>(
     [`users`],
@@ -16,7 +16,31 @@ const useUserPrivate = () => {
       if (!accessToken) return null
       return await userPrivateRepository.get(accessToken)
     },
+    {
+      // ログイン状態が変わったときにデータを再検証する
+      revalidateOnFocus: true,
+      revalidateIfStale: true,
+    },
   )
+
+  // ログイン状態が変わったときにデータをリロードする
+  useEffect(() => {
+    if (authenticated) {
+      mutate()
+    }
+  }, [authenticated, mutate])
+
+  // localStorage内のトークンの変更を検知してリロードする
+  useEffect(() => {
+    const handleStorageChange = () => {
+      mutate()
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+    }
+  }, [mutate])
 
   const updateUserPrivate = async (data: UserPrivateEntity) => {
     const accessToken = await PrivyAccessTokenRepository.get()
@@ -47,6 +71,7 @@ const useUserPrivate = () => {
     userPrivate: data,
     userPrivateError: error,
     userPrivateIsLoading: isLoading,
+    userPrivateMutate: mutate,
     updateUserPrivate,
   }
 }

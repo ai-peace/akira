@@ -1,19 +1,18 @@
 'use client'
+
 import ETypewriterText from '@/components/01_elements/ETypewriterText'
+import { ECenteredLoadingSpinner } from '@/components/01_elements/ECenteredLoadingSpinner'
+import { EMdxRenderer } from '@/components/01_elements/EMdxRenderer'
+import { OChatHistorySection } from '@/components/02_organisms/OChatHistorySection'
 import { OChatTextarea } from '@/components/02_organisms/OChatTextarea'
-import { Card } from '@/components/ui/card'
+import OProductListItem from '@/components/02_organisms/OProductListItem'
 import { ChatBubble, ChatBubbleAvatar, ChatBubbleMessage } from '@/components/ui/chat/chat-bubble'
 import { ChatMessageList } from '@/components/ui/chat/chat-message-list'
+import { Skeleton } from '@/components/ui/skeleton'
 import { ProductEntity } from '@/domains/entities/product.entity'
 import { useChat } from '@/hooks/resources/chats/useChat'
-import { FC, Fragment, useEffect, useRef, useState, useMemo } from 'react'
-import { ECenteredLoadingSpinner } from '@/components/01_elements/ECenteredLoadingSpinner'
 import { KeywordPair } from '@/server/domains/entities/prompt.entity'
-import { Skeleton } from '@/components/ui/skeleton'
-import { EMdxRenderer } from '@/components/01_elements/EMdxRenderer'
-import OProductListItem from '@/components/02_organisms/OProductListItem'
-import { OChatHistorySection } from '@/components/02_organisms/OChatHistorySection'
-import Image from 'next/image'
+import { FC, Fragment, useEffect, useMemo, useRef, useState } from 'react'
 
 type Props = {
   chatUniqueKey: string

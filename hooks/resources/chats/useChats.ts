@@ -7,7 +7,7 @@ import useSWR from 'swr'
 export const useChats = () => {
   const [errorType, setErrorType] = useState<string | undefined>()
 
-  const { data, error, isLoading } = useSWR<ChatEntity[]>([`chats`], async () => {
+  const { data, error, isLoading, mutate } = useSWR<ChatEntity[]>([`chats`], async () => {
     const token = await PrivyAccessTokenRepository.get()
     if (!token) throw new Error('No token')
     return await chatRepository.getLoginedUsersCollection(token)
@@ -27,5 +27,6 @@ export const useChats = () => {
     chatsError: error,
     chatsIsLoading: isLoading,
     chatsErrorType: errorType,
+    chatsMutate: mutate,
   }
 }
