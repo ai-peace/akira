@@ -2,7 +2,7 @@ import { UserPromptUsageEntity } from '@/domains/entities/user-prompt-usage.enti
 import { applicationServerConst } from '@/server/server-const/appilication.server-const'
 import { prisma } from '@/server/server-lib/prisma'
 import { Hono } from 'hono'
-import { privyAuthMiddleware } from '../../../server-middleware/privy-auth.middleware'
+import { privyAuthMiddleware } from '@/server/server-middleware/privy-auth.middleware'
 import { requireUserMiddleware } from '@/server/server-middleware/require-user.middleware'
 
 export const upsertUserPromptUsage = new Hono()
@@ -15,11 +15,16 @@ const route = upsertUserPromptUsage.patch(
   async (c) => {
     try {
       const user = c.var.user
+
+      // UTCの0時をベースにする
+      const today = new Date()
+      today.setUTCHours(0, 0, 0, 0)
+
       const userPromptUsage = await prisma.userPromptUsage.findUnique({
         where: {
           userId_date: {
             userId: user.id,
-            date: new Date(),
+            date: today, // UTCベースの日付を使用
           },
         },
       })
@@ -29,7 +34,7 @@ const route = upsertUserPromptUsage.patch(
         updatedUserPromptUsage = await prisma.userPromptUsage.create({
           data: {
             userId: user.id,
-            date: new Date(),
+            date: today, // UTCベースの日付を使用
           },
         })
       } else {

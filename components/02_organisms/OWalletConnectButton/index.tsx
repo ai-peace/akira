@@ -4,6 +4,7 @@ import { Loader2, WalletIcon } from 'lucide-react'
 import { OUserProfile } from '../OUserProfile'
 import { cn } from '@/lib/utils'
 import { usePrivy } from '@privy-io/react-auth'
+import { Skeleton } from '@/components/ui/skeleton'
 
 type Props = {
   className?: string
@@ -16,7 +17,7 @@ const Component = ({ className }: Props) => {
   if (!ready) {
     return (
       <div className="flex w-full items-center justify-center gap-2">
-        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+        <Skeleton className="h-4 w-24" />
       </div>
     )
   }

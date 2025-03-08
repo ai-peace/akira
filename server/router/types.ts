@@ -5,8 +5,8 @@ import { GetUserPrivateRoute } from './user-privates/show'
 import { CreateUserPrivateRoute } from './user-privates/create'
 import { UpdateUserPrivateRoute } from './user-privates/update'
 import { GetUserPrivateChatCollectionRoute } from './user-privates/chats'
-import { InitializeUserPromptUsageRoute } from './user-privates/prompt-usages/initialize'
-import { UpsertUserPromptUsageRoute } from './user-privates/prompt-usages/upsert'
+import { InitializeUserPromptUsageRoute } from './user-prompt-usages/initialize'
+import { UpsertUserPromptUsageRoute } from './user-prompt-usages/upsert'
 
 export type ApiRoutes =
   | CreateChatRoute

@@ -14,10 +14,10 @@ const route = initializeUserPromptUsage.post(
     try {
       const user = c.var.user
 
-      // トランザクションを使用して競合を防ぐ
       const userPromptUsage = await prisma.$transaction(async (tx) => {
+        // UTCの0時をベースにする
         const today = new Date()
-        today.setHours(0, 0, 0, 0)
+        today.setUTCHours(0, 0, 0, 0)
 
         const existing = await tx.userPromptUsage.findUnique({
           where: {

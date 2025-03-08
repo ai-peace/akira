@@ -7,6 +7,7 @@ import { Hono } from 'hono'
 import { createChatSchema } from './schema/create.schema'
 import { privyAuthMiddleware } from '@/server/server-middleware/privy-auth.middleware'
 import { requireUserMiddleware } from '@/server/server-middleware/require-user.middleware'
+import { requireUserPromptUsage } from '@/server/server-middleware/require-user-prompt-usage.middleware'
 
 export const createChat = new Hono()
 
@@ -14,10 +15,12 @@ const route = createChat.post(
   '/chats',
   privyAuthMiddleware,
   requireUserMiddleware,
+  requireUserPromptUsage,
   zValidator('json', createChatSchema),
   async (c) => {
     try {
       const data = c.req.valid('json')
+      const userPromptUsage = c.get('userPromptUsage')
 
       const user = await prisma.user.findUnique({
         where: {
@@ -44,7 +47,7 @@ const route = createChat.post(
         },
       })
 
-      await generateUserResponseUsecase.execute(chat.uniqueKey, data.mainPrompt)
+      await generateUserResponseUsecase.execute(chat.uniqueKey, data.mainPrompt, userPromptUsage)
 
       const chatEntity = chatMapper.toDomain(chat)
 

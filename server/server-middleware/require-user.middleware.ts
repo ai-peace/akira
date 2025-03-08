@@ -1,6 +1,8 @@
 import { prisma } from '@/server/server-lib/prisma'
 import { createMiddleware } from 'hono/factory'
 import { User } from '@prisma/client'
+import { HcApiResponse } from '@/domains/types/hc-api-response.types'
+import { createServerAppError } from '@/domains/error-codes/server.error-codes'
 
 export const requireUserMiddleware = createMiddleware<{
   Variables: {
@@ -17,13 +19,23 @@ export const requireUserMiddleware = createMiddleware<{
     })
 
     if (!user) {
-      return c.json({ error: 'User not found' }, 404)
+      return c.json<HcApiResponse<never>>(
+        {
+          error: createServerAppError('NOT_FOUND'),
+        },
+        404,
+      )
     }
 
     c.set('user', user)
     await next()
   } catch (error) {
     console.error('Error fetching user:', error)
-    return c.json({ error: 'Failed to fetch user' }, 500)
+    return c.json<HcApiResponse<never>>(
+      {
+        error: createServerAppError('SERVER_ERROR'),
+      },
+      500,
+    )
   }
 })

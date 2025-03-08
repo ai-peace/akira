@@ -2,12 +2,10 @@
 
 import { ONewChatButton } from '@/components/02_organisms/ONewChatButton'
 import { OWalletConnectButton } from '@/components/02_organisms/OWalletConnectButton'
-import { clientApplicationProperties } from '@/consts/client-application-properties'
 import useUserPrivate from '@/hooks/resources/user-private/useUserPrivate'
-import useUserPromptUsage from '@/hooks/resources/user-prompt-usage/usePromptUsage'
-import { InfoIcon, PanelLeftCloseIcon, PanelRightCloseIcon } from 'lucide-react'
+import { PanelLeftCloseIcon, PanelRightCloseIcon } from 'lucide-react'
 import { useState } from 'react'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { OUserPromptUsage } from '../OUserPromptUsage'
 
 type Props = {
   position?: 'left' | 'right'
@@ -15,10 +13,8 @@ type Props = {
 }
 
 const Component = ({ children, position = 'right' }: Props) => {
-  const storageKey = `resizable-panel-${position}-visible`
   const { userPrivate } = useUserPrivate()
   const [isVisible, setIsVisible] = useState(true)
-  const { userPromptUsage } = useUserPromptUsage()
 
   if (!userPrivate) return null
 
@@ -68,26 +64,7 @@ const Component = ({ children, position = 'right' }: Props) => {
       <div className="relative mt-0 w-full flex-grow overflow-x-hidden">{children}</div>
       <div className="sticky bottom-0 left-0 right-0 mt-auto bg-background-soft px-4 py-4">
         <div className="flex flex-col gap-4">
-          {userPromptUsage && (
-            <div className="text-md flex items-center justify-between gap-1 px-1 font-semibold">
-              {clientApplicationProperties.dailyPromptUsageLimit.perUser - userPromptUsage.count} /{' '}
-              {clientApplicationProperties.dailyPromptUsageLimit.perUser} Credits
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger>
-                    <InfoIcon className="h-4 w-4" />
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>
-                      The number of prompts available per day.
-                      <br />
-                      Resets at 00:00 (UTC) every day.
-                    </p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </div>
-          )}
+          <OUserPromptUsage />
           <OWalletConnectButton />
         </div>
       </div>

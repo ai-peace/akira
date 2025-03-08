@@ -1,5 +1,6 @@
 import { ChatEntity } from '@/domains/entities/chat.entity'
 import { chatRepository } from '@/repository/chat.repository'
+import { PrivyAccessTokenRepository } from '@/repository/privy-access-token.repository'
 import { promptGroupRepository } from '@/repository/prompt-group'
 import { useEffect, useState } from 'react'
 import useSWR from 'swr'
@@ -17,6 +18,7 @@ export const useChat = (variables: { uniqueKey: string }) => {
     },
   )
 
+  // TODO ここでエラーをどうハンドリングするか。利用数が多いものはエラーを出す。
   useEffect(() => {
     if (!error) return
     if (`${error}`.includes('NotFoundError')) {
@@ -27,14 +29,19 @@ export const useChat = (variables: { uniqueKey: string }) => {
   }, [error])
 
   const createChatPromptGroup = async (question: string) => {
-    const response = await promptGroupRepository.create({
-      json: {
-        question,
+    const accessToken = await PrivyAccessTokenRepository.get()
+    if (!accessToken) throw new Error('Access token not found')
+    const response = await promptGroupRepository.create(
+      {
+        json: {
+          question,
+        },
+        param: {
+          uniqueKey: variables.uniqueKey,
+        },
       },
-      param: {
-        uniqueKey: variables.uniqueKey,
-      },
-    })
+      accessToken,
+    )
     mutate()
     return response
   }

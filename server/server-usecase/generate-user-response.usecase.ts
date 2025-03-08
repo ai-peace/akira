@@ -3,6 +3,8 @@ import { prisma } from '../server-lib/prisma'
 import { generateUniqueKey } from '../server-lib/uuid'
 import { promptGroupMapper } from '../server-mappers/prompt-group/index.mapper'
 import { conversationAgent } from '../server-service/tools/conversation-agent/index.tool'
+import { UserPromptUsage } from '@prisma/client'
+import { userPromptUsageService } from '../server-service/user-prompt-usage.service'
 
 type LlmStatus = 'IDLE' | 'PROCESSING' | 'SUCCESS' | 'FAILED'
 const LlmStatus = {
@@ -10,12 +12,19 @@ const LlmStatus = {
   SUCCESS: 'SUCCESS' as const,
 } as const
 
-const execute = async (chatUniqueKey: string, question: string): Promise<PromptGroupEntity> => {
+const execute = async (
+  chatUniqueKey: string,
+  question: string,
+  userPromptUsage: UserPromptUsage,
+): Promise<PromptGroupEntity> => {
   try {
     const promptGroup = await initializePromptGroup(chatUniqueKey, question)
 
     // 非同期で会話エージェントを実行
-    processConversation(promptGroup.prompts[0].uniqueKey, question)
+    processConversation(promptGroup.prompts[0].uniqueKey, question).then(() => {
+      // 会話エージェントが成功したら、ユーザーのプロンプト使用回数をインクリメント
+      userPromptUsageService.increment(userPromptUsage)
+    })
 
     const promptGroupEntity = promptGroupMapper.toDomain(promptGroup)
     return promptGroupEntity
