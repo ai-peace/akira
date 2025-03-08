@@ -7,6 +7,8 @@
     --foreground: 180 4% 2%;
     --background-soft: 0 0% 98%;
     --background-muted: 0 0% 96%;
+    --background-light: 0 0% 98%;
+    --background-lighter: 0 0% 99.5%;
     --text-strong: 180 4% 2%;
     --text-default: 180 4% 15%;
     --text-muted: 180 4% 45%;
@@ -46,6 +48,8 @@
     --foreground: 0 0% 80%;
     --background-soft: 180 4% 4%;
     --background-muted: 0 0% 19%;
+    --background-light: 0 0% 10%;
+    --background-lighter: 0 0% 15%;
     --text-strong: 0 0% 100%;
     --text-default: 0 0% 85%;
     --text-muted: 0 0% 65%;
