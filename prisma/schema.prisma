@@ -22,7 +22,8 @@ model User {
   updatedAt DateTime @updatedAt @map("updated_at")
   createdAt DateTime @default(now()) @map("created_at")
 
-  chats Chat[]
+  chats            Chat[]
+  userPromptUsages UserPromptUsage[]
 
   @@unique([uniqueKey])
   @@unique([privyId])
@@ -30,6 +31,25 @@ model User {
   @@index([privyId], name: "users_privyid_unique")
   @@index([email])
   @@map("users")
+}
+
+model UserPromptUsage {
+  id Int @id @default(autoincrement())
+
+  userId Int @map("user_id")
+
+  count Int      @default(0)
+  date  DateTime @db.Date
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, date])
+  @@index([userId])
+  @@index([userId, date])
+  @@map("user_prompt_usage")
 }
 
 model Chat {

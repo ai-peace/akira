@@ -1,14 +1,14 @@
 import { UserPrivateEntity } from '@/domains/entities/user-private.entity'
 import { PrivyAccessTokenRepository } from '@/repository/privy-access-token.repository'
 import { userPrivateRepository } from '@/repository/user-private.repository'
+import { userPromptUsageRepository } from '@/repository/user-prompt-usage.repository'
 import { errorUrl, rootUrl } from '@/utils/url.helper'
 import { useLogin, useLogout, usePrivy } from '@privy-io/react-auth'
-import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import useUserPrivate from './resources/user-private/useUserPrivate'
 import { useChats } from './resources/chats/useChats'
-
+import useUserPrivate from './resources/user-private/useUserPrivate'
+import useUserPromptUsage from './resources/user-prompt-usage/usePromptUsage'
 type Variables = {
   redirectUrl?: string
 }
@@ -20,6 +20,7 @@ export const usePrivyAuthentication = ({ redirectUrl }: Variables = {}) => {
   const { ready, authenticated } = usePrivy()
   const { userPrivateMutate } = useUserPrivate()
   const { chatsMutate } = useChats()
+  const { userPromptUsageMutate } = useUserPromptUsage()
 
   const { login } = useLogin({
     onComplete: async ({ user, isNewUser, wasAlreadyAuthenticated }) => {
@@ -35,6 +36,7 @@ export const usePrivyAuthentication = ({ redirectUrl }: Variables = {}) => {
       const userPrivate = await userPrivateRepository.get(`${accessToken}`)
       userPrivateMutate(userPrivate)
       chatsMutate()
+      userPromptUsageMutate()
 
       if (!userPrivate) {
         const userPrivate = await userPrivateRepository.create(`${accessToken}`)
@@ -49,6 +51,12 @@ export const usePrivyAuthentication = ({ redirectUrl }: Variables = {}) => {
         toast('ログイン成功', {
           description: 'おかえりなさい！',
         })
+      }
+
+      const userPromptUsage = await userPromptUsageRepository.get(`${accessToken}`)
+      if (!userPromptUsage) {
+        window.location.href = errorUrl()
+        return
       }
     },
     onError: (error: any) => {
