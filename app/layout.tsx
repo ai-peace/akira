@@ -7,27 +7,52 @@ import type { Metadata } from 'next'
 import { Providers } from './providers'
 
 export const metadata: Metadata = {
-  title: 'AKIRA',
-  description: 'AKIRA App',
+  title: {
+    default: 'Akira - SEARCH AI AGENT',
+    template: '%s | Akira',
+  },
+  description:
+    'Find your perfect items through natural conversations with AI. Akira makes your shopping experience smarter and more intuitive.',
+  icons: {
+    icon: '/icon512_rounded.png',
+    apple: '/icon512_rounded.png',
+  },
   manifest: '/manifest.json',
+  themeColor: '#ffffff',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'AKIRA',
+    title: 'Akira',
+  },
+  openGraph: {
+    title: 'Akira - SEARCH AI AGENT',
+    description:
+      'Find your perfect items through natural conversations with AI. Akira makes your shopping experience smarter and more intuitive.',
+    images: [
+      {
+        url: '/logo_akira_black.png',
+        width: 512,
+        height: 512,
+        alt: 'Akira Logo',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Akira - SEARCH AI AGENT',
+    description: 'Find your perfect items through natural conversations with AI',
+    images: ['/logo_akira_black.png'],
   },
   formatDetection: {
     telephone: false,
   },
-}
-
-export const viewport = {
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-    { media: '(prefers-color-scheme: dark)', color: '#0A0A0A' },
-  ],
-  width: 'device-width',
-  initialScale: 1,
-  maximumScale: 1,
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -2,24 +2,27 @@ import { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    theme_color: '#000000',
+    name: 'Akira - AI Shopping Assistant',
+    short_name: 'Akira',
+    description: 'Your AI-powered shopping companion',
+    start_url: '/',
+    display: 'standalone',
     background_color: '#ffffff',
+    theme_color: '#ffffff',
     icons: [
       {
-        purpose: 'maskable',
+        src: '/icon512_rounded.png',
         sizes: '512x512',
-        src: 'icon512_maskable.png',
         type: 'image/png',
+        purpose: 'any',
       },
-      { purpose: 'any', sizes: '512x512', src: 'icon512_rounded.png', type: 'image/png' },
+      {
+        src: '/icon512_maskable.png',
+        sizes: '512x512',
+        type: 'image/png',
+        purpose: 'maskable',
+      },
     ],
-    orientation: 'any',
-    display: 'standalone',
-    dir: 'auto',
-    lang: 'ja',
-    name: 'AKIRA',
-    short_name: 'AKIRA',
-    start_url: '/',
-    scope: '/',
+    prefer_related_applications: false,
   }
 }
