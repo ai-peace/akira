@@ -1,10 +1,13 @@
+import { PromptGroupEntity } from '@/domains/entities/prompt-group.entity'
+import { createServerAppError } from '@/domains/error-codes/server.error-codes'
+import { HcApiResponseType } from '@/domains/types/hc-api-response.types'
+import { privyAuthMiddleware } from '@/server/server-middleware/privy-auth.middleware'
+import { requireUserPromptUsage } from '@/server/server-middleware/require-user-prompt-usage.middleware'
+import { requireUserMiddleware } from '@/server/server-middleware/require-user.middleware'
 import { generateUserResponseUsecase } from '@/server/server-usecase/generate-user-response.usecase'
 import { zValidator } from '@hono/zod-validator'
 import { Hono } from 'hono'
 import { createChatPromptGroupSchema } from './schema/create.schema'
-import { privyAuthMiddleware } from '@/server/server-middleware/privy-auth.middleware'
-import { requireUserMiddleware } from '@/server/server-middleware/require-user.middleware'
-import { requireUserPromptUsage } from '@/server/server-middleware/require-user-prompt-usage.middleware'
 
 export const createChatPromptGroup = new Hono()
 
@@ -26,10 +29,21 @@ const route = createChatPromptGroup.post(
         userPromptUsage,
       )
 
-      return c.json({ data: promptGroupEntity }, 201)
+      return c.json<HcApiResponseType<PromptGroupEntity>>(
+        {
+          data: promptGroupEntity,
+        },
+        201,
+      )
     } catch (error) {
-      console.error('Error creating chat:', error)
-      return c.json({ error: 'Failed to create chat' }, 500)
+      console.error('Error chats/prompt-groups/create:', error)
+
+      return c.json<HcApiResponseType<never>>(
+        {
+          error: createServerAppError('SERVER_ERROR'),
+        },
+        500,
+      )
     }
   },
 )

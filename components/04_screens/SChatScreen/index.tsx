@@ -1,19 +1,20 @@
 'use client'
 
-import ETypewriterText from '@/components/01_elements/ETypewriterText'
 import { ECenteredLoadingSpinner } from '@/components/01_elements/ECenteredLoadingSpinner'
 import { EMdxRenderer } from '@/components/01_elements/EMdxRenderer'
+import ETypewriterText from '@/components/01_elements/ETypewriterText'
 import { OChatHistorySection } from '@/components/02_organisms/OChatHistorySection'
 import { OChatTextarea } from '@/components/02_organisms/OChatTextarea'
 import OProductListItem from '@/components/02_organisms/OProductListItem'
+import { OProductListModal } from '@/components/02_organisms/OProductListModal'
 import { ChatBubble, ChatBubbleAvatar, ChatBubbleMessage } from '@/components/ui/chat/chat-bubble'
 import { ChatMessageList } from '@/components/ui/chat/chat-message-list'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ProductEntity } from '@/domains/entities/product.entity'
 import { useChat } from '@/hooks/resources/chats/useChat'
+import { useErrorHandler } from '@/hooks/uis/use-error-hander'
 import { KeywordPair } from '@/server/domains/entities/prompt.entity'
-import { FC, Fragment, useEffect, useMemo, useRef, useState } from 'react'
-import { OProductListModal } from '@/components/02_organisms/OProductListModal'
+import { FC, Fragment, useEffect, useRef, useState } from 'react'
 
 type Props = {
   chatUniqueKey: string
@@ -28,6 +29,7 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
   } | null>(null)
   const messageListRef = useRef<HTMLDivElement>(null)
   const [currentPromptId, setCurrentPromptId] = useState<string | null>(null)
+  const { handleError } = useErrorHandler()
 
   useEffect(() => {
     if (!messageListRef.current) return
@@ -91,23 +93,33 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
 
   const handleCreateChatPromptGroup = async (question: string) => {
     setOptimisticPromptGroup({ question: question })
-    await createChatPromptGroup(question)
-    if (messageListRef.current) {
-      messageListRef.current.scrollTo({
-        top: messageListRef.current.scrollHeight,
-        behavior: 'smooth',
-      })
+    try {
+      await createChatPromptGroup(question)
+      if (messageListRef.current) {
+        messageListRef.current.scrollTo({
+          top: messageListRef.current.scrollHeight,
+          behavior: 'smooth',
+        })
+      }
+    } catch (error) {
+      setOptimisticPromptGroup(null)
+      handleError(error)
     }
   }
 
   const handleCreateChatPromptGroupByKeyword = async (keyword: KeywordPair) => {
     setOptimisticPromptGroup({ question: keyword.en })
-    await createChatPromptGroup(keyword.ja)
-    if (messageListRef.current) {
-      messageListRef.current.scrollTo({
-        top: messageListRef.current.scrollHeight,
-        behavior: 'smooth',
-      })
+    try {
+      await createChatPromptGroup(keyword.ja)
+      if (messageListRef.current) {
+        messageListRef.current.scrollTo({
+          top: messageListRef.current.scrollHeight,
+          behavior: 'smooth',
+        })
+      }
+    } catch (error) {
+      setOptimisticPromptGroup(null)
+      handleError(error)
     }
   }
 
@@ -289,12 +301,13 @@ type ChatInputSectionProps = {
 }
 
 const ChatInputSection = ({ createChatPromptGroup }: ChatInputSectionProps) => {
+  const { handleError } = useErrorHandler()
+
   const handleSubmit = async (question: string) => {
     try {
       await createChatPromptGroup(question)
     } catch (error) {
-      console.error('Error creating chat:', error)
-      throw error
+      handleError(error)
     }
   }
   return (

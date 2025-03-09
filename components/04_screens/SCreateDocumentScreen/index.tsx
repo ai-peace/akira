@@ -2,9 +2,9 @@
 
 import EDotFont from '@/components/01_elements/EDotFont'
 import ELogoAkira from '@/components/01_elements/ELogoAkira'
-import ETypewriterText from '@/components/01_elements/ETypewriterText'
 import { TCreateDocumentForm } from '@/components/03_templates/TCreateDocumentForm'
 import { useCreateChat } from '@/hooks/resources/chats/useCreateChat'
+import { useErrorHandler } from '@/hooks/uis/use-error-hander'
 import { getChatUrl } from '@/utils/url.helper'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
@@ -13,6 +13,7 @@ import { FC } from 'react'
 const Component: FC = () => {
   const router = useRouter()
   const { createChat } = useCreateChat()
+  const { handleError } = useErrorHandler()
 
   const handleSubmit = async (prompt: string) => {
     try {
@@ -25,7 +26,7 @@ const Component: FC = () => {
       router.push(getChatUrl(chat.uniqueKey))
     } catch (error) {
       console.error('Error creating chat:', error)
-      throw error // 再スローしてフォーム側でハンドリング可能に
+      handleError(error)
     }
   }
 

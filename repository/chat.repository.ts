@@ -1,5 +1,6 @@
 import { hcClient } from '@/api-client/hc.api-client'
 import { ChatEntity } from '@/domains/entities/chat.entity'
+import { HcApiError } from '@/domains/error-codes/index.error-codes'
 import type { InferRequestType } from 'hono/client'
 
 const client = hcClient()
@@ -48,26 +49,35 @@ const create = async (input: CreateChatInput, token: string): Promise<ChatEntity
     const res = await client.chats.$post({ json: input.json })
     const json = await res.json()
 
-    if (!('data' in json)) throw new Error('Failed to create chat')
-    const data = json.data as any
+    if (res.ok && 'data' in json) {
+      const data = json.data as ChatEntity
 
-    return {
-      ...data,
-      updatedAt: new Date(data.updatedAt),
-      createdAt: new Date(data.createdAt),
-      promptGroups: data.promptGroups?.map((promptGroup: any) => ({
-        ...promptGroup,
-        updatedAt: new Date(promptGroup.updatedAt),
-        createdAt: new Date(promptGroup.createdAt),
-        prompts: promptGroup.prompts?.map((prompt: any) => ({
-          ...prompt,
-          llmStatusChangeAt: prompt.llmStatusChangeAt
-            ? new Date(prompt.llmStatusChangeAt)
-            : undefined,
-          updatedAt: new Date(prompt.updatedAt),
-          createdAt: new Date(prompt.createdAt),
+      return {
+        ...data,
+        updatedAt: new Date(data.updatedAt),
+        createdAt: new Date(data.createdAt),
+        promptGroups: data.promptGroups?.map((promptGroup: any) => ({
+          ...promptGroup,
+          updatedAt: new Date(promptGroup.updatedAt),
+          createdAt: new Date(promptGroup.createdAt),
+          prompts: promptGroup.prompts?.map((prompt: any) => ({
+            ...prompt,
+            llmStatusChangeAt: prompt.llmStatusChangeAt
+              ? new Date(prompt.llmStatusChangeAt)
+              : undefined,
+            updatedAt: new Date(prompt.updatedAt),
+            createdAt: new Date(prompt.createdAt),
+          })),
         })),
-      })),
+      }
+    } else if (!res.ok && 'error' in json) {
+      throw new HcApiError(
+        json.error?.code ?? 'UNKNOWN_ERROR',
+        json.error?.message ?? '',
+        json.error,
+      )
+    } else {
+      throw new HcApiError('UNKNOWN_ERROR', 'Unknown error', {})
     }
   } catch (error) {
     console.error('Error creating chat:', error)

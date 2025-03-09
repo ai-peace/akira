@@ -1,4 +1,4 @@
-import { HcApiError } from './index.error-codes'
+import { HcApiErrorType } from './index.error-codes'
 
 export type ServerErrorCode = (typeof serverErrorCodes)[keyof typeof serverErrorCodes]
 
@@ -23,7 +23,7 @@ export const serverErrorMessages = {
 export const createServerAppError = (
   code: ServerErrorCode,
   details?: Record<string, unknown>,
-): HcApiError => {
+): HcApiErrorType => {
   return {
     code,
     message: serverErrorMessages[code].en,
