@@ -4,6 +4,9 @@ import { Hono } from 'hono'
 import { privyAuthMiddleware } from '../../server-middleware/privy-auth.middleware'
 import { z } from 'zod'
 import { zValidator } from '@hono/zod-validator'
+import { createHcApiError } from '@/domains/errors/hc-api.error'
+import { HcApiResponseType } from '@/domains/errors/hc-api.error'
+import { UserPrivateEntity } from '@/domains/entities/user-private.entity'
 
 export const updateUserPrivate = new Hono()
 
@@ -29,7 +32,14 @@ const route = updateUserPrivate.patch(
       })
 
       if (!existingUser) {
-        return c.json({ error: 'User not found' }, 404)
+        return c.json<HcApiResponseType<never>>(
+          {
+            error: createHcApiError('NOT_FOUND', {
+              resource: 'user',
+            }),
+          },
+          404,
+        )
       }
 
       const updatedUser = await prisma.user.update({
@@ -41,12 +51,15 @@ const route = updateUserPrivate.patch(
 
       const userPrivateEntity = userPrivateMapper.toDomain(updatedUser)
 
-      return c.json({
-        data: userPrivateEntity,
-      })
+      return c.json<HcApiResponseType<UserPrivateEntity>>(
+        {
+          data: userPrivateEntity,
+        },
+        200,
+      )
     } catch (error) {
       console.error('Error updating user private:', error)
-      return c.json({ error: 'Failed to update user private' }, 500)
+      return c.json<HcApiResponseType<never>>({ error: createHcApiError('SERVER_ERROR') }, 500)
     }
   },
 )

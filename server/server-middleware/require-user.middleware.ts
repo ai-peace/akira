@@ -20,7 +20,9 @@ export const requireUserMiddleware = createMiddleware<{
     if (!user) {
       return c.json<HcApiResponseType<never>>(
         {
-          error: createHcApiError('NOT_FOUND'),
+          error: createHcApiError('NOT_FOUND', {
+            resource: 'user',
+          }),
         },
         404,
       )

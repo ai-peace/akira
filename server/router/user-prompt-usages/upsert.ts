@@ -4,6 +4,8 @@ import { prisma } from '@/server/server-lib/prisma'
 import { Hono } from 'hono'
 import { privyAuthMiddleware } from '@/server/server-middleware/privy-auth.middleware'
 import { requireUserMiddleware } from '@/server/server-middleware/require-user.middleware'
+import { createHcApiError } from '@/domains/errors/hc-api.error'
+import { HcApiResponseType } from '@/domains/errors/hc-api.error'
 
 export const upsertUserPromptUsage = new Hono()
 
@@ -55,7 +57,7 @@ const route = upsertUserPromptUsage.patch(
       return c.json({ data: updatedUserPromptUsage })
     } catch (error) {
       console.error('Error upserting user prompt usage:', error)
-      return c.json({ error: 'Failed to upsert user prompt usage' }, 500)
+      return c.json<HcApiResponseType<never>>({ error: createHcApiError('SERVER_ERROR') }, 500)
     }
   },
 )

@@ -1,3 +1,6 @@
+import { createHcApiError } from '@/domains/errors/hc-api.error'
+import { UserPrivateEntity } from '@/domains/entities/user-private.entity'
+import { HcApiResponseType } from '@/domains/errors/hc-api.error'
 import { userPrivateMapper } from '@/server/server-mappers/user-private/user-private.mapper'
 import { privyAuthMiddleware } from '@/server/server-middleware/privy-auth.middleware'
 import { requireUserMiddleware } from '@/server/server-middleware/require-user.middleware'
@@ -13,10 +16,15 @@ const route = getUserPrivate.get(
   async (c) => {
     try {
       const userPrivateEntity = userPrivateMapper.toDomain(c.var.user)
-      return c.json({ data: userPrivateEntity })
+      return c.json<HcApiResponseType<UserPrivateEntity>>(
+        {
+          data: userPrivateEntity,
+        },
+        200,
+      )
     } catch (error) {
       console.error('Error fetching user private:', error)
-      return c.json({ error: 'Failed to fetch user private' }, 500)
+      return c.json<HcApiResponseType<never>>({ error: createHcApiError('SERVER_ERROR') }, 500)
     }
   },
 )

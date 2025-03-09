@@ -1,5 +1,6 @@
 import { hcClient } from '@/api-client/hc.api-client'
 import { UserPromptUsageEntity } from '@/domains/entities/user-prompt-usage.entity'
+import { HcApiError } from '@/domains/errors/frontend.error'
 
 const get = async (token: string): Promise<UserPromptUsageEntity | null> => {
   const client = hcClient({
@@ -12,11 +13,11 @@ const get = async (token: string): Promise<UserPromptUsageEntity | null> => {
   const json = await res.json()
 
   if ('data' in json) {
+    const responseData = json.data as UserPromptUsageEntity
     const data = {
-      ...json.data,
-      date: new Date(json.data.date),
-    } as UserPromptUsageEntity
-
+      ...responseData,
+      date: new Date(responseData.date),
+    }
     return data
   } else {
     return null
@@ -46,9 +47,14 @@ const upsert = async (
     } as UserPromptUsageEntity
 
     return data
-  } else {
-    throw new Error('Failed to upsert user prompt usage')
   }
+
+  if ('error' in json) {
+    const error = json.error as HcApiError
+    throw new HcApiError(error.code ?? 'UNKNOWN_ERROR', error.message ?? 'Unknown error')
+  }
+
+  throw new HcApiError('UNKNOWN_ERROR', 'Unknown error', {})
 }
 
 export const userPromptUsageRepository = {

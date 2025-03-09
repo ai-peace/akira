@@ -25,12 +25,13 @@ const create = async (input: CreateChatPromptGroupInput, token: string) => {
 
   if (res.ok && 'data' in json) {
     return json.data as PromptGroupEntity
-  } else if (!res.ok && 'error' in json) {
-    const error = json.error
-    throw new HcApiError(json.error?.code ?? 'UNKNOWN_ERROR', json.error?.message ?? '', json.error)
-  } else {
-    throw new HcApiError('UNKNOWN_ERROR', 'Unknown error', {})
   }
+
+  if ('error' in json) {
+    throw new HcApiError(json.error?.code ?? 'UNKNOWN_ERROR', json.error?.message ?? '', json.error)
+  }
+
+  throw new HcApiError('UNKNOWN_ERROR', 'Unknown error', {})
 }
 
 export const promptGroupRepository = {

@@ -47,7 +47,7 @@ export const requireUserPromptUsage = createMiddleware<{
     console.error('Error fetching user:', error)
     return c.json<HcApiResponseType<never>>(
       {
-        error: createHcApiError('SERVER_ERROR'),
+        error: createHcApiError('CHECK_USER_PROMPT_USAGE_ERROR'),
       },
       500,
     )

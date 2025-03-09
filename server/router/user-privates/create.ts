@@ -4,6 +4,9 @@ import { userPrivateMapper } from '@/server/server-mappers/user-private/user-pri
 import { Hono } from 'hono'
 import { privyAuthMiddleware } from '../../server-middleware/privy-auth.middleware'
 import { faker } from '@faker-js/faker'
+import { createHcApiError } from '@/domains/errors/hc-api.error'
+import { UserPrivateEntity } from '@/domains/entities/user-private.entity'
+import { HcApiResponseType } from '@/domains/errors/hc-api.error'
 
 export const createUserPrivate = new Hono()
 
@@ -36,12 +39,15 @@ const route = createUserPrivate.post('/users', privyAuthMiddleware, async (c) =>
 
     const userPrivateEntity = userPrivateMapper.toDomain(userPrivate)
 
-    return c.json({
-      data: userPrivateEntity,
-    })
+    return c.json<HcApiResponseType<UserPrivateEntity>>(
+      {
+        data: userPrivateEntity,
+      },
+      201,
+    )
   } catch (error) {
     console.error('Error creating user private:', error)
-    return c.json({ error: 'Failed to create user private' }, 500)
+    return c.json<HcApiResponseType<never>>({ error: createHcApiError('SERVER_ERROR') }, 500)
   }
 })
 

@@ -1,3 +1,5 @@
+import { ChatEntity } from '@/domains/entities/chat.entity'
+import { createHcApiError, HcApiResponseType } from '@/domains/errors/hc-api.error'
 import { prisma } from '@/server/server-lib/prisma'
 import { chatMapper } from '@/server/server-mappers/chat/index.mapper'
 import { Hono } from 'hono'
@@ -24,13 +26,31 @@ const route = getChat.get('/chats/:uniqueKey', async (c) => {
       },
     })
 
-    if (!chat) return c.json({ error: 'Chat not found' }, 404)
+    if (!chat)
+      return c.json<HcApiResponseType<never>>(
+        {
+          error: createHcApiError('NOT_FOUND', {
+            resource: 'chat',
+          }),
+        },
+        404,
+      )
 
     const chatEntity = chatMapper.toDomain(chat)
-    return c.json({ data: chatEntity })
+    return c.json<HcApiResponseType<ChatEntity>>(
+      {
+        data: chatEntity,
+      },
+      200,
+    )
   } catch (error) {
     console.error('Error fetching chat:', error)
-    return c.json({ error: 'Failed to fetch chat' }, 500)
+    return c.json<HcApiResponseType<never>>(
+      {
+        error: createHcApiError('SERVER_ERROR'),
+      },
+      500,
+    )
   }
 })
 

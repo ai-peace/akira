@@ -1,3 +1,5 @@
+import { ChatEntity } from '@/domains/entities/chat.entity'
+import { createHcApiError, HcApiResponseType } from '@/domains/errors/hc-api.error'
 import { prisma } from '@/server/server-lib/prisma'
 import { chatMapper } from '@/server/server-mappers/chat/index.mapper'
 import { privyAuthMiddleware } from '@/server/server-middleware/privy-auth.middleware'
@@ -26,10 +28,10 @@ const route = getUserPrivateChatCollection.get(
 
       const chatEntities = chatMapper.toDomainCollection(chats)
 
-      return c.json({ data: chatEntities })
+      return c.json<HcApiResponseType<ChatEntity[]>>({ data: chatEntities })
     } catch (error) {
       console.error('Error fetching chat collection:', error)
-      return c.json({ error: 'Failed to fetch chat collection' }, 500)
+      return c.json<HcApiResponseType<never>>({ error: createHcApiError('SERVER_ERROR') }, 500)
     }
   },
 )

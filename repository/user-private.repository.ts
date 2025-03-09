@@ -1,5 +1,6 @@
 import { hcClient } from '@/api-client/hc.api-client'
 import { UserPrivateEntity } from '@/domains/entities/user-private.entity'
+import { HcApiError } from '@/domains/errors/frontend.error'
 
 const get = async (token: string): Promise<UserPrivateEntity | null> => {
   const client = hcClient({
@@ -36,9 +37,16 @@ const create = async (token: string): Promise<UserPrivateEntity | null> => {
     return {
       ...data,
     }
-  } else {
-    return null
   }
+
+  if ('error' in json) {
+    throw new HcApiError(
+      json.error?.code ?? 'UNKNOWN_ERROR',
+      json.error?.message ?? 'Unknown error',
+    )
+  }
+
+  throw new HcApiError('UNKNOWN_ERROR', 'Unknown error', {})
 }
 
 const update = async (token: string, data: UserPrivateEntity): Promise<UserPrivateEntity> => {
@@ -59,9 +67,16 @@ const update = async (token: string, data: UserPrivateEntity): Promise<UserPriva
       return {
         ...data,
       }
-    } else {
-      throw new Error('Failed to update user private')
     }
+
+    if ('error' in json) {
+      throw new HcApiError(
+        json.error?.code ?? 'UNKNOWN_ERROR',
+        json.error?.message ?? 'Unknown error',
+      )
+    }
+
+    throw new HcApiError('UNKNOWN_ERROR', 'Unknown error', {})
   } catch (error) {
     console.error('Error updating user private:', error)
     throw error

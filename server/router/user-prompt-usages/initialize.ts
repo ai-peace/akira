@@ -1,3 +1,6 @@
+import { createHcApiError } from '@/domains/errors/hc-api.error'
+import { UserPromptUsageEntity } from '@/domains/entities/user-prompt-usage.entity'
+import { HcApiResponseType } from '@/domains/errors/hc-api.error'
 import { prisma } from '@/server/server-lib/prisma'
 import { userPromptUsageMapper } from '@/server/server-mappers/user-prompt-usage/user-prompt-usage.mapper'
 import { privyAuthMiddleware } from '@/server/server-middleware/privy-auth.middleware'
@@ -41,10 +44,10 @@ const route = initializeUserPromptUsage.post(
       })
 
       const userPromptUsageEntity = userPromptUsageMapper.toDomain(userPromptUsage)
-      return c.json({ data: userPromptUsageEntity })
+      return c.json<HcApiResponseType<UserPromptUsageEntity>>({ data: userPromptUsageEntity }, 200)
     } catch (error) {
       console.error('Error initializing user prompt usage:', error)
-      return c.json({ error: 'Failed to initialize user prompt usage' }, 500)
+      return c.json<HcApiResponseType<never>>({ error: createHcApiError('SERVER_ERROR') }, 500)
     }
   },
 )
