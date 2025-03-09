@@ -1,4 +1,4 @@
-import { HcApiError } from '@/domains/errors/client.error'
+import { HcApiError } from '@/domains/errors/frontend.error'
 import { useToast } from '../use-toast'
 
 export const useErrorHandler = () => {

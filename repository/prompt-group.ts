@@ -1,6 +1,6 @@
 import { hcClient } from '@/api-client/hc.api-client'
 import { PromptGroupEntity } from '@/domains/entities/prompt-group.entity'
-import { HcApiError } from '@/domains/errors/client.error'
+import { HcApiError } from '@/domains/errors/frontend.error'
 import type { InferRequestType } from 'hono/client'
 
 const client = hcClient()
