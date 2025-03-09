@@ -49,7 +49,6 @@ const Component: FC = () => {
                 className="font-[400]"
                 animate={true}
               />
-              {/* <ETypewriterText text="What rare item are you looking for?" delay={0} /> */}
             </h1>
           </div>
           <div className="flex-grow">

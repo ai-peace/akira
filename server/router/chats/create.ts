@@ -1,6 +1,5 @@
 import { ChatEntity } from '@/domains/entities/chat.entity'
-import { createServerAppError } from '@/domains/error-codes/server.error-codes'
-import { HcApiResponseType } from '@/domains/types/hc-api-response.types'
+import { createHcApiError, HcApiResponseType } from '@/domains/errors/hc-api.error'
 import { prisma } from '@/server/server-lib/prisma'
 import { generateUniqueKey } from '@/server/server-lib/uuid'
 import { chatMapper } from '@/server/server-mappers/chat/index.mapper'
@@ -34,7 +33,7 @@ const route = createChat.post(
       if (!user) {
         return c.json<HcApiResponseType<never>>(
           {
-            error: createServerAppError('NOT_FOUND'),
+            error: createHcApiError('NOT_FOUND'),
           },
           404,
         )
@@ -70,7 +69,7 @@ const route = createChat.post(
 
       return c.json<HcApiResponseType<never>>(
         {
-          error: createServerAppError('SERVER_ERROR'),
+          error: createHcApiError('SERVER_ERROR'),
         },
         500,
       )

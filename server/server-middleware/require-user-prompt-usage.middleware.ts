@@ -1,9 +1,8 @@
-import { prisma } from '@/server/server-lib/prisma'
-import { createMiddleware } from 'hono/factory'
-import { User, UserPromptUsage } from '@prisma/client'
 import { clientApplicationProperties } from '@/consts/client-application-properties'
-import { createServerAppError } from '@/domains/error-codes/server.error-codes'
-import { HcApiResponse } from '@/domains/types/hc-api-response.types'
+import { createHcApiError, HcApiResponseType } from '@/domains/errors/hc-api.error'
+import { prisma } from '@/server/server-lib/prisma'
+import { User, UserPromptUsage } from '@prisma/client'
+import { createMiddleware } from 'hono/factory'
 
 export const requireUserPromptUsage = createMiddleware<{
   Variables: {
@@ -34,9 +33,9 @@ export const requireUserPromptUsage = createMiddleware<{
     }
 
     if (userPromptUsage.count >= clientApplicationProperties.dailyPromptUsageLimit.perUser) {
-      return c.json<HcApiResponse<never>>(
+      return c.json<HcApiResponseType<never>>(
         {
-          error: createServerAppError('DAILY_PROMPT_USAGE_LIMIT_EXCEEDED'),
+          error: createHcApiError('DAILY_PROMPT_USAGE_LIMIT_EXCEEDED'),
         },
         403,
       )
@@ -46,9 +45,9 @@ export const requireUserPromptUsage = createMiddleware<{
     await next()
   } catch (error) {
     console.error('Error fetching user:', error)
-    return c.json<HcApiResponse<never>>(
+    return c.json<HcApiResponseType<never>>(
       {
-        error: createServerAppError('SERVER_ERROR'),
+        error: createHcApiError('SERVER_ERROR'),
       },
       500,
     )

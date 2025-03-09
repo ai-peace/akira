@@ -1,6 +1,5 @@
 import { PromptGroupEntity } from '@/domains/entities/prompt-group.entity'
-import { createServerAppError } from '@/domains/error-codes/server.error-codes'
-import { HcApiResponseType } from '@/domains/types/hc-api-response.types'
+import { createHcApiError, HcApiResponseType } from '@/domains/errors/hc-api.error'
 import { privyAuthMiddleware } from '@/server/server-middleware/privy-auth.middleware'
 import { requireUserPromptUsage } from '@/server/server-middleware/require-user-prompt-usage.middleware'
 import { requireUserMiddleware } from '@/server/server-middleware/require-user.middleware'
@@ -40,7 +39,7 @@ const route = createChatPromptGroup.post(
 
       return c.json<HcApiResponseType<never>>(
         {
-          error: createServerAppError('SERVER_ERROR'),
+          error: createHcApiError('SERVER_ERROR'),
         },
         500,
       )

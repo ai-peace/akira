@@ -1,6 +1,6 @@
 import { hcClient } from '@/api-client/hc.api-client'
 import { ChatEntity } from '@/domains/entities/chat.entity'
-import { HcApiError } from '@/domains/error-codes/index.error-codes'
+import { HcApiError } from '@/domains/errors/client.error'
 import type { InferRequestType } from 'hono/client'
 
 const client = hcClient()
