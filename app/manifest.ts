@@ -2,8 +2,8 @@ import { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Akira - AI Shopping Assistant',
-    short_name: 'Akira',
+    name: 'AKIRA - AI Shopping Assistant',
+    short_name: 'AKIRA',
     description: 'Your AI-powered shopping companion',
     start_url: '/',
     display: 'standalone',

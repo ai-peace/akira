@@ -2,17 +2,18 @@ import { OMainSpaceHeader } from '@/components/02_organisms/OMainSpaceHeader'
 import { TChatLists } from '@/components/03_templates/TChatLists'
 import { RootLayoutClient } from '@/components/99_providers/root-layout-client'
 import { Toaster } from '@/components/ui/toaster'
+import { clientApplicationProperties } from '@/consts/client-application-properties'
 import '@/styles/globals.css'
 import type { Metadata } from 'next'
 import { Providers } from './providers'
 
 export const metadata: Metadata = {
   title: {
-    default: 'Akira - SEARCH AI AGENT',
-    template: '%s | Akira',
+    default: 'AKIRA - SEARCH AI AGENT',
+    template: '%s | AKIRA',
   },
   description:
-    'Find your perfect items through natural conversations with AI. Akira makes your shopping experience smarter and more intuitive.',
+    'Find your perfect items through natural conversations with AI. AKIRA makes your shopping experience smarter and more intuitive.',
   icons: {
     icon: '/icon512_rounded.png',
     apple: '/icon512_rounded.png',
@@ -22,18 +23,18 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'Akira',
+    title: 'AKIRA',
   },
   openGraph: {
-    title: 'Akira - SEARCH AI AGENT',
+    title: 'AKIRA - SEARCH AI AGENT',
     description:
-      'Find your perfect items through natural conversations with AI. Akira makes your shopping experience smarter and more intuitive.',
+      'Find your perfect items through natural conversations with AI. AKIRA makes your shopping experience smarter and more intuitive.',
     images: [
       {
-        url: '/logo_akira_black.png',
+        url: `${clientApplicationProperties.appUrl}/images/ogp/ogp_twitterCard_default.jpg`,
         width: 512,
         height: 512,
-        alt: 'Akira Logo',
+        alt: 'AKIRA Logo',
       },
     ],
     locale: 'en_US',
@@ -41,9 +42,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Akira - SEARCH AI AGENT',
+    title: 'AKIRA - SEARCH AI AGENT',
     description: 'Find your perfect items through natural conversations with AI',
-    images: ['/logo_akira_black.png'],
+    images: [`${clientApplicationProperties.appUrl}/images/ogp/ogp_twitterCard_default.jpg`],
   },
   formatDetection: {
     telephone: false,
