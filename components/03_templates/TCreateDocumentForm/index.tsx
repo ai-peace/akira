@@ -1,9 +1,12 @@
 'use client'
 
 import ETypewriterText from '@/components/01_elements/ETypewriterText'
+import { ORecommendKeywordListItemCollection } from '@/components/02_organisms/ORecommendKeywordListItem/collection'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
+import { RecommendKeywordEntity } from '@/domains/entities/recommend-keyword.entity'
+import { recommendKeywords } from '@/domains/mocks/recommend-keywords'
 import { cn } from '@/lib/utils'
 import { PrivyAccessTokenRepository } from '@/repository/privy-access-token.repository'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -76,8 +79,8 @@ const Component: FC<Props> = ({ onSubmit }) => {
     }
   }
 
-  const handleKeywordClick = (keyword: string) => {
-    form.setValue('prompt', keyword)
+  const handleKeywordClick = (keyword: RecommendKeywordEntity) => {
+    form.setValue('prompt', keyword.value.en)
     const textareaElement = document.querySelector('textarea')
     if (textareaElement) {
       textareaElement.style.height = 'auto'
@@ -93,7 +96,7 @@ const Component: FC<Props> = ({ onSubmit }) => {
       <form onSubmit={form.handleSubmit(handleSubmit)} className="flex h-full flex-col">
         <div
           className={cn(
-            'border-border-muted relative flex-grow rounded-lg border bg-background-muted p-4',
+            'border-border-muted relative w-full flex-grow rounded-lg border bg-background-muted p-4',
             isSubmitting && 'opacity-20',
           )}
         >
@@ -109,7 +112,7 @@ const Component: FC<Props> = ({ onSubmit }) => {
               setTextareaHeight(`${newHeight}px`)
             }}
             className={
-              'min-h-[24px] resize-none border-0 bg-transparent p-0 pb-12 text-lg text-foreground-strong shadow-none focus-visible:ring-0'
+              'min-h-[24px] w-full resize-none border-0 bg-transparent p-0 pb-12 text-lg text-foreground-strong shadow-none focus-visible:ring-0'
             }
             style={{
               overflow: parseInt(textareaHeight) >= lineHeight * 18 ? 'auto' : 'hidden',
@@ -140,20 +143,13 @@ const Component: FC<Props> = ({ onSubmit }) => {
             </div>
           </div>
         </div>
-        <div
-          className={cn('mt-4 flex flex-wrap justify-center gap-3', isSubmitting && 'opacity-10')}
-        >
-          {topPageKeywords.map((keyword, index) => (
-            <Badge
-              key={keyword}
-              variant="secondary"
-              className="cursor-pointer hover:bg-foreground/10"
-              onClick={() => handleKeywordClick(keyword)}
-            >
-              <ETypewriterText text={keyword} delay={20 * index} />
-            </Badge>
-          ))}
-        </div>
+
+        <ORecommendKeywordListItemCollection
+          keywords={recommendKeywords}
+          isSubmitting={isSubmitting}
+          onClick={handleKeywordClick}
+          className="mt-4"
+        />
       </form>
     </>
   )

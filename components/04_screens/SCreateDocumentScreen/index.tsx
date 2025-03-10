@@ -51,7 +51,7 @@ const Component: FC = () => {
               />
             </h1>
           </div>
-          <div className="flex-grow">
+          <div className="w-full flex-grow">
             <TCreateDocumentForm onSubmit={handleSubmit} />
           </div>
         </div>
