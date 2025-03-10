@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils'
 import { PrivyAccessTokenRepository } from '@/repository/privy-access-token.repository'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { usePrivy } from '@privy-io/react-auth'
-import { ArrowUp, Loader2 } from 'lucide-react'
+import { ArrowUp, ChevronLeft, Loader2 } from 'lucide-react'
 import { FC, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
@@ -52,6 +52,9 @@ type Props = {
 const Component: FC<Props> = ({ onSubmit }) => {
   const [textareaHeight, setTextareaHeight] = useState('auto')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [currentKeywords, setCurrentKeywords] =
+    useState<RecommendKeywordEntity[]>(recommendKeywords)
+  const [parentKeyword, setParentKeyword] = useState<RecommendKeywordEntity | null>(null)
   const lineHeight = 24
   const { login } = usePrivy()
 
@@ -80,15 +83,25 @@ const Component: FC<Props> = ({ onSubmit }) => {
   }
 
   const handleKeywordClick = (keyword: RecommendKeywordEntity) => {
-    form.setValue('prompt', keyword.value.en)
-    const textareaElement = document.querySelector('textarea')
-    if (textareaElement) {
-      textareaElement.style.height = 'auto'
-      const maxHeight = lineHeight * 18
-      const newHeight = Math.min(textareaElement.scrollHeight, maxHeight)
-      textareaElement.style.height = `${newHeight}px`
-      setTextareaHeight(`${newHeight}px`)
+    if (keyword.children && keyword.children.length > 0) {
+      setParentKeyword(keyword)
+      setCurrentKeywords(keyword.children)
+    } else {
+      form.setValue('prompt', keyword.value.en)
+      const textareaElement = document.querySelector('textarea')
+      if (textareaElement) {
+        textareaElement.style.height = 'auto'
+        const maxHeight = lineHeight * 18
+        const newHeight = Math.min(textareaElement.scrollHeight, maxHeight)
+        textareaElement.style.height = `${newHeight}px`
+        setTextareaHeight(`${newHeight}px`)
+      }
     }
+  }
+
+  const handleBackToParent = () => {
+    setParentKeyword(null)
+    setCurrentKeywords(recommendKeywords)
   }
 
   return (
@@ -144,12 +157,27 @@ const Component: FC<Props> = ({ onSubmit }) => {
           </div>
         </div>
 
-        <ORecommendKeywordListItemCollection
-          keywords={recommendKeywords}
-          isSubmitting={isSubmitting}
-          onClick={handleKeywordClick}
-          className="mt-4"
-        />
+        <div className="mt-4">
+          {parentKeyword && (
+            <div className="mb-3 flex items-center justify-center">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleBackToParent}
+                className="flex items-center gap-1 text-xs"
+              >
+                <ChevronLeft size={14} />
+                <span>メインカテゴリに戻る</span>
+              </Button>
+            </div>
+          )}
+
+          <ORecommendKeywordListItemCollection
+            keywords={currentKeywords}
+            isSubmitting={isSubmitting}
+            onClick={handleKeywordClick}
+          />
+        </div>
       </form>
     </>
   )
