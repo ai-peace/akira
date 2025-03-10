@@ -16,7 +16,7 @@ const Component: FC<Props> = ({ showModal, setShowModal, products }) => {
   const shops = useMemo(() => {
     const shopSet = new Set<string>()
     products.forEach((product) => {
-      shopSet.add(product.shop || 'unknown')
+      shopSet.add(product.shopName || 'unknown')
     })
     return ['all', ...Array.from(shopSet)]
   }, [products])
@@ -24,7 +24,7 @@ const Component: FC<Props> = ({ showModal, setShowModal, products }) => {
   const shopCounts = useMemo(() => {
     const counts: Record<string, number> = { all: products.length }
     products.forEach((product) => {
-      const shop = product.shop || 'unknown'
+      const shop = product.shopName || 'unknown'
       counts[shop] = (counts[shop] || 0) + 1
     })
     return counts
@@ -36,14 +36,15 @@ const Component: FC<Props> = ({ showModal, setShowModal, products }) => {
         // フィルタリング: 検索語句
         const matchesSearch =
           searchTerm === '' ||
-          product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          product.title.en.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          product.title.ja.toLowerCase().includes(searchTerm.toLowerCase()) ||
           product.description?.toLowerCase().includes(searchTerm.toLowerCase())
 
         // フィルタリング: ショップ
         const matchesShop =
           activeTab === 'all' ||
-          product.shop === activeTab ||
-          (activeTab === 'unknown' && !product.shop)
+          product.shopName === activeTab ||
+          (activeTab === 'unknown' && !product.shopName)
 
         return matchesSearch && matchesShop
       })
