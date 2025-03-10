@@ -23,6 +23,12 @@ export async function generateMetadata(
     }
 
     // チャットのタイトルを使用してメタデータを生成
+    const baseUrl =
+      process.env.NEXT_PUBLIC_APP_URL ||
+      (typeof window !== 'undefined'
+        ? window.location.origin
+        : 'https://jp-rare-items-production.up.railway.app')
+
     return {
       title: chat.title || 'Chat',
       description: `Discover unique Japanese items with Akira - Your AI guide to finding rare and exclusive products from Japan.`,
@@ -30,15 +36,21 @@ export async function generateMetadata(
         title: `${chat.title || 'Chat'} | Akira`,
         description: `Exploring ${chat.title || 'Japanese treasures'} with Akira - Your AI companion for discovering rare and exclusive items from Japan.`,
         type: 'website',
-        url: `${process.env.NEXT_PUBLIC_APP_URL}/chats/${params.uniqueKey}`,
+        url: `${baseUrl}/chats/${params.uniqueKey}`,
         images: [
           {
-            url: `${clientApplicationProperties.appUrl}/images/ogp/ogp_twitterCard_default.jpg`,
+            url: `${baseUrl}/images/ogp/ogp_twitterCard_default.jpg`,
             width: 1200,
             height: 630,
             alt: 'Akira - Your AI Guide to Rare Japanese Items',
           },
         ],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: `${chat.title || 'Chat'} | Akira`,
+        description: `Exploring ${chat.title || 'Japanese treasures'} with Akira - Your AI companion for discovering rare and exclusive items from Japan.`,
+        images: [`${baseUrl}/images/ogp/ogp_twitterCard_default.jpg`],
       },
     }
   } catch (error) {
