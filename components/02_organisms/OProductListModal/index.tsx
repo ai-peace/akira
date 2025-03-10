@@ -1,6 +1,6 @@
-import { FC, useMemo, useState } from 'react'
-import OProductListItem from '../OProductListItem'
+import OProductListItem from '@/components/02_organisms/OProductListItem'
 import { ProductEntity } from '@/domains/entities/product.entity'
+import { FC, useState, useMemo } from 'react'
 
 type Props = {
   showModal: boolean
@@ -9,65 +9,58 @@ type Props = {
 }
 
 const Component: FC<Props> = ({ showModal, setShowModal, products }) => {
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   const [searchTerm, setSearchTerm] = useState('')
-  const [activeTab, setActiveTab] = useState('all')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
+  const [activeTab, setActiveTab] = useState<string>('all')
 
-  // 検索フィルター適用
-  const searchFilteredProducts = useMemo(() => {
-    return products.filter((product) => {
-      if (!searchTerm) return true
-      return (
-        product.title.en.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.title.ja.toLowerCase().includes(searchTerm.toLowerCase())
-      )
-    })
-  }, [products, searchTerm])
-
-  // 商品一覧から店舗を動的に抽出
   const shops = useMemo(() => {
-    const shopSet = new Set(searchFilteredProducts.map((p) => p.shopName || 'unknown'))
-    return ['all', ...Array.from(shopSet)].filter(Boolean)
-  }, [searchFilteredProducts])
+    const shopSet = new Set<string>()
+    products.forEach((product) => {
+      shopSet.add(product.shop || 'unknown')
+    })
+    return ['all', ...Array.from(shopSet)]
+  }, [products])
 
-  // 店舗ごとの商品数を計算
   const shopCounts = useMemo(() => {
-    return shops.reduce(
-      (acc, shop) => {
-        if (shop === 'all') {
-          acc[shop] = searchFilteredProducts.length
-        } else {
-          acc[shop] = searchFilteredProducts.filter(
-            (p) => (p.shopName || 'unknown') === shop,
-          ).length
-        }
-        return acc
-      },
-      {} as Record<string, number>,
-    )
-  }, [searchFilteredProducts, shops])
+    const counts: Record<string, number> = { all: products.length }
+    products.forEach((product) => {
+      const shop = product.shop || 'unknown'
+      counts[shop] = (counts[shop] || 0) + 1
+    })
+    return counts
+  }, [products])
 
-  // タブフィルターとソートを適用
   const filteredProducts = useMemo(() => {
-    return searchFilteredProducts
+    return products
       .filter((product) => {
-        if (activeTab === 'all') return true
-        return (product.shopName || 'unknown') === activeTab
+        // フィルタリング: 検索語句
+        const matchesSearch =
+          searchTerm === '' ||
+          product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          product.description?.toLowerCase().includes(searchTerm.toLowerCase())
+
+        // フィルタリング: ショップ
+        const matchesShop =
+          activeTab === 'all' ||
+          product.shop === activeTab ||
+          (activeTab === 'unknown' && !product.shop)
+
+        return matchesSearch && matchesShop
       })
       .sort((a, b) => {
-        if (sortOrder === 'asc') {
-          return a.price - b.price
-        }
-        return b.price - a.price
+        // 並び替え: 価格
+        const priceA = a.price || 0
+        const priceB = b.price || 0
+        return sortOrder === 'asc' ? priceA - priceB : priceB - priceA
       })
-  }, [searchFilteredProducts, activeTab, sortOrder])
+  }, [products, searchTerm, sortOrder, activeTab])
 
   if (!showModal) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40">
-      <div className="max-h-[90vh] w-[90vw] overflow-hidden rounded-lg bg-background">
-        <div className="sticky top-0 z-10 border-b bg-background">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="max-h-[90vh] w-[90vw] rounded-lg bg-white">
+        <div className="sticky top-0 z-10 border-b bg-white">
           <div className="flex items-center justify-between p-4">
             <h2 className="text-xl font-bold">All products ({filteredProducts.length} items)</h2>
             <button
@@ -105,7 +98,7 @@ const Component: FC<Props> = ({ showModal, setShowModal, products }) => {
                   activeTab === shop ? 'bg-blue-500 text-white' : 'bg-gray-100 hover:bg-gray-200'
                 }`}
               >
-                {shop === 'unknown' ? 'Other' : shop} ({shopCounts[shop]})
+                {shop === 'unknown' ? 'Other' : shop === 'all' ? 'All' : shop} ({shopCounts[shop]})
               </button>
             ))}
           </div>
