@@ -1,7 +1,5 @@
 'use client'
 
-import { MDXRemote } from 'next-mdx-remote'
-import { serialize } from 'next-mdx-remote/serialize'
 import { useEffect, useState } from 'react'
 
 interface EMdxRendererProps {
@@ -42,10 +40,14 @@ const CustomLink = ({
 
 export const EMdxRenderer = ({ content, className = '', onSearch }: EMdxRendererProps) => {
   const [mdxSource, setMdxSource] = useState<any>(null)
+  const [MDXRemote, setMDXRemote] = useState<any>(null)
 
   useEffect(() => {
     const prepareMdx = async () => {
       if (!content) return
+      const { MDXRemote } = await import('next-mdx-remote')
+      const { serialize } = await import('next-mdx-remote/serialize')
+      setMDXRemote(() => MDXRemote)
       const mdxSource = await serialize(content)
       setMdxSource(mdxSource)
     }
@@ -53,7 +55,7 @@ export const EMdxRenderer = ({ content, className = '', onSearch }: EMdxRenderer
     prepareMdx()
   }, [content])
 
-  if (!mdxSource) {
+  if (!mdxSource || !MDXRemote) {
     return null
   }
 

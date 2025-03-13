@@ -54,12 +54,6 @@ const Component: FC<Props> = ({ products, message }) => {
     }
   }, [])
 
-  const scrollLeft = () => {
-    if (carouselRef.current) {
-      carouselRef.current.scrollBy({ left: -200, behavior: 'smooth' })
-    }
-  }
-
   const scrollRight = () => {
     if (carouselRef.current) {
       carouselRef.current.scrollBy({ left: 200, behavior: 'smooth' })
@@ -80,17 +74,8 @@ const Component: FC<Props> = ({ products, message }) => {
       </ChatBubble>
 
       {isMobile ? (
-        <div className="relative w-full">
-          {showLeftArrow && (
-            <button
-              onClick={scrollLeft}
-              className="absolute -left-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-background shadow-md"
-              aria-label="前へ"
-            >
-              <ChevronLeft className="h-5 w-5" />
-            </button>
-          )}
-          <div className="-ml-4 -mr-4 h-full w-[100vw] overflow-hidden md:w-full">
+        <>
+          <div className="relative -ml-4 -mr-4 h-full w-[100vw] overflow-hidden md:w-full">
             <div
               ref={carouselRef}
               className="no-scrollbar flex h-full w-full snap-x snap-mandatory items-stretch gap-2 overflow-x-auto pb-2 pt-1"
@@ -127,25 +112,24 @@ const Component: FC<Props> = ({ products, message }) => {
                 aria-hidden="true"
               />
             </div>
+            {showRightArrow && (
+              <button
+                onClick={scrollRight}
+                className="z-2 absolute right-4 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-foreground shadow-md"
+                aria-label="次へ"
+              >
+                <ChevronRight className="h-5 w-5 text-background" />
+              </button>
+            )}
           </div>
-          {showRightArrow && (
-            <button
-              onClick={scrollRight}
-              className="z-2 absolute right-0 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-foreground shadow-md"
-              aria-label="次へ"
-            >
-              <ChevronRight className="h-5 w-5 text-background" />
-            </button>
-          )}
-
           {products.length > displayCount && (
-            <div className="mt-2 flex justify-end">
+            <div className="mb-2 flex justify-end pr-4">
               <button onClick={handleShowMore} className="text-xs text-blue-500 hover:underline">
                 全て見る ({products.length})
               </button>
             </div>
           )}
-        </div>
+        </>
       ) : (
         <div className="grid w-full grid-cols-4 gap-2">
           {products.slice(0, displayCount).map((product) => (

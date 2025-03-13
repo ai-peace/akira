@@ -58,7 +58,7 @@ const Component: FC = () => {
       </div>
       <div className="absolute left-0 right-0 top-4 flex items-center justify-center">
         <ELogoAkira
-          className="fill-foreground dark:fill-foreground"
+          className="z-20 fill-foreground dark:fill-foreground"
           width={150 / 1.75}
           height={63 / 1.75}
         />
