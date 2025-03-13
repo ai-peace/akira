@@ -40,7 +40,7 @@ const Component: FC<Props> = ({ onSubmit }) => {
 
   return (
     <form onSubmit={form.handleSubmit(handleSubmit)} className="w-full">
-      <div className="md:border-border-muted relative flex-grow rounded-t-2xl border bg-background-soft p-4 md:rounded-2xl md:bg-background">
+      <div className="relative flex-grow rounded-t-3xl border bg-background-muted p-4 md:rounded-2xl md:border-border-strong md:bg-background">
         <Textarea
           {...form.register('prompt')}
           placeholder="Send a message"

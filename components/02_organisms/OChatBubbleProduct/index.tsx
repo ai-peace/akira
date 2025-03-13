@@ -90,10 +90,10 @@ const Component: FC<Props> = ({ products, message }) => {
               <ChevronLeft className="h-5 w-5" />
             </button>
           )}
-          <div className="-ml-4 -mr-4 w-[100vw] overflow-hidden md:w-full">
+          <div className="-ml-4 -mr-4 h-full w-[100vw] overflow-hidden md:w-full">
             <div
               ref={carouselRef}
-              className="no-scrollbar flex w-full snap-x snap-mandatory gap-2 overflow-x-auto pb-2 pt-1"
+              className="no-scrollbar flex h-full w-full snap-x snap-mandatory items-stretch gap-2 overflow-x-auto pb-2 pt-1"
               style={{
                 scrollbarWidth: 'none',
                 msOverflowStyle: 'none',
@@ -114,10 +114,11 @@ const Component: FC<Props> = ({ products, message }) => {
               {products.slice(0, displayCount).map((product, index) => (
                 <div
                   key={product.itemCode}
-                  className="w-[140px] min-w-[140px] max-w-[140px] flex-shrink-0 snap-start"
-                  style={{ aspectRatio: '4/3' }}
+                  className="relative flex h-full w-[140px] min-w-[140px] max-w-[140px] flex-shrink-0 snap-start"
                 >
-                  <OProductListItem product={product} />
+                  <div className="flex-1">
+                    <OProductListItem product={product} />
+                  </div>
                 </div>
               ))}
               <div
@@ -137,13 +138,13 @@ const Component: FC<Props> = ({ products, message }) => {
             </button>
           )}
 
-          {/* {products.length > displayCount && (
+          {products.length > displayCount && (
             <div className="mt-2 flex justify-end">
               <button onClick={handleShowMore} className="text-xs text-blue-500 hover:underline">
                 全て見る ({products.length})
               </button>
             </div>
-          )} */}
+          )}
         </div>
       ) : (
         <div className="grid w-full grid-cols-4 gap-2">
