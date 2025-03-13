@@ -143,7 +143,7 @@ const Component = () => {
             {!userPrivate && (
               <div className="flex h-full flex-col items-center justify-center p-4">
                 <p className="mb-4 text-center text-sm text-muted-foreground">
-                  ログインするとチャット履歴が保存されます
+                  When you login, your chat history will be saved.
                 </p>
                 <OWalletConnectButton className="w-full" />
               </div>
@@ -185,7 +185,7 @@ const Component = () => {
       {!userPrivate && (
         <div className="flex h-full flex-col items-center justify-center p-4">
           <p className="mb-4 text-center text-sm text-muted-foreground">
-            ログインするとチャット履歴が保存されます
+            When you login, your chat history will be saved.
           </p>
           <OWalletConnectButton className="w-full" />
         </div>
