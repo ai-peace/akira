@@ -7,6 +7,7 @@ import { clientApplicationProperties } from '@/consts/client-application-propert
 import '@/styles/globals.css'
 import type { Metadata } from 'next'
 import { Providers } from './providers'
+import { TLeftMenu } from '@/components/03_templates/TLeftMenu'
 
 export const metadata: Metadata = {
   title: {
@@ -76,7 +77,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <section className="flex h-screen bg-background-muted">
               <section className="w-full bg-background text-foreground">
                 <div className="relative flex h-full">
-                  <TChatLists />
+                  <TLeftMenu />
                   <div className="relative flex h-full w-full">
                     <OMainSpaceHeader />
                     {children}

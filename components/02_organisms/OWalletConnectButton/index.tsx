@@ -1,10 +1,9 @@
 import EDotFont from '@/components/01_elements/EDotFont'
 import { Button } from '@/components/ui/button'
-import { Loader2, WalletIcon } from 'lucide-react'
-import { OUserProfile } from '../OUserProfile'
 import { cn } from '@/lib/utils'
 import { usePrivy } from '@privy-io/react-auth'
-import { Skeleton } from '@/components/ui/skeleton'
+import { WalletIcon } from 'lucide-react'
+import { OUserProfile } from '../OUserProfile'
 
 type Props = {
   className?: string
@@ -15,11 +14,7 @@ const Component = ({ className }: Props) => {
 
   // Privyが準備できていない場合は工事中ダイアログを表示
   if (!ready) {
-    return (
-      <div className="flex w-full items-center justify-center gap-2">
-        <Skeleton className="h-4 w-24" />
-      </div>
-    )
+    return null
   }
 
   // ログイン済みの場合はログイン済みボタンを表示
