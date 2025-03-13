@@ -1,4 +1,4 @@
-import OProductListItem from '@/components/02_organisms/OProductListItem'
+import { OProductListItem } from '@/components/02_organisms/OProductListItem'
 import { ProductEntity } from '@/domains/entities/product.entity'
 import { FC, useState, useMemo } from 'react'
 

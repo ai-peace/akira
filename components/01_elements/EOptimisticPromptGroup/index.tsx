@@ -11,12 +11,14 @@ const Component: FC<Props> = ({ question }) => {
       <div className="flex justify-end">
         <ChatBubble variant="sent">
           <ChatBubbleAvatar fallback="Y" />
-          <ChatBubbleMessage variant="sent">{question}</ChatBubbleMessage>
+          <ChatBubbleMessage variant="sent" className="text-sm md:text-base">
+            {question}
+          </ChatBubbleMessage>
         </ChatBubble>
       </div>
       <ChatBubble variant="received">
         <ChatBubbleAvatar fallback="AI" />
-        <ChatBubbleMessage isLoading />
+        <ChatBubbleMessage isLoading className="text-sm md:text-base" />
       </ChatBubble>
     </>
   )

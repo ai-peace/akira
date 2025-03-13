@@ -65,4 +65,4 @@ const Component: FC<Props> = ({ product }) => {
   )
 }
 
-export default Component
+export { Component as OProductListItem }

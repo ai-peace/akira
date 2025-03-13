@@ -102,7 +102,9 @@ const Component: FC<Props> = ({ promptGroups, createChatPromptGroup, onIntersect
                   <div id={promptGroup.uniqueKey} data-prompt-group className="flex justify-end">
                     <ChatBubble variant="sent">
                       <ChatBubbleAvatar fallback="Y" />
-                      <ChatBubbleMessage variant="sent">{promptGroup.question}</ChatBubbleMessage>
+                      <ChatBubbleMessage variant="sent" className="text-sm md:text-base">
+                        {promptGroup.question}
+                      </ChatBubbleMessage>
                     </ChatBubble>
                   </div>
                   {/* 回答 */}
@@ -133,7 +135,10 @@ const Component: FC<Props> = ({ promptGroups, createChatPromptGroup, onIntersect
                                   fallback="AI"
                                   src="/images/picture/picture_akira-kun.png"
                                 />
-                                <ChatBubbleMessage variant="received">
+                                <ChatBubbleMessage
+                                  variant="received"
+                                  className="text-sm md:text-base"
+                                >
                                   <ETypewriterText
                                     text={prompt.result?.message || ''}
                                     delay={200}
@@ -147,7 +152,10 @@ const Component: FC<Props> = ({ promptGroups, createChatPromptGroup, onIntersect
                                   fallback="AI"
                                   src="/images/picture/picture_akira-kun.png"
                                 />
-                                <ChatBubbleMessage variant="received">
+                                <ChatBubbleMessage
+                                  variant="received"
+                                  className="text-sm md:text-base"
+                                >
                                   <ETypewriterText
                                     text={prompt.result?.message || ''}
                                     delay={200}
@@ -170,7 +178,7 @@ const Component: FC<Props> = ({ promptGroups, createChatPromptGroup, onIntersect
                                 fallback="AI"
                                 src="/images/picture/picture_akira-kun.png"
                               />
-                              <ChatBubbleMessage isLoading />
+                              <ChatBubbleMessage isLoading className="text-sm md:text-base" />
                             </ChatBubble>
                           </>
                         )}
