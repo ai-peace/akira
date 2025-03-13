@@ -37,7 +37,9 @@ export const OBottomLoginButton = () => {
 
   return (
     <div className="fixed bottom-6 left-1/2 z-40 -translate-x-1/2 transform">
-      <OWalletConnectButton className="w-[200px] shadow-lg" />
+      <div className="rounded-full bg-primary p-1 shadow-lg">
+        <OWalletConnectButton className="w-[200px]" />
+      </div>
     </div>
   )
 }
