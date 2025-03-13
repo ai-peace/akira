@@ -1,6 +1,7 @@
 import { OProductListItem } from '@/components/02_organisms/OProductListItem'
 import { ProductEntity } from '@/domains/entities/product.entity'
 import { FC, useState, useMemo } from 'react'
+import { OProductListItemCollection } from '../OProductListItem/collection'
 
 type Props = {
   showModal: boolean
@@ -59,9 +60,9 @@ const Component: FC<Props> = ({ showModal, setShowModal, products }) => {
   if (!showModal) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="max-h-[90vh] w-[90vw] rounded-lg bg-white">
-        <div className="sticky top-0 z-10 border-b bg-white">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background-soft/90">
+      <div className="h-[100vh] bg-background-muted md:max-h-[90vh] md:w-[90vw] md:rounded-xl">
+        <div className="sticky top-0 z-10 border-b bg-background-muted md:rounded-xl">
           <div className="flex items-center justify-between p-4">
             <h2 className="text-xl font-bold">All products ({filteredProducts.length} items)</h2>
             <button
@@ -106,11 +107,16 @@ const Component: FC<Props> = ({ showModal, setShowModal, products }) => {
         </div>
 
         <div className="max-h-[calc(90vh-200px)] overflow-y-auto p-6">
-          <div className="grid grid-cols-6 gap-4">
+          <OProductListItemCollection
+            products={filteredProducts}
+            displayCount={filteredProducts.length}
+            onShowMore={() => {}}
+          />
+          {/* <div className="grid grid-cols-6 gap-4">
             {filteredProducts.map((product) => (
               <OProductListItem key={product.itemCode} product={product} />
             ))}
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
