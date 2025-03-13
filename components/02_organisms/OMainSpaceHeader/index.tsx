@@ -6,6 +6,7 @@ import { OThemeChangeButton } from '../OThemeChangeButton'
 import { OWalletConnectButton } from '../OWalletConnectButton'
 import { useAtom } from 'jotai'
 import { leftMenuVisibleAtom } from '@/store/atoms/menuAtoms'
+import EShareButton from '@/components/01_elements/EShareButton'
 
 const OMainSpaceHeader = () => {
   const { userPrivate } = useUserPrivate()
@@ -32,7 +33,8 @@ const OMainSpaceHeader = () => {
           <SquarePen className="h-5 w-5 text-foreground" />
         </button>
       </div>
-      <div>
+      <div className="flex items-center gap-2">
+        <EShareButton className="static bottom-auto right-auto z-auto" />
         <OThemeChangeButton />
         {!userPrivate && <OWalletConnectButton className="w-[100px]" />}
       </div>

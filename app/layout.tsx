@@ -1,7 +1,6 @@
 import { OMainSpaceHeader } from '@/components/02_organisms/OMainSpaceHeader'
 import { RootLayoutClient } from '@/components/99_providers/root-layout-client'
 import { Toaster } from '@/components/ui/toaster'
-import EShareButton from '@/components/01_elements/EShareButton'
 import { clientApplicationProperties } from '@/consts/client-application-properties'
 import '@/styles/globals.css'
 import type { Metadata } from 'next'
@@ -86,7 +85,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </section>
           </RootLayoutClient>
           <Toaster />
-          <EShareButton />
         </Providers>
       </body>
     </html>

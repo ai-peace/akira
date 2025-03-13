@@ -43,11 +43,19 @@ export default function EShareButton({ className }: Props) {
     },
   ]
 
+  // ヘッダー内で使用される場合とフローティングボタンとして使用される場合でスタイルを分ける
+  const isFloating = !className?.includes('static')
+
   return (
-    <div className={cn('fixed bottom-6 right-6 z-50', className)}>
+    <div className={cn(isFloating ? 'fixed bottom-6 right-6 z-50' : '', className)}>
       <div className="relative">
         {isOpen && (
-          <div className="absolute bottom-16 right-0 mb-2 flex flex-col gap-2 rounded-lg border border-border bg-background p-2 shadow-lg">
+          <div
+            className={cn(
+              'absolute mb-2 flex flex-col gap-2 rounded-lg border border-border bg-background p-2 shadow-lg',
+              isFloating ? 'bottom-16 right-0' : 'right-0 top-12',
+            )}
+          >
             {shareOptions.map((option) => (
               <button
                 key={option.name}
@@ -66,11 +74,16 @@ export default function EShareButton({ className }: Props) {
         )}
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="flex items-center justify-center rounded-full bg-primary p-3 text-primary-foreground shadow-lg transition-colors hover:bg-primary/90"
+          className={cn(
+            'flex items-center justify-center rounded-full transition-colors',
+            isFloating
+              ? 'bg-primary p-3 text-primary-foreground shadow-lg hover:bg-primary/90'
+              : 'p-2 hover:bg-background-muted',
+          )}
           aria-label="Share"
           title="Share"
         >
-          <Share size={20} />
+          <Share size={isFloating ? 20 : 18} className={isFloating ? '' : 'text-foreground'} />
         </button>
       </div>
     </div>
