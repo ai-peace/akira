@@ -92,6 +92,9 @@ importers:
       idb:
         specifier: ^8.0.1
         version: 8.0.1
+      jotai:
+        specifier: ^2.12.2
+        version: 2.12.2(@types/react@18.0.26)(react@18.2.0)
       langchain:
         specifier: ^0.3.15
         version: 0.3.15(@langchain/core@0.3.37(openai@4.77.0(encoding@0.1.13)(zod@3.24.1)))(axios@1.7.9)(cheerio@1.0.0)(encoding@0.1.13)(openai@4.77.0(encoding@0.1.13)(zod@3.24.1))
@@ -4367,6 +4370,18 @@ packages:
 
   jose@4.15.9:
     resolution: {integrity: sha512-1vUQX+IdDMVPj4k8kOxgUqlcK518yluMuGZwqlr44FS1ppZB/5GWh4rZG89erpOBOJjU/OBsnCVFfapsRz6nEA==}
+
+  jotai@2.12.2:
+    resolution: {integrity: sha512-oN8715y7MkjXlSrpyjlR887TOuc/NLZMs9gvgtfWH/JP47ChwO0lR2ijSwBvPMYyXRAPT+liIAhuBavluKGgtA==}
+    engines: {node: '>=12.20.0'}
+    peerDependencies:
+      '@types/react': '>=17.0.0'
+      react: '>=17.0.0'
+    peerDependenciesMeta:
+      '@types/react':
+        optional: true
+      react:
+        optional: true
 
   joycon@3.1.1:
     resolution: {integrity: sha512-34wB/Y7MW7bzjKRjUKTa46I2Z7eV62Rkhva+KkopW7Qvv/OSWBqvkSY7vusOPrNuZcUG3tApvdVgNB8POj3SPw==}
@@ -11227,6 +11242,11 @@ snapshots:
   jiti@1.21.6: {}
 
   jose@4.15.9: {}
+
+  jotai@2.12.2(@types/react@18.0.26)(react@18.2.0):
+    optionalDependencies:
+      '@types/react': 18.0.26
+      react: 18.2.0
 
   joycon@3.1.1: {}
 
