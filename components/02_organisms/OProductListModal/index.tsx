@@ -61,7 +61,7 @@ const Component: FC<Props> = ({ showModal, setShowModal, products }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background-soft/90">
-      <div className="h-[100vh] bg-background-muted md:max-h-[90vh] md:w-[90vw] md:rounded-xl">
+      <div className="h-full bg-background-muted md:max-h-[90vh] md:w-[90vw] md:rounded-xl">
         <div className="sticky top-0 z-10 border-b bg-background-muted md:rounded-xl">
           <div className="flex items-center justify-between p-4">
             <h2 className="text-xl font-bold">All products ({filteredProducts.length} items)</h2>
@@ -106,17 +106,12 @@ const Component: FC<Props> = ({ showModal, setShowModal, products }) => {
           </div>
         </div>
 
-        <div className="max-h-[calc(90vh-200px)] overflow-y-auto p-6">
+        <div className="max-h-[calc(100vh-200px)] overflow-y-scroll p-4 md:max-h-[calc(90vh-200px)] md:p-4">
           <OProductListItemCollection
             products={filteredProducts}
             displayCount={filteredProducts.length}
             onShowMore={() => {}}
           />
-          {/* <div className="grid grid-cols-6 gap-4">
-            {filteredProducts.map((product) => (
-              <OProductListItem key={product.itemCode} product={product} />
-            ))}
-          </div> */}
         </div>
       </div>
     </div>
