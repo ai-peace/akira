@@ -17,6 +17,7 @@ const Component: FC<Props> = ({ product }) => {
           <div className="flex h-full flex-col justify-between">
             <div>
               <div className="relative flex h-[200px] w-full items-center justify-center">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={product.imageUrl}
                   alt={product.title.en}
