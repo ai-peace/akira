@@ -1,14 +1,12 @@
 'use client'
 
-import useUserPrivate from '@/hooks/resources/user-private/useUserPrivate'
+import EShareButton from '@/components/01_elements/EShareButton'
+import { leftMenuVisibleAtom } from '@/store/atoms/menuAtoms'
+import { useAtom } from 'jotai'
 import { Menu, SquarePen } from 'lucide-react'
 import { OThemeChangeButton } from '../OThemeChangeButton'
-import { useAtom } from 'jotai'
-import { leftMenuVisibleAtom } from '@/store/atoms/menuAtoms'
-import EShareButton from '@/components/01_elements/EShareButton'
 
 const OMainSpaceHeader = () => {
-  const { userPrivate } = useUserPrivate()
   const [leftMenuVisible, setLeftMenuVisible] = useAtom(leftMenuVisibleAtom)
 
   const toggleLeftMenu = () => {
@@ -16,7 +14,7 @@ const OMainSpaceHeader = () => {
   }
 
   return (
-    <div className="absolute right-0 top-0 z-10 flex h-12 w-full items-center justify-between gap-2 px-2">
+    <div className="absolute right-0 top-0 z-10 flex h-12 w-full items-center justify-between gap-2 bg-background px-2 md:bg-background/0 md:px-4">
       <div>
         <button
           onClick={toggleLeftMenu}

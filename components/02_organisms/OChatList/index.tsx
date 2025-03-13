@@ -4,16 +4,17 @@ import Link from 'next/link'
 
 type Props = {
   chats: ChatEntity[]
+  onChatSelect?: () => void
 }
 
-const Component = ({ chats }: Props) => {
+const Component = ({ chats, onChatSelect }: Props) => {
   return (
     <div className="flex h-full flex-col">
       <div className="mb-2 flex items-center justify-between text-xs font-semibold">Histories</div>
       {chats.length > 0 &&
         chats.map((chat) => (
           <div key={chat.uniqueKey}>
-            <Link href={`/chats/${chat.uniqueKey}`}>
+            <Link href={`/chats/${chat.uniqueKey}`} onClick={onChatSelect}>
               <div className="flex cursor-pointer items-center gap-1 rounded-sm py-1 text-sm text-foreground-muted hover:bg-background-muted">
                 <ETypewriterText
                   text={chat.title ?? 'aaaa'}

@@ -122,7 +122,7 @@ const Component = () => {
       >
         <div
           ref={drawerRef}
-          className="animate-slide-in-bottom absolute bottom-0 left-0 right-0 h-[80vh] rounded-t-xl bg-background-soft"
+          className="absolute bottom-0 left-0 right-0 h-[80vh] animate-slide-in-bottom rounded-t-xl bg-background-soft"
           onClick={(e) => e.stopPropagation()}
         >
           <div
@@ -137,13 +137,13 @@ const Component = () => {
           <div className="relative mt-0 h-[calc(80vh-3rem)] w-full overflow-y-auto overflow-x-hidden">
             {userPrivate && !chatsIsLoading && !chatsError && chats && (
               <div className="flex min-h-full flex-col px-4 py-3">
-                <OChatList chats={chats} />
+                <OChatList chats={chats} onChatSelect={() => setIsVisible(false)} />
               </div>
             )}
             {!userPrivate && (
               <div className="flex h-full flex-col items-center justify-center p-4">
                 <p className="mb-4 text-center text-sm text-muted-foreground">
-                  When you login, your chat history will be saved.
+                  ログインするとチャット履歴が保存されます
                 </p>
                 <OWalletConnectButton className="w-full" />
               </div>
@@ -185,7 +185,7 @@ const Component = () => {
       {!userPrivate && (
         <div className="flex h-full flex-col items-center justify-center p-4">
           <p className="mb-4 text-center text-sm text-muted-foreground">
-            When you login, your chat history will be saved.
+            ログインするとチャット履歴が保存されます
           </p>
           <OWalletConnectButton className="w-full" />
         </div>
