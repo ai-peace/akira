@@ -6,6 +6,7 @@ import '@/styles/globals.css'
 import type { Metadata } from 'next'
 import { Providers } from './providers'
 import { TLeftMenu } from '@/components/03_templates/TLeftMenu'
+import { OBottomLoginButton } from '@/components/02_organisms/OBottomLoginButton'
 
 export const metadata: Metadata = {
   title: {
@@ -83,6 +84,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 </div>
               </section>
             </section>
+            <OBottomLoginButton />
           </RootLayoutClient>
           <Toaster />
         </Providers>
