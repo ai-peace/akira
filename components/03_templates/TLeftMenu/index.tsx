@@ -1,14 +1,12 @@
 'use client'
 
-import { ONewChatButton } from '@/components/02_organisms/ONewChatButton'
-import { OWalletConnectButton } from '@/components/02_organisms/OWalletConnectButton'
-import useUserPrivate from '@/hooks/resources/user-private/useUserPrivate'
-import { PanelLeftCloseIcon, PanelRightCloseIcon } from 'lucide-react'
-import { useAtom } from 'jotai'
-import { leftMenuVisibleAtom } from '@/store/atoms/menuAtoms'
+import { OChatList } from '@/components/02_organisms/OChatList'
+import { OUserProfile } from '@/components/02_organisms/OUserProfile'
 import { OUserPromptUsage } from '@/components/02_organisms/OUserPromptUsage'
 import { useChats } from '@/hooks/resources/chats/useChats'
-import { OChatList } from '@/components/02_organisms/OChatList'
+import useUserPrivate from '@/hooks/resources/user-private/useUserPrivate'
+import { leftMenuVisibleAtom } from '@/store/atoms/menuAtoms'
+import { useAtom } from 'jotai'
 
 const Component = () => {
   const { userPrivate } = useUserPrivate()
@@ -32,7 +30,7 @@ const Component = () => {
       <div className="sticky bottom-0 left-0 right-0 mt-auto bg-background-soft px-4 py-4">
         <div className="flex flex-col gap-4">
           <OUserPromptUsage />
-          <OWalletConnectButton />
+          <OUserProfile />
         </div>
       </div>
     </div>
