@@ -42,8 +42,8 @@ const Component: FC = () => {
               className="object-cover"
             />
           </div>
-          <div className="flex-none py-6 text-center">
-            <h1 className="mb-0 text-3xl font-semibold text-white">
+          <div className="flex-none py-4 text-center md:py-6">
+            <h1 className="mb-0 text-xl font-semibold text-white md:text-3xl">
               <EDotFont
                 text="What rare item are you looking for?"
                 className="font-[400]"
