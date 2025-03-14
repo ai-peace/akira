@@ -10,7 +10,7 @@ export const promptGroupMapper = {
       prompts: promptMapper.toDomainCollection(promptGroup.prompts ?? []),
       updatedAt: promptGroup.updatedAt,
       createdAt: promptGroup.createdAt,
-      chatUniqueKey: promptGroup.chat?.uniqueKey,
+      chatUniqueKey: promptGroup.chat.uniqueKey,
     }
   },
 

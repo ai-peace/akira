@@ -11,11 +11,16 @@ export const chatMapper = {
   ): ChatEntity & {
     promptGroups: PromptGroupEntity[]
   } => {
+    const promptGroupsWithChat = prismaChat.promptGroups.map((pg) => ({
+      ...pg,
+      chat: prismaChat,
+    }))
+
     return {
       uniqueKey: prismaChat.uniqueKey,
       title: prismaChat.title ?? undefined,
       mdxContent: prismaChat.mdxContent ?? undefined,
-      promptGroups: promptGroupMapper.toDomainCollection(prismaChat.promptGroups),
+      promptGroups: promptGroupMapper.toDomainCollection(promptGroupsWithChat),
       updatedAt: prismaChat.updatedAt,
       createdAt: prismaChat.createdAt,
     }

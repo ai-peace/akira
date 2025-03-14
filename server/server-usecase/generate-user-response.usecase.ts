@@ -58,6 +58,7 @@ const initializePromptGroup = async (chatUniqueKey: string, question: string) =>
     },
     include: {
       prompts: true,
+      chat: true,
     },
   })
 }
