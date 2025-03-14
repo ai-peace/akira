@@ -58,7 +58,7 @@ const Component: FC<Props> = ({ products, chatUniqueKey }) => {
   }, [products, searchTerm, sortOrder, activeTab])
 
   return (
-    <div className="">
+    <>
       <div className="relative bg-background md:rounded-xl">
         {chatUniqueKey ? (
           <Link
@@ -84,7 +84,7 @@ const Component: FC<Props> = ({ products, chatUniqueKey }) => {
         )}
 
         {/* Search filter */}
-        <div className="flex items-center gap-2 px-2 pb-2 md:px-4 md:pb-4">
+        <div className="mx-auto flex max-w-3xl items-center gap-2 px-2 pb-2 md:px-4 md:pb-4">
           <div className="flex-1">
             <input
               type="text"
@@ -103,7 +103,7 @@ const Component: FC<Props> = ({ products, chatUniqueKey }) => {
         </div>
 
         {/* タブバー - スクロール可能なコンテナ */}
-        <div className="relative w-full max-w-[100vw] border-b">
+        <div className="relative w-full max-w-[100vw] border-b md:mx-auto md:max-w-3xl">
           <div
             className="-mb-[1px] overflow-x-auto overflow-y-hidden"
             style={{
@@ -167,19 +167,16 @@ const Component: FC<Props> = ({ products, chatUniqueKey }) => {
               })}
             </div>
           </div>
-
-          {/* スクロールインジケーター（オプション） */}
-          <div className="pointer-events-none absolute bottom-0 right-0 top-0 w-8 bg-gradient-to-l from-background-muted to-transparent"></div>
         </div>
       </div>
 
-      <div className="p-2 md:p-4">
+      <div className="mx-auto max-w-3xl p-2 md:p-4">
         <OProductListItemCollection
           products={filteredProducts}
           displayCount={filteredProducts.length}
         />
       </div>
-    </div>
+    </>
   )
 }
 

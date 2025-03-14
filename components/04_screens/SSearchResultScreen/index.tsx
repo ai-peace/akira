@@ -16,7 +16,7 @@ const Component: FC<Props> = ({ promptGroupUniqueKey }) => {
       {/* ここから */}
       {promptGroup?.prompts.map((prompt) => {
         return (
-          <div key={prompt.uniqueKey}>
+          <div key={prompt.uniqueKey} className="w-full">
             {prompt.resultType === 'FOUND_PRODUCT_ITEMS' && (
               <TProductSearch
                 key={prompt.uniqueKey}
