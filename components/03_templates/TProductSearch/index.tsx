@@ -4,12 +4,10 @@ import { OProductListItemCollection } from '../../02_organisms/OProductListItem/
 import { ArrowLeftIcon, ListFilter } from 'lucide-react'
 
 type Props = {
-  showModal: boolean
-  setShowModal: (show: boolean) => void
   products: ProductEntity[]
 }
 
-const Component: FC<Props> = ({ showModal, setShowModal, products }) => {
+const Component: FC<Props> = ({ products }) => {
   const [searchTerm, setSearchTerm] = useState('')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
   const [activeTab, setActiveTab] = useState<string>('all')
@@ -57,16 +55,11 @@ const Component: FC<Props> = ({ showModal, setShowModal, products }) => {
       })
   }, [products, searchTerm, sortOrder, activeTab])
 
-  if (!showModal) return null
-
   return (
     <div className="">
       <div className="relative bg-background md:rounded-xl">
         <div className="relative flex items-center justify-between p-2 md:p-4">
-          <button
-            onClick={() => setShowModal(false)}
-            className="flex items-center gap-2 rounded-full p-2 hover:bg-gray-100"
-          >
+          <button className="flex items-center gap-2 rounded-full p-2 hover:bg-gray-100">
             <ArrowLeftIcon className="h-4 w-4" />
           </button>
           <h2 className="text-md absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-bold">
@@ -97,7 +90,7 @@ const Component: FC<Props> = ({ showModal, setShowModal, products }) => {
         {/* タブバー - スクロール可能なコンテナ */}
         <div className="relative w-full max-w-[100vw] border-b">
           <div
-            className="-mb-[1px] overflow-x-auto"
+            className="-mb-[1px] overflow-x-auto overflow-y-hidden"
             style={{
               scrollbarWidth: 'none',
               msOverflowStyle: 'none',
@@ -111,30 +104,51 @@ const Component: FC<Props> = ({ showModal, setShowModal, products }) => {
               }
             `}</style>
             <div className="flex whitespace-nowrap px-4">
-              {[...shops, ...shops].map((shop) => (
-                <button
-                  key={shop}
-                  onClick={() => setActiveTab(shop)}
-                  className={`flex-shrink-0 border-b-2 px-4 py-2 text-sm transition-all duration-200 ${
-                    activeTab === shop
-                      ? 'border-blue-500 font-medium text-blue-500'
-                      : 'hover:text-foreground-hover border-transparent text-foreground-muted hover:border-gray-300'
-                  }`}
-                  style={{
-                    marginBottom: '-1px',
-                    scrollSnapAlign: 'start',
-                  }}
-                >
-                  <div className="whitespace-nowrap">
-                    {shop === 'unknown' ? 'Other' : shop === 'all' ? 'All' : shop}
-                    <span
-                      className={`ml-1 text-xs ${activeTab === shop ? 'text-blue-400' : 'text-gray-400'}`}
-                    >
-                      ({shopCounts[shop]})
-                    </span>
-                  </div>
-                </button>
-              ))}
+              {[...shops, ...shops].map((shop) => {
+                // 現在の店舗のアイコンURLを取得
+                const shopIconUrl =
+                  shop === 'all' || shop === 'unknown'
+                    ? null
+                    : products.find((product) => product.shopName === shop)?.shopIconUrl
+
+                return (
+                  <button
+                    key={shop}
+                    onClick={() => setActiveTab(shop)}
+                    className={`flex-shrink-0 border-b-2 px-4 py-2 text-sm transition-all duration-200 ${
+                      activeTab === shop
+                        ? 'border-blue-500 text-blue-500'
+                        : 'hover:text-foreground-hover border-transparent text-foreground-muted hover:border-gray-300'
+                    }`}
+                    style={{
+                      marginBottom: '-1px',
+                      scrollSnapAlign: 'start',
+                    }}
+                  >
+                    <div className="flex items-center gap-1 whitespace-nowrap">
+                      <div className="flex items-center">
+                        {shopIconUrl && (
+                          <img
+                            src={shopIconUrl}
+                            alt={shop}
+                            className="mr-1.5 h-4 w-4 rounded-full object-contain"
+                            onError={(e) => {
+                              // 画像読み込みエラー時に代替表示
+                              e.currentTarget.style.display = 'none'
+                            }}
+                          />
+                        )}
+                        <span>{shop === 'unknown' ? 'Other' : shop === 'all' ? 'All' : shop}</span>
+                      </div>
+                      <span
+                        className={`text-xs ${activeTab === shop ? 'text-blue-400' : 'text-gray-400'}`}
+                      >
+                        ({shopCounts[shop]})
+                      </span>
+                    </div>
+                  </button>
+                )
+              })}
             </div>
           </div>
 

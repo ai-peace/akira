@@ -9,7 +9,6 @@ type Props = {
 }
 
 const Component: FC<Props> = ({ promptGroupUniqueKey }) => {
-  const [showModal, setShowModal] = useState(true)
   const { promptGroup } = usePromptGroup({ uniqueKey: promptGroupUniqueKey })
 
   return (
@@ -19,12 +18,7 @@ const Component: FC<Props> = ({ promptGroupUniqueKey }) => {
         return (
           <div key={prompt.uniqueKey}>
             {prompt.resultType === 'FOUND_PRODUCT_ITEMS' && (
-              <TProductSearch
-                key={prompt.uniqueKey}
-                showModal={showModal}
-                setShowModal={setShowModal}
-                products={prompt.result?.data}
-              />
+              <TProductSearch key={prompt.uniqueKey} products={prompt.result?.data} />
             )}
           </div>
         )
