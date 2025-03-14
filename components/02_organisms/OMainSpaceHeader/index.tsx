@@ -5,6 +5,8 @@ import { leftMenuVisibleAtom } from '@/store/atoms/menuAtoms'
 import { useAtom } from 'jotai'
 import { Menu, SquarePen } from 'lucide-react'
 import { OThemeChangeButton } from '../OThemeChangeButton'
+import Link from 'next/link'
+import { rootUrl } from '@/utils/url.helper'
 
 const OMainSpaceHeader = () => {
   const [leftMenuVisible, setLeftMenuVisible] = useAtom(leftMenuVisibleAtom)
@@ -14,8 +16,8 @@ const OMainSpaceHeader = () => {
   }
 
   return (
-    <div className="absolute right-0 top-0 z-10 flex h-12 w-full items-center justify-between gap-2 bg-background px-2 md:bg-background/0 md:px-4">
-      <div>
+    <div className="absolute right-0 top-0 z-10 flex h-12 w-full items-center justify-between gap-2 bg-background px-2 md:bg-background/0 md:px-2">
+      <div className="flex">
         <button
           onClick={toggleLeftMenu}
           className="cursor-pointer rounded-md p-2 hover:bg-background-muted"
@@ -23,12 +25,12 @@ const OMainSpaceHeader = () => {
           <Menu className="h-5 w-5 text-foreground" />
         </button>
 
-        <button
-          onClick={() => {}}
-          className="cursor-pointer rounded-md p-2 hover:bg-background-muted"
+        <Link
+          href={rootUrl()}
+          className="block cursor-pointer rounded-md p-2 hover:bg-background-muted"
         >
           <SquarePen className="h-5 w-5 text-foreground" />
-        </button>
+        </Link>
       </div>
       <div className="flex items-center gap-2">
         <EShareButton className="static bottom-auto right-auto z-auto" />
