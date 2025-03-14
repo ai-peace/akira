@@ -60,8 +60,8 @@ const Component: FC<Props> = ({ showModal, setShowModal, products }) => {
   if (!showModal) return null
 
   return (
-    <div>
-      <div className="relative top-0 z-10 border-b bg-background-muted md:rounded-xl">
+    <div className="">
+      <div className="relative border-b bg-background md:rounded-xl">
         <div className="relative flex items-center justify-between p-2 md:p-4">
           <button
             onClick={() => setShowModal(false)}
@@ -94,18 +94,52 @@ const Component: FC<Props> = ({ showModal, setShowModal, products }) => {
           </button>
         </div>
 
-        <div className="flex flex-wrap gap-2 px-4 pb-2">
-          {shops.map((shop) => (
-            <button
-              key={shop}
-              onClick={() => setActiveTab(shop)}
-              className={`rounded-md px-3 py-1 ${
-                activeTab === shop ? 'bg-blue-500 text-white' : 'bg-gray-100 hover:bg-gray-200'
-              }`}
-            >
-              {shop === 'unknown' ? 'Other' : shop === 'all' ? 'All' : shop} ({shopCounts[shop]})
-            </button>
-          ))}
+        {/* タブバー - スクロール可能なコンテナ */}
+        <div className="relative w-full max-w-[100vw] border-b">
+          <div
+            className="overflow-x-auto pb-1"
+            style={{
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+              WebkitOverflowScrolling: 'touch',
+              scrollSnapType: 'x proximity',
+            }}
+          >
+            <style jsx>{`
+              div::-webkit-scrollbar {
+                display: none;
+              }
+            `}</style>
+            <div className="flex whitespace-nowrap px-4">
+              {[...shops, ...shops].map((shop) => (
+                <button
+                  key={shop}
+                  onClick={() => setActiveTab(shop)}
+                  className={`flex-shrink-0 border-b-2 px-4 py-2 text-sm transition-all duration-200 ${
+                    activeTab === shop
+                      ? 'border-blue-500 font-medium text-blue-500'
+                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                  }`}
+                  style={{
+                    marginBottom: '-1px',
+                    scrollSnapAlign: 'start',
+                  }}
+                >
+                  <span className="whitespace-nowrap">
+                    {shop === 'unknown' ? 'Other' : shop === 'all' ? 'All' : shop}
+                    <span
+                      className={`ml-1 text-xs ${activeTab === shop ? 'text-blue-400' : 'text-gray-400'}`}
+                    >
+                      ({shopCounts[shop]})
+                    </span>
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* スクロールインジケーター（オプション） */}
+          <div className="pointer-events-none absolute bottom-0 right-0 top-0 w-8 bg-gradient-to-l from-background-muted to-transparent"></div>
         </div>
       </div>
 
