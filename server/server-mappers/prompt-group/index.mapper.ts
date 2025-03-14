@@ -1,15 +1,16 @@
 import { PromptGroupEntity } from '@/domains/entities/prompt-group.entity'
-import { Prompt, PromptGroup } from '@prisma/client'
+import { Chat, Prompt, PromptGroup } from '@prisma/client'
 import { promptMapper } from '../prompt/index.mapper'
 
 export const promptGroupMapper = {
-  toDomain: (promptGroup: PromptGroup & { prompts?: Prompt[] }): PromptGroupEntity => {
+  toDomain: (promptGroup: PromptGroup & { chat?: Chat; prompts?: Prompt[] }): PromptGroupEntity => {
     return {
       uniqueKey: promptGroup.uniqueKey,
       question: promptGroup.question ?? '',
       prompts: promptMapper.toDomainCollection(promptGroup.prompts ?? []),
       updatedAt: promptGroup.updatedAt,
       createdAt: promptGroup.createdAt,
+      chatUniqueKey: promptGroup.chat?.uniqueKey,
     }
   },
 

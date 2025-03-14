@@ -15,6 +15,7 @@ const route = getPromptGroup.get('/prompt-groups/:uniqueKey', async (c) => {
       },
       include: {
         prompts: true,
+        chat: true,
       },
     })
 

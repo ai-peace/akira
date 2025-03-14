@@ -2,7 +2,7 @@
 
 import { TProductSearch } from '@/components/03_templates/TProductSearch'
 import { usePromptGroup } from '@/hooks/resources/prompt-groups/usePromptGroup'
-import { FC, useState } from 'react'
+import { FC } from 'react'
 
 type Props = {
   promptGroupUniqueKey: string
@@ -18,7 +18,11 @@ const Component: FC<Props> = ({ promptGroupUniqueKey }) => {
         return (
           <div key={prompt.uniqueKey}>
             {prompt.resultType === 'FOUND_PRODUCT_ITEMS' && (
-              <TProductSearch key={prompt.uniqueKey} products={prompt.result?.data} />
+              <TProductSearch
+                key={prompt.uniqueKey}
+                products={prompt.result?.data}
+                chatUniqueKey={promptGroup?.chatUniqueKey}
+              />
             )}
           </div>
         )
