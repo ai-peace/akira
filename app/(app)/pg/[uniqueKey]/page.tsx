@@ -16,9 +16,7 @@ const Page = ({ params }: Params) => {
     setIsClient(true)
   }, [])
 
-  if (!isClient) {
-    return <div>Loading...</div>
-  }
+  if (!isClient) return <div>Loading...</div>
 
   return (
     <>
