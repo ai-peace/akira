@@ -6,5 +6,5 @@ export interface PromptGroupEntity {
   prompts: PromptEntity[]
   updatedAt: Date
   createdAt: Date
-  chatUniqueKey?: string
+  chatUniqueKey: string
 }

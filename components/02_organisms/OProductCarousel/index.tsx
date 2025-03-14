@@ -1,15 +1,17 @@
-import { ProductEntity } from '@/domains/entities/product.entity'
 import { OProductListItem } from '@/components/02_organisms/OProductListItem'
+import { ProductEntity } from '@/domains/entities/product.entity'
+import { getPromptGroupUrl } from '@/utils/url.helper'
 import { ChevronRight } from 'lucide-react'
+import Link from 'next/link'
 import { FC, useEffect, useRef, useState } from 'react'
 
 type Props = {
   products: ProductEntity[]
   displayCount: number
-  onShowMore: () => void
+  promptGroupUniqueKey: string
 }
 
-const Component: FC<Props> = ({ products, displayCount, onShowMore }) => {
+const Component: FC<Props> = ({ products, displayCount, promptGroupUniqueKey }) => {
   const carouselRef = useRef<HTMLDivElement>(null)
   const [showRightArrow, setShowRightArrow] = useState(true)
 
@@ -84,11 +86,15 @@ const Component: FC<Props> = ({ products, displayCount, onShowMore }) => {
           </button>
         )}
       </div>
-      {products.length > displayCount && (
-        <div className="mb-2 flex justify-end pr-4">
-          <button onClick={onShowMore} className="text-xs text-blue-500 hover:underline">
-            全て見る ({products.length})
-          </button>
+
+      {promptGroupUniqueKey && (
+        <div className="flex justify-end">
+          <Link
+            href={getPromptGroupUrl(promptGroupUniqueKey)}
+            className="rounded-md px-4 py-2 text-sm text-blue-500 transition-all hover:underline"
+          >
+            View all
+          </Link>
         </div>
       )}
     </>

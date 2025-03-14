@@ -6,7 +6,7 @@ import Link from 'next/link'
 
 type Props = {
   products: ProductEntity[]
-  chatUniqueKey?: string
+  chatUniqueKey: string
 }
 
 const Component: FC<Props> = ({ products, chatUniqueKey }) => {
@@ -177,7 +177,7 @@ const Component: FC<Props> = ({ products, chatUniqueKey }) => {
         <OProductListItemCollection
           products={filteredProducts}
           displayCount={filteredProducts.length}
-          onShowMore={() => {}}
+          chatUniqueKey={chatUniqueKey}
         />
       </div>
     </div>

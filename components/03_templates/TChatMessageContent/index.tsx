@@ -118,6 +118,7 @@ const Component: FC<Props> = ({ promptGroups, createChatPromptGroup, onIntersect
                                 <OChatBubbleProduct
                                   products={prompt.result?.data}
                                   message={prompt.result?.message || ''}
+                                  promptGroupUniqueKey={promptGroup.uniqueKey}
                                 />
                                 {prompt.result?.keywords && (
                                   <ORelativeKeywords

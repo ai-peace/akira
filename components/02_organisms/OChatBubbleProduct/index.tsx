@@ -7,9 +7,10 @@ import { OChatProducts } from '../OChatProducts'
 type Props = {
   products: ProductEntity[]
   message: string
+  promptGroupUniqueKey: string
 }
 
-const Component: FC<Props> = ({ products, message }) => {
+const Component: FC<Props> = ({ products, message, promptGroupUniqueKey }) => {
   return (
     <>
       <ChatBubble variant="received">
@@ -19,7 +20,7 @@ const Component: FC<Props> = ({ products, message }) => {
         </ChatBubbleMessage>
       </ChatBubble>
 
-      <OChatProducts products={products} />
+      <OChatProducts products={products} promptGroupUniqueKey={promptGroupUniqueKey} />
     </>
   )
 }

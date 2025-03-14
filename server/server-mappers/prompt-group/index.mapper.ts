@@ -3,7 +3,7 @@ import { Chat, Prompt, PromptGroup } from '@prisma/client'
 import { promptMapper } from '../prompt/index.mapper'
 
 export const promptGroupMapper = {
-  toDomain: (promptGroup: PromptGroup & { chat?: Chat; prompts?: Prompt[] }): PromptGroupEntity => {
+  toDomain: (promptGroup: PromptGroup & { chat: Chat; prompts?: Prompt[] }): PromptGroupEntity => {
     return {
       uniqueKey: promptGroup.uniqueKey,
       question: promptGroup.question ?? '',
@@ -15,7 +15,7 @@ export const promptGroupMapper = {
   },
 
   toDomainCollection: (
-    promptGroups: (PromptGroup & { prompts?: Prompt[] })[],
+    promptGroups: (PromptGroup & { chat: Chat; prompts?: Prompt[] })[],
   ): PromptGroupEntity[] => {
     return promptGroups.map(promptGroupMapper.toDomain)
   },

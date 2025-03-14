@@ -1,15 +1,14 @@
+import { ProductEntity } from '@/domains/entities/product.entity'
 import { FC, useEffect, useState } from 'react'
 import { OProductCarousel } from '../OProductCarousel'
 import { OProductListItemCollection } from '../OProductListItem/collection'
-import { ProductEntity } from '@/domains/entities/product.entity'
-import { OProductListModal } from '../OProductListModal'
 
 type Props = {
   products: ProductEntity[]
+  promptGroupUniqueKey: string
 }
 
-const Component: FC<Props> = ({ products }) => {
-  const [showModal, setShowModal] = useState(false)
+const Component: FC<Props> = ({ products, promptGroupUniqueKey }) => {
   const [displayCount] = useState(8)
   const [isMobile, setIsMobile] = useState(false)
 
@@ -31,27 +30,21 @@ const Component: FC<Props> = ({ products }) => {
     }
   }, [])
 
-  const handleShowMore = () => {
-    setShowModal(true)
-  }
-
   return (
     <>
       {isMobile ? (
         <OProductCarousel
           products={products}
           displayCount={displayCount}
-          onShowMore={handleShowMore}
+          promptGroupUniqueKey={promptGroupUniqueKey}
         />
       ) : (
         <OProductListItemCollection
           products={products}
           displayCount={displayCount}
-          onShowMore={handleShowMore}
+          promptGroupUniqueKey={promptGroupUniqueKey}
         />
       )}
-
-      <OProductListModal showModal={showModal} setShowModal={setShowModal} products={products} />
     </>
   )
 }
