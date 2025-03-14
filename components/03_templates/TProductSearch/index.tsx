@@ -61,7 +61,7 @@ const Component: FC<Props> = ({ showModal, setShowModal, products }) => {
 
   return (
     <div className="">
-      <div className="relative border-b bg-background md:rounded-xl">
+      <div className="relative bg-background md:rounded-xl">
         <div className="relative flex items-center justify-between p-2 md:p-4">
           <button
             onClick={() => setShowModal(false)}
@@ -70,7 +70,7 @@ const Component: FC<Props> = ({ showModal, setShowModal, products }) => {
             <ArrowLeftIcon className="h-4 w-4" />
           </button>
           <h2 className="text-md absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-bold">
-            All products ({filteredProducts.length} items)
+            All products
           </h2>
           <div id="spacer" />
         </div>
@@ -97,7 +97,7 @@ const Component: FC<Props> = ({ showModal, setShowModal, products }) => {
         {/* タブバー - スクロール可能なコンテナ */}
         <div className="relative w-full max-w-[100vw] border-b">
           <div
-            className="overflow-x-auto pb-1"
+            className="-mb-[1px] overflow-x-auto"
             style={{
               scrollbarWidth: 'none',
               msOverflowStyle: 'none',
@@ -118,21 +118,21 @@ const Component: FC<Props> = ({ showModal, setShowModal, products }) => {
                   className={`flex-shrink-0 border-b-2 px-4 py-2 text-sm transition-all duration-200 ${
                     activeTab === shop
                       ? 'border-blue-500 font-medium text-blue-500'
-                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                      : 'hover:text-foreground-hover border-transparent text-foreground-muted hover:border-gray-300'
                   }`}
                   style={{
                     marginBottom: '-1px',
                     scrollSnapAlign: 'start',
                   }}
                 >
-                  <span className="whitespace-nowrap">
+                  <div className="whitespace-nowrap">
                     {shop === 'unknown' ? 'Other' : shop === 'all' ? 'All' : shop}
                     <span
                       className={`ml-1 text-xs ${activeTab === shop ? 'text-blue-400' : 'text-gray-400'}`}
                     >
                       ({shopCounts[shop]})
                     </span>
-                  </span>
+                  </div>
                 </button>
               ))}
             </div>
@@ -143,7 +143,7 @@ const Component: FC<Props> = ({ showModal, setShowModal, products }) => {
         </div>
       </div>
 
-      <div className="max-h-[calc(100vh-200px)] overflow-y-scroll p-4 md:max-h-[calc(90vh-200px)] md:p-4">
+      <div className="p-2 md:p-4">
         <OProductListItemCollection
           products={filteredProducts}
           displayCount={filteredProducts.length}

@@ -1,12 +1,8 @@
-import { OMainSpaceHeader } from '@/components/02_organisms/OMainSpaceHeader'
-import { RootLayoutClient } from '@/components/99_providers/root-layout-client'
+import { Providers } from '@/components/99_providers/providers'
 import { Toaster } from '@/components/ui/toaster'
 import { clientApplicationProperties } from '@/consts/client-application-properties'
 import '@/styles/globals.css'
 import type { Metadata } from 'next'
-import { Providers } from './providers'
-import { TLeftMenu } from '@/components/03_templates/TLeftMenu'
-import { OBottomLoginButton } from '@/components/02_organisms/OBottomLoginButton'
 
 export const metadata: Metadata = {
   title: {
@@ -71,23 +67,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="apple-touch-icon" href="/icon-192x192.png" />
       </head>
       <body>
-        <Providers>
-          <RootLayoutClient>
-            <section className="flex h-screen bg-background-muted">
-              <section className="w-full bg-background text-foreground">
-                <div className="relative flex h-full">
-                  <TLeftMenu />
-                  <div className="relative flex h-full w-full">
-                    <OMainSpaceHeader />
-                    {children}
-                  </div>
-                </div>
-              </section>
-            </section>
-            <OBottomLoginButton />
-          </RootLayoutClient>
-          <Toaster />
-        </Providers>
+        <Providers>{children}</Providers>
+        <Toaster />
       </body>
     </html>
   )
