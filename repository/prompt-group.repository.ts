@@ -9,6 +9,25 @@ export type CreateChatPromptGroupInput = InferRequestType<
   (typeof client.chats)[':uniqueKey']['prompt-groups']['$post']
 >
 
+const get = async (uniqueKey: string): Promise<PromptGroupEntity | null> => {
+  const res = await client['prompt-groups'][':uniqueKey'].$get({
+    param: {
+      uniqueKey: uniqueKey,
+    },
+  })
+  const json = await res.json()
+
+  if (res.ok && 'data' in json) {
+    return json.data as PromptGroupEntity
+  }
+
+  if ('error' in json) {
+    throw new HcApiError(json.error?.code ?? 'UNKNOWN_ERROR', json.error?.message ?? '', json.error)
+  }
+
+  throw new HcApiError('UNKNOWN_ERROR', 'Unknown error', {})
+}
+
 const create = async (input: CreateChatPromptGroupInput, token: string) => {
   const client = hcClient({
     headers: {
@@ -35,5 +54,6 @@ const create = async (input: CreateChatPromptGroupInput, token: string) => {
 }
 
 export const promptGroupRepository = {
+  get,
   create,
 }

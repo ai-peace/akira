@@ -7,6 +7,7 @@ import { UpdateUserPrivateRoute } from './user-privates/update'
 import { GetUserPrivateChatCollectionRoute } from './user-privates/chats'
 import { InitializeUserPromptUsageRoute } from './user-prompt-usages/initialize'
 import { UpsertUserPromptUsageRoute } from './user-prompt-usages/upsert'
+import { GetPromptGroupRoute } from './prompt-groups/show'
 
 export type ApiRoutes =
   | CreateChatRoute
@@ -18,3 +19,4 @@ export type ApiRoutes =
   | GetUserPrivateChatCollectionRoute
   | InitializeUserPromptUsageRoute
   | UpsertUserPromptUsageRoute
+  | GetPromptGroupRoute

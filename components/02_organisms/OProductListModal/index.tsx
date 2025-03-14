@@ -1,6 +1,5 @@
-import { OProductListItem } from '@/components/02_organisms/OProductListItem'
 import { ProductEntity } from '@/domains/entities/product.entity'
-import { FC, useState, useMemo } from 'react'
+import { FC, useMemo, useState } from 'react'
 import { OProductListItemCollection } from '../OProductListItem/collection'
 
 type Props = {

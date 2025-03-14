@@ -1,7 +1,7 @@
 import { ChatEntity } from '@/domains/entities/chat.entity'
 import { chatRepository } from '@/repository/chat.repository'
 import { PrivyAccessTokenRepository } from '@/repository/privy-access-token.repository'
-import { promptGroupRepository } from '@/repository/prompt-group'
+import { promptGroupRepository } from '@/repository/prompt-group.repository'
 import { useEffect, useState } from 'react'
 import useSWR from 'swr'
 

@@ -11,7 +11,7 @@ type Props = {
 const Component: FC<Props> = ({ products, displayCount, onShowMore }) => {
   return (
     <>
-      <div className="grid w-full grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+      <div className="grid w-full grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
         {products.slice(0, displayCount).map((product) => (
           <OProductListItem key={product.itemCode} product={product} />
         ))}
