@@ -7,7 +7,7 @@ import Link from 'next/link'
 type Props = {
   products: ProductEntity[]
   displayCount: number
-  promptGroupUniqueKey: string
+  promptGroupUniqueKey?: string
 }
 
 const Component: FC<Props> = ({ products, displayCount, promptGroupUniqueKey }) => {

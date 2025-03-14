@@ -177,7 +177,6 @@ const Component: FC<Props> = ({ products, chatUniqueKey }) => {
         <OProductListItemCollection
           products={filteredProducts}
           displayCount={filteredProducts.length}
-          chatUniqueKey={chatUniqueKey}
         />
       </div>
     </div>
