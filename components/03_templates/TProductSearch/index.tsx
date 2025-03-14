@@ -1,7 +1,7 @@
 import { ProductEntity } from '@/domains/entities/product.entity'
 import { FC, useMemo, useState } from 'react'
 import { OProductListItemCollection } from '../../02_organisms/OProductListItem/collection'
-import { ArrowLeftIcon } from 'lucide-react'
+import { ArrowLeftIcon, ListFilter } from 'lucide-react'
 
 type Props = {
   showModal: boolean
@@ -62,7 +62,7 @@ const Component: FC<Props> = ({ showModal, setShowModal, products }) => {
   return (
     <div>
       <div className="relative top-0 z-10 border-b bg-background-muted md:rounded-xl">
-        <div className="relative flex items-center justify-between p-4">
+        <div className="relative flex items-center justify-between p-2 md:p-4">
           <button
             onClick={() => setShowModal(false)}
             className="flex items-center gap-2 rounded-full p-2 hover:bg-gray-100"
@@ -75,21 +75,22 @@ const Component: FC<Props> = ({ showModal, setShowModal, products }) => {
           <div id="spacer" />
         </div>
 
-        <div className="flex items-center gap-4 px-4 pb-4">
+        {/* Search filter */}
+        <div className="flex items-center gap-2 px-2 pb-2 md:px-4 md:pb-4">
           <div className="flex-1">
             <input
               type="text"
               placeholder="Search products..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full rounded-md border px-3 py-2"
+              className="w-full rounded-md border px-2 py-1 md:px-3 md:py-2"
             />
           </div>
           <button
             onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
             className="flex items-center gap-2 rounded-md border px-3 py-2 hover:bg-gray-50"
           >
-            Price {sortOrder === 'asc' ? '↑' : '↓'}
+            <ListFilter className="h-4 w-4" />
           </button>
         </div>
 
