@@ -60,29 +60,6 @@ const Component: FC<Props> = ({ products, chatUniqueKey }) => {
   return (
     <>
       <div className="relative bg-background md:rounded-xl">
-        {chatUniqueKey ? (
-          <Link
-            href={`/chats/${chatUniqueKey}`}
-            className="relative flex items-center justify-between p-2 md:p-4"
-          >
-            <button className="flex items-center gap-2 rounded-full p-2 hover:bg-gray-100">
-              <ArrowLeftIcon className="h-4 w-4" />
-            </button>
-            <h2 className="text-md absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-bold">
-              All products
-            </h2>
-            <div id="spacer" />
-          </Link>
-        ) : (
-          <div className="relative flex items-center justify-between p-2 md:p-4">
-            <div className="h-6" />
-            <h2 className="text-md absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-bold">
-              All products
-            </h2>
-            <div id="spacer" />
-          </div>
-        )}
-
         {/* Search filter */}
         <div className="mx-auto flex max-w-3xl items-center gap-2 px-2 pb-2 md:px-4 md:pb-4">
           <div className="flex-1">
