@@ -119,7 +119,7 @@ const Component: FC<Props> = ({ products, chatUniqueKey }) => {
               }
             `}</style>
             <div className="flex whitespace-nowrap px-4">
-              {[...shops, ...shops].map((shop) => {
+              {shops.map((shop) => {
                 // 現在の店舗のアイコンURLを取得
                 const shopIconUrl =
                   shop === 'all' || shop === 'unknown'
