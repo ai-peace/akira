@@ -1,6 +1,7 @@
 'use client'
 
 import { OProductListModal } from '@/components/02_organisms/OProductListModal'
+import { TProductSearch } from '@/components/03_templates/TProductSearch'
 import { usePromptGroup } from '@/hooks/resources/prompt-groups/usePromptGroup'
 import { FC, useState } from 'react'
 
@@ -17,12 +18,20 @@ const Component: FC<Props> = ({ promptGroupUniqueKey }) => {
   return (
     <>
       {/* ここから */}
-      {/* <OProductListModal
-        key={promptGroup?.uniqueKey}
-        showModal={showModal}
-        setShowModal={setShowModal}
-        products={promptGroup?.prompts}
-      /> */}
+      {promptGroup?.prompts.map((prompt) => {
+        return (
+          <div key={prompt.uniqueKey}>
+            {prompt.resultType === 'FOUND_PRODUCT_ITEMS' && (
+              <TProductSearch
+                key={prompt.uniqueKey}
+                showModal={showModal}
+                setShowModal={setShowModal}
+                products={prompt.result?.data}
+              />
+            )}
+          </div>
+        )
+      })}
     </>
   )
 }
