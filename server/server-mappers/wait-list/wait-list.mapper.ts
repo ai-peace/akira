@@ -1,8 +1,8 @@
 import { WaitListEntity } from '@/domains/entities/wait-list.entity'
-import { WaitList } from '@prisma/client'
+import { Waitlist } from '@prisma/client'
 
 export const waitListMapper = {
-  toDomain: (prismaWaitList: WaitList): WaitListEntity => {
+  toDomain: (prismaWaitList: Waitlist): WaitListEntity => {
     return {
       uniqueKey: prismaWaitList.uniqueKey,
       email: prismaWaitList.email,
@@ -12,7 +12,7 @@ export const waitListMapper = {
     }
   },
 
-  toDomainCollection: (prismaWaitLists: WaitList[]): WaitListEntity[] => {
+  toDomainCollection: (prismaWaitLists: Waitlist[]): WaitListEntity[] => {
     return prismaWaitLists.map(waitListMapper.toDomain)
   },
 }
