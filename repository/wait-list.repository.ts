@@ -13,28 +13,21 @@ export const waitListRepository = {
       email: string
     }
   }): Promise<WaitListEntity> => {
-    try {
-      const response = await client['wait-lists'].$post({
-        json: params.json,
-      })
-      const json = await response.json()
-      if (response.ok && 'data' in json) {
-        return json.data as WaitListEntity
-      }
+    const response = await client['wait-lists'].$post({
+      json: params.json,
+    })
+    const json = await response.json()
+    if (response.ok && 'data' in json) {
+      return json.data as WaitListEntity
+    }
 
-      if ('error' in json) {
-        throw new HcApiError(
-          json.error?.code ?? 'UNKNOWN_ERROR',
-          json.error?.message ?? 'Unknown error',
-        )
-      }
-
-      throw new HcApiError('UNKNOWN_ERROR', 'Unknown error', {})
-    } catch (error: any) {
+    if ('error' in json) {
       throw new HcApiError(
-        error.response?.data?.error?.code ?? 'UNKNOWN_ERROR',
-        error.response?.data?.error?.message ?? 'Unknown error',
+        json.error?.code ?? 'UNKNOWN_ERROR',
+        json.error?.message ?? 'Unknown error',
       )
     }
+
+    throw new HcApiError('UNKNOWN_ERROR', 'Unknown error', {})
   },
 }

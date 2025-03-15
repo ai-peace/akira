@@ -30,6 +30,7 @@ const route = createWaitList.post(
         201,
       )
     } catch (error) {
+      console.error('0-------------------------------------------------')
       console.error('Error creating wait list:', error)
       return c.json<HcApiResponseType<never>>(
         {

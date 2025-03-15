@@ -48,7 +48,7 @@ export const hcApiErrorMessages = {
     en: (payload?: Record<string, unknown>) => `Not found: ${payload?.resource}`,
   },
   [hcApiErrorCodes.WAITLIST_REGISTRATION_ERROR]: {
-    en: () => 'Waitlist registration error',
+    en: () => 'Waitlist registration error. You may have already registered.',
   },
   [hcApiErrorCodes.UNKNOWN_ERROR]: {
     en: () => 'Unknown error',

@@ -8,7 +8,6 @@ import { upsertUserPromptUsage } from '@/server/router/user-prompt-usages/upsert
 import { getUserPrivate } from '@/server/router/user-privates/show'
 import { updateUserPrivate } from '@/server/router/user-privates/update'
 import { createWaitList } from '@/server/router/wait-lists/create'
-import { getWaitList } from '@/server/router/wait-lists/show'
 import { Hono } from 'hono'
 import { handle } from 'hono/vercel'
 import { getPromptGroup } from '@/server/router/prompt-groups/show'
@@ -26,7 +25,6 @@ hono.route('/', initializeUserPromptUsage)
 hono.route('/', upsertUserPromptUsage)
 hono.route('/', getPromptGroup)
 hono.route('/', createWaitList)
-hono.route('/', getWaitList)
 hono.route('/', createWaitList)
 
 export const GET = handle(hono)
