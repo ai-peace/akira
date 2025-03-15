@@ -25,7 +25,7 @@ const Component = ({ className }: Props) => {
     <Button
       onClick={() => login()}
       className={cn(
-        'h-12 w-full rounded-full border-2 border-foreground bg-background-soft text-foreground shadow-none transition-colors hover:text-background',
+        'h-12 w-full rounded-full border-foreground bg-background-soft text-foreground shadow-none transition-colors hover:text-background',
 
         className,
       )}

@@ -38,7 +38,6 @@ export const usePrivyAuthentication = ({ redirectUrl }: Variables = {}) => {
       if (wasAlreadyAuthenticated) return
 
       let userPrivate = await userPrivateRepository.get(`${accessToken}`)
-      console.log('userPrivate', userPrivate)
       if (!userPrivate) {
         try {
           userPrivate = await userPrivateRepository.create(`${accessToken}`)

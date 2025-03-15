@@ -36,10 +36,8 @@ export const OBottomLoginButton = () => {
   if (isMobile && leftMenuVisible) return null
 
   return (
-    <div className="fixed bottom-6 left-1/2 z-40 -translate-x-1/2 transform">
-      <div className="rounded-full p-1 shadow-lg">
-        <OWalletConnectButton className="w-[200px]" />
-      </div>
+    <div className="fixed bottom-20 left-1/2 z-40 -translate-x-1/2 transform">
+      <OWalletConnectButton className="w-[200px]" />
     </div>
   )
 }
