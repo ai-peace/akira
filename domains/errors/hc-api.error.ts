@@ -15,6 +15,7 @@ export type HcApiErrorCode = (typeof hcApiErrorCodes)[keyof typeof hcApiErrorCod
 
 export const hcApiErrorCodes = {
   UNAUTHORIZED: 'UNAUTHORIZED',
+  FORBIDDEN: 'FORBIDDEN',
   VERIFICATION_ERROR: 'VERIFICATION_ERROR',
   CHECK_USER_PROMPT_USAGE_ERROR: 'CHECK_USER_PROMPT_USAGE_ERROR',
   SERVER_ERROR: 'SERVER_ERROR',
@@ -28,6 +29,9 @@ export const hcApiErrorCodes = {
 export const hcApiErrorMessages = {
   [hcApiErrorCodes.UNAUTHORIZED]: {
     en: () => 'Unauthorized',
+  },
+  [hcApiErrorCodes.FORBIDDEN]: {
+    en: () => 'Forbidden',
   },
   [hcApiErrorCodes.VERIFICATION_ERROR]: {
     en: () => 'Verification error',
