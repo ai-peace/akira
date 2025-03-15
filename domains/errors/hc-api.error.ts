@@ -20,6 +20,7 @@ export const hcApiErrorCodes = {
   SERVER_ERROR: 'SERVER_ERROR',
   DAILY_PROMPT_USAGE_LIMIT_EXCEEDED: 'DAILY_PROMPT_USAGE_LIMIT_EXCEEDED',
   USER_REGISTRATION_CAP_EXCEEDED: 'USER_REGISTRATION_CAP_EXCEEDED',
+  WAITLIST_REGISTRATION_ERROR: 'WAITLIST_REGISTRATION_ERROR',
   NOT_FOUND: 'NOT_FOUND',
   UNKNOWN_ERROR: 'UNKNOWN_ERROR',
 } as const
@@ -45,6 +46,9 @@ export const hcApiErrorMessages = {
   },
   [hcApiErrorCodes.NOT_FOUND]: {
     en: (payload?: Record<string, unknown>) => `Not found: ${payload?.resource}`,
+  },
+  [hcApiErrorCodes.WAITLIST_REGISTRATION_ERROR]: {
+    en: () => 'Waitlist registration error',
   },
   [hcApiErrorCodes.UNKNOWN_ERROR]: {
     en: () => 'Unknown error',

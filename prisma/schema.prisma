@@ -119,9 +119,32 @@ model Prompt {
   @@map("prompts")
 }
 
+model Waitlist {
+  id        Int    @id @default(autoincrement())
+  uniqueKey String @map("unique_key") @db.VarChar(255)
+
+  email  String         @db.VarChar(255)
+  status WaitListStatus @default(WAITING)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([uniqueKey])
+  @@unique([email])
+  @@index([email])
+  @@index([status])
+  @@map("waitlists")
+}
+
 enum LlmStatus {
   IDLE
   PROCESSING
   SUCCESS
   FAILED
+}
+
+enum WaitListStatus {
+  WAITING
+  INVITED
+  REGISTERED
 }

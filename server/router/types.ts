@@ -8,6 +8,7 @@ import { GetUserPrivateChatCollectionRoute } from './user-privates/chats'
 import { InitializeUserPromptUsageRoute } from './user-prompt-usages/initialize'
 import { UpsertUserPromptUsageRoute } from './user-prompt-usages/upsert'
 import { GetPromptGroupRoute } from './prompt-groups/show'
+import { CreateWaitListRoute } from './wait-lists/create'
 
 export type ApiRoutes =
   | CreateChatRoute
@@ -20,3 +21,4 @@ export type ApiRoutes =
   | InitializeUserPromptUsageRoute
   | UpsertUserPromptUsageRoute
   | GetPromptGroupRoute
+  | CreateWaitListRoute
