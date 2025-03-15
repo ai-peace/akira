@@ -5,9 +5,9 @@ const handleError = (error: unknown, options?: { description?: string }) => {
   const errorOptions = {
     ...options,
     style: {
-      backgroundColor: '#FEE2E2', // 薄い赤色の背景
-      border: '1px solid #FCA5A5', // 赤色のボーダー
-      color: '#B91C1C', // 濃い赤色のテキスト
+      backgroundColor: 'hsl(346.8 77.2% 49.8%)', // 薄い赤色の背景
+      border: '1px solid hsl(346.8 77.2% 49.8%)', // 赤色のボーダー
+      color: 'var(--foreground)', // 濃い赤色のテキスト
     },
   }
 
