@@ -1,5 +1,6 @@
 'use client'
 
+import { EDotButton } from '@/components/01_elements/EDotButton'
 import EDotFont from '@/components/01_elements/EDotFont'
 import ELogoAkira from '@/components/01_elements/ELogoAkira'
 import { Button } from '@/components/ui/button'
@@ -57,16 +58,16 @@ export default function UsersLimitExceedPage() {
 
         {/* アクションボタン */}
         <div className="flex flex-col gap-4 md:flex-row">
-          <Link href="/">
-            <Button variant="outline" size="lg">
-              Return to Home
-            </Button>
-          </Link>
-          <Link href="/waitlist">
-            <Button variant="default" size="lg" className="bg-accent-1 hover:bg-accent-1/90">
-              Join Waitlist
-            </Button>
-          </Link>
+          <EDotButton
+            href="/"
+            text="Return to Home"
+            className="w-[160px] bg-background-soft hover:bg-background-soft/90"
+          />
+          <EDotButton
+            href="/waitlist"
+            text="Join Waitlist"
+            className="w-[160px] bg-accent-1 hover:bg-accent-1/90"
+          />
         </div>
       </div>
     </div>

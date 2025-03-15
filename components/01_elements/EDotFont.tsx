@@ -42,23 +42,40 @@ const EDotFont: React.FC<Props> = ({
     isJapanese || containsJapanese(text) ? dotGothic16.className : pixelifySans.className
 
   if (!animate) {
-    return <span className={`${fontClass} ${className}`}>{text}</span>
+    // 非アニメーション時は改行文字を<br>に変換
+    return (
+      <span className={`${fontClass} ${className}`}>
+        {text.split('\n').map((line, i) => (
+          <React.Fragment key={i}>
+            {line}
+            {i < text.split('\n').length - 1 && <br />}
+          </React.Fragment>
+        ))}
+      </span>
+    )
   }
 
   return (
     <span className={`${fontClass} ${className}`}>
-      {text.split('').map((char, index) => (
-        <span
-          key={index}
-          style={{
-            display: char === ' ' ? 'inline' : 'inline-block',
-            opacity: 0,
-            animation: `fadeIn ${speed}ms forwards ${delay + index * speed}ms`,
-            whiteSpace: 'pre',
-          }}
-        >
-          {char}
-        </span>
+      {text.split('\n').map((line, lineIndex) => (
+        <React.Fragment key={`line-${lineIndex}`}>
+          {line.split('').map((char, charIndex) => (
+            <span
+              key={`${lineIndex}-${charIndex}`}
+              style={{
+                display: char === ' ' ? 'inline' : 'inline-block',
+                opacity: 0,
+                animation: `fadeIn ${speed}ms forwards ${
+                  delay + (lineIndex * line.length + charIndex) * speed
+                }ms`,
+                whiteSpace: 'pre',
+              }}
+            >
+              {char}
+            </span>
+          ))}
+          {lineIndex < text.split('\n').length - 1 && <br />}
+        </React.Fragment>
       ))}
     </span>
   )

@@ -2,7 +2,7 @@ import { PrivyAccessTokenRepository } from '@/repository/privy-access-token.repo
 import { userPrivateRepository } from '@/repository/user-private.repository'
 import { userPromptUsageRepository } from '@/repository/user-prompt-usage.repository'
 import { handleError } from '@/utils/error-handler.helper'
-import { errorUrl, rootUrl } from '@/utils/url.helper'
+import { errorUrl, getUsersLimitExceedUrl, rootUrl } from '@/utils/url.helper'
 import { useLogin, useLogout, usePrivy } from '@privy-io/react-auth'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
@@ -47,6 +47,7 @@ export const usePrivyAuthentication = ({ redirectUrl }: Variables = {}) => {
             description:
               'AKIRA has reached its user limit. Please register for the waitlist if you would like to join.',
           })
+          router.push(getUsersLimitExceedUrl())
           return
         }
       }

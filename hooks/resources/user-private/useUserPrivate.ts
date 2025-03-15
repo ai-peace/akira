@@ -19,7 +19,6 @@ const useUserPrivate = () => {
 
   // localStorage内のトークンの変更を検知してリロードする
   useEffect(() => {
-    console.log('token changed')
     const handleStorageChange = () => {
       mutate()
     }
