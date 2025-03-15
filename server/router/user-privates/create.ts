@@ -7,6 +7,7 @@ import { faker } from '@faker-js/faker'
 import { createHcApiError } from '@/domains/errors/hc-api.error'
 import { UserPrivateEntity } from '@/domains/entities/user-private.entity'
 import { HcApiResponseType } from '@/domains/errors/hc-api.error'
+import { clientApplicationProperties } from '@/consts/client-application-properties'
 
 export const createUserPrivate = new Hono()
 
@@ -15,6 +16,18 @@ const route = createUserPrivate.post('/users', privyAuthMiddleware, async (c) =>
   try {
     const privyId = c.get('privyId')
     const privyUser = c.get('privyUser')
+
+    const userCount = await prisma.user.count()
+    if (userCount >= clientApplicationProperties.userRegistrationCap) {
+      return c.json<HcApiResponseType<never>>(
+        {
+          error: createHcApiError('USER_REGISTRATION_CAP_EXCEEDED', {
+            message: 'ユーザー登録の上限に達しました。',
+          }),
+        },
+        403,
+      )
+    }
 
     const email =
       typeof privyUser.email === 'string' ? privyUser.email : privyUser.email?.address || ''

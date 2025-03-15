@@ -6,6 +6,10 @@ export const getPromptGroupUrl = (uniqueKey: string) => {
   return `/pg/${uniqueKey}`
 }
 
+export const getUsersLimitExceedUrl = () => {
+  return '/errors/users-limit-exceed'
+}
+
 export const rootUrl = () => {
   return '/'
 }

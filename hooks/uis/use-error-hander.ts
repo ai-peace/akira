@@ -1,15 +1,12 @@
 import { HcApiError } from '@/domains/errors/frontend.error'
-import { useToast } from '../use-toast'
+import { toast } from 'sonner'
 
 export const useErrorHandler = () => {
-  const { toast } = useToast()
-
-  const handleError = (error: unknown) => {
+  const handleError = (error: unknown, options?: { description?: string }) => {
     if (error instanceof HcApiError) {
-      toast({
-        description: error.message,
-        variant: 'destructive',
-      })
+      toast.error(error.message, options)
+    } else {
+      toast.error('Error', options)
     }
   }
 

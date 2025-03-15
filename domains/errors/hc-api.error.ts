@@ -15,10 +15,13 @@ export type HcApiErrorCode = (typeof hcApiErrorCodes)[keyof typeof hcApiErrorCod
 
 export const hcApiErrorCodes = {
   UNAUTHORIZED: 'UNAUTHORIZED',
+  FORBIDDEN: 'FORBIDDEN',
   VERIFICATION_ERROR: 'VERIFICATION_ERROR',
   CHECK_USER_PROMPT_USAGE_ERROR: 'CHECK_USER_PROMPT_USAGE_ERROR',
   SERVER_ERROR: 'SERVER_ERROR',
   DAILY_PROMPT_USAGE_LIMIT_EXCEEDED: 'DAILY_PROMPT_USAGE_LIMIT_EXCEEDED',
+  USER_REGISTRATION_CAP_EXCEEDED: 'USER_REGISTRATION_CAP_EXCEEDED',
+  WAITLIST_REGISTRATION_ERROR: 'WAITLIST_REGISTRATION_ERROR',
   NOT_FOUND: 'NOT_FOUND',
   UNKNOWN_ERROR: 'UNKNOWN_ERROR',
 } as const
@@ -26,6 +29,9 @@ export const hcApiErrorCodes = {
 export const hcApiErrorMessages = {
   [hcApiErrorCodes.UNAUTHORIZED]: {
     en: () => 'Unauthorized',
+  },
+  [hcApiErrorCodes.FORBIDDEN]: {
+    en: () => 'Forbidden',
   },
   [hcApiErrorCodes.VERIFICATION_ERROR]: {
     en: () => 'Verification error',
@@ -37,10 +43,16 @@ export const hcApiErrorMessages = {
     en: () => 'Server error',
   },
   [hcApiErrorCodes.DAILY_PROMPT_USAGE_LIMIT_EXCEEDED]: {
-    en: () => 'Daily usage limit exceeded',
+    en: () => 'Daily usage limit  xceeded',
+  },
+  [hcApiErrorCodes.USER_REGISTRATION_CAP_EXCEEDED]: {
+    en: () => 'User registration cap exceeded',
   },
   [hcApiErrorCodes.NOT_FOUND]: {
     en: (payload?: Record<string, unknown>) => `Not found: ${payload?.resource}`,
+  },
+  [hcApiErrorCodes.WAITLIST_REGISTRATION_ERROR]: {
+    en: () => 'Waitlist registration error. You may have already registered.',
   },
   [hcApiErrorCodes.UNKNOWN_ERROR]: {
     en: () => 'Unknown error',

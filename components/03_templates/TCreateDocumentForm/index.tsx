@@ -195,7 +195,7 @@ const Component: FC<Props> = ({ onSubmit }) => {
                 className="flex items-center gap-1 text-xs"
               >
                 <ChevronLeft size={14} />
-                <span>メインカテゴリに戻る</span>
+                <span>Go back to the main category</span>
               </Button>
             </div>
           )}

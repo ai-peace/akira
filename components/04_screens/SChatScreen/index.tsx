@@ -37,7 +37,6 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
           createChatPromptGroup={createChatPromptGroup}
           onIntersect={handleIntersect}
         />
-
         <OChatHistorySection chat={chat} currentPromptId={currentPromptId} />
       </div>
     </>

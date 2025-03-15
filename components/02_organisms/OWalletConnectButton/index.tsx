@@ -1,5 +1,4 @@
-import EDotFont from '@/components/01_elements/EDotFont'
-import { Button } from '@/components/ui/button'
+import { EDotButton } from '@/components/01_elements/EDotButton'
 import { cn } from '@/lib/utils'
 import { usePrivy } from '@privy-io/react-auth'
 import { WalletIcon } from 'lucide-react'
@@ -22,17 +21,16 @@ const Component = ({ className }: Props) => {
 
   // ログインボタンを表示
   return (
-    <Button
+    <EDotButton
       onClick={() => login()}
       className={cn(
-        'h-12 w-full rounded-full border-2 border-foreground bg-background-soft text-foreground shadow-none transition-colors hover:text-background',
+        'h-12 w-full rounded-full border-foreground bg-background-soft text-foreground shadow-none transition-colors hover:text-background',
 
         className,
       )}
-    >
-      <WalletIcon className="mr-1 h-4 w-4" />
-      <EDotFont text="Login" />
-    </Button>
+      icon={<WalletIcon className="mr-1 h-4 w-4" />}
+      text="Login"
+    />
   )
 }
 
