@@ -6,7 +6,7 @@ import { errorUrl, rootUrl } from '@/utils/url.helper'
 import { useLogin, useLogout, usePrivy } from '@privy-io/react-auth'
 import { toast } from 'sonner'
 import { useChats } from './resources/chats/useChats'
-import useUserPrivate from './resources/user-private/useUserPrivate'
+import { useUserPrivate } from './resources/user-private/useUserPrivate'
 import useUserPromptUsage from './resources/user-prompt-usage/usePromptUsage'
 import { handleError } from '@/utils/error-handler.helper'
 import { useRouter } from 'next/navigation'
@@ -37,6 +37,7 @@ export const usePrivyAuthentication = ({ redirectUrl }: Variables = {}) => {
       if (wasAlreadyAuthenticated) return
 
       let userPrivate = await userPrivateRepository.get(`${accessToken}`)
+      console.log('userPrivate', userPrivate)
       if (!userPrivate) {
         try {
           userPrivate = await userPrivateRepository.create(`${accessToken}`)
@@ -74,7 +75,7 @@ export const usePrivyAuthentication = ({ redirectUrl }: Variables = {}) => {
 
   const { logout } = useLogout({
     onSuccess: () => {
-      router.push(rootUrl())
+      window.location.href = rootUrl()
     },
   })
 

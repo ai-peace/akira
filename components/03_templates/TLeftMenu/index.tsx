@@ -5,17 +5,15 @@ import { OUserProfile } from '@/components/02_organisms/OUserProfile'
 import { OUserPromptUsage } from '@/components/02_organisms/OUserPromptUsage'
 import { OWalletConnectButton } from '@/components/02_organisms/OWalletConnectButton'
 import { useChats } from '@/hooks/resources/chats/useChats'
-import useUserPrivate from '@/hooks/resources/user-private/useUserPrivate'
+import { useUserPrivate } from '@/hooks/resources/user-private/useUserPrivate'
 import { leftMenuVisibleAtom } from '@/store/atoms/menuAtoms'
 import { useAtom } from 'jotai'
-import { ChevronDown, PanelLeftCloseIcon } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
 const Component = () => {
   const { userPrivate } = useUserPrivate()
   const [isVisible, setIsVisible] = useAtom(leftMenuVisibleAtom)
   const [isMobile, setIsMobile] = useState(false)
-  const [drawerHeight, setDrawerHeight] = useState('80vh')
   const [isDragging, setIsDragging] = useState(false)
   const startYRef = useRef(0)
   const drawerRef = useRef<HTMLDivElement>(null)

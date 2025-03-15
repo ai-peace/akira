@@ -1,6 +1,6 @@
 'use client'
 
-import useUserPrivate from '@/hooks/resources/user-private/useUserPrivate'
+import { useUserPrivate } from '@/hooks/resources/user-private/useUserPrivate'
 import { OWalletConnectButton } from '../OWalletConnectButton'
 import { useAtom } from 'jotai'
 import { leftMenuVisibleAtom } from '@/store/atoms/menuAtoms'
