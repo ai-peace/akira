@@ -39,7 +39,7 @@ export default function UsersLimitExceedPage() {
             />
           </h1>
           <p className="mb-6 text-base text-foreground/80 md:text-lg">
-            We're currently at capacity with our user registrations. Join our waitlist to be
+            We&apos;re currently at capacity with our user registrations. Join our waitlist to be
             notified when spots become available.
           </p>
           <div className="text-sm text-foreground/60">
