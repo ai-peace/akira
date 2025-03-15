@@ -39,12 +39,8 @@ export default function UsersLimitExceedPage() {
             />
           </h1>
           <p className="mb-6 text-base text-foreground/80 md:text-lg">
-            <EDotFont
-              text="We're currently at capacity with our user registrations. Join our waitlist to be notified when spots become available."
-              className="font-[400]"
-              animate={true}
-              delay={100}
-            />
+            We're currently at capacity with our user registrations. Join our waitlist to be
+            notified when spots become available.
           </p>
           <div className="text-sm text-foreground/60">
             <EDotFont
@@ -64,7 +60,7 @@ export default function UsersLimitExceedPage() {
             className="w-[160px] bg-background-soft hover:bg-background-soft/90"
           />
           <EDotButton
-            href="/waitlist"
+            href="/waitlists"
             text="Join Waitlist"
             className="w-[160px] bg-accent-1 hover:bg-accent-1/90"
           />
