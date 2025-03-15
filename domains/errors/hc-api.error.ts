@@ -19,6 +19,7 @@ export const hcApiErrorCodes = {
   CHECK_USER_PROMPT_USAGE_ERROR: 'CHECK_USER_PROMPT_USAGE_ERROR',
   SERVER_ERROR: 'SERVER_ERROR',
   DAILY_PROMPT_USAGE_LIMIT_EXCEEDED: 'DAILY_PROMPT_USAGE_LIMIT_EXCEEDED',
+  USER_REGISTRATION_CAP_EXCEEDED: 'USER_REGISTRATION_CAP_EXCEEDED',
   NOT_FOUND: 'NOT_FOUND',
   UNKNOWN_ERROR: 'UNKNOWN_ERROR',
 } as const
@@ -37,7 +38,10 @@ export const hcApiErrorMessages = {
     en: () => 'Server error',
   },
   [hcApiErrorCodes.DAILY_PROMPT_USAGE_LIMIT_EXCEEDED]: {
-    en: () => 'Daily usage limit exceeded',
+    en: () => 'Daily usage limit  xceeded',
+  },
+  [hcApiErrorCodes.USER_REGISTRATION_CAP_EXCEEDED]: {
+    en: () => 'User registration cap exceeded',
   },
   [hcApiErrorCodes.NOT_FOUND]: {
     en: (payload?: Record<string, unknown>) => `Not found: ${payload?.resource}`,

@@ -4,7 +4,7 @@ import EDotFont from '@/components/01_elements/EDotFont'
 import ELogoAkira from '@/components/01_elements/ELogoAkira'
 import { TCreateDocumentForm } from '@/components/03_templates/TCreateDocumentForm'
 import { useCreateChat } from '@/hooks/resources/chats/useCreateChat'
-import { useErrorHandler } from '@/hooks/uis/use-error-hander'
+import { handleError } from '@/utils/error-handler.helper'
 import { getChatUrl } from '@/utils/url.helper'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
@@ -13,7 +13,6 @@ import { FC } from 'react'
 const Component: FC = () => {
   const router = useRouter()
   const { createChat } = useCreateChat()
-  const { handleError } = useErrorHandler()
 
   const handleSubmit = async (prompt: string) => {
     try {
@@ -26,7 +25,10 @@ const Component: FC = () => {
       router.push(getChatUrl(chat.uniqueKey))
     } catch (error) {
       console.error('Error creating chat:', error)
-      handleError(error)
+      handleError(error, {
+        description:
+          'AKIRA has reached its user limit. Please register for the waitlist if you would like to join.',
+      })
     }
   }
 

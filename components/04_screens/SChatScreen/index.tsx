@@ -32,12 +32,12 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
   return (
     <>
       <div className="relative flex h-full w-full">
+        aaaa
         <TChatMessageContent
           promptGroups={chat.promptGroups}
           createChatPromptGroup={createChatPromptGroup}
           onIntersect={handleIntersect}
         />
-
         <OChatHistorySection chat={chat} currentPromptId={currentPromptId} />
       </div>
     </>

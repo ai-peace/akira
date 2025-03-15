@@ -1,5 +1,5 @@
 import { Providers } from '@/components/99_providers/providers'
-import { Toaster } from '@/components/ui/toaster'
+import { Toaster } from '@/components/ui/sonner'
 import { clientApplicationProperties } from '@/consts/client-application-properties'
 import '@/styles/globals.css'
 import type { Metadata } from 'next'
