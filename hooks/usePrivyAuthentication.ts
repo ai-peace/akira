@@ -1,15 +1,14 @@
-import { UserPrivateEntity } from '@/domains/entities/user-private.entity'
 import { PrivyAccessTokenRepository } from '@/repository/privy-access-token.repository'
 import { userPrivateRepository } from '@/repository/user-private.repository'
 import { userPromptUsageRepository } from '@/repository/user-prompt-usage.repository'
+import { handleError } from '@/utils/error-handler.helper'
 import { errorUrl, rootUrl } from '@/utils/url.helper'
 import { useLogin, useLogout, usePrivy } from '@privy-io/react-auth'
+import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { useChats } from './resources/chats/useChats'
 import { useUserPrivate } from './resources/user-private/useUserPrivate'
 import useUserPromptUsage from './resources/user-prompt-usage/usePromptUsage'
-import { handleError } from '@/utils/error-handler.helper'
-import { useRouter } from 'next/navigation'
 
 type Variables = {
   redirectUrl?: string
@@ -24,6 +23,8 @@ export const usePrivyAuthentication = ({ redirectUrl }: Variables = {}) => {
   const { chatsMutate } = useChats()
   const { userPromptUsageMutate } = useUserPromptUsage()
   const router = useRouter()
+
+  const { logout } = useLogout()
 
   const { login } = useLogin({
     onComplete: async ({ user, isNewUser, wasAlreadyAuthenticated }) => {
@@ -42,11 +43,11 @@ export const usePrivyAuthentication = ({ redirectUrl }: Variables = {}) => {
         try {
           userPrivate = await userPrivateRepository.create(`${accessToken}`)
         } catch (error) {
+          logout()
           handleError(error, {
             description:
               'AKIRA has reached its user limit. Please register for the waitlist if you would like to join.',
           })
-          logout()
           return
         }
       }
@@ -73,16 +74,9 @@ export const usePrivyAuthentication = ({ redirectUrl }: Variables = {}) => {
     },
   })
 
-  const { logout } = useLogout({
-    onSuccess: () => {
-      window.location.href = rootUrl()
-    },
-  })
-
   return {
     login,
     ready,
     authenticated,
-    logout,
   }
 }
