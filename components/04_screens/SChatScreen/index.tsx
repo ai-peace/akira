@@ -32,7 +32,6 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
   return (
     <>
       <div className="relative flex h-full w-full">
-        aaaa
         <TChatMessageContent
           promptGroups={chat.promptGroups}
           createChatPromptGroup={createChatPromptGroup}

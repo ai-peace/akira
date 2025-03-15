@@ -93,7 +93,7 @@ const Component: FC<Props> = ({ promptGroups, createChatPromptGroup, onIntersect
         ref={messageListRef}
         className="scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent relative h-full overflow-y-scroll overscroll-y-contain scroll-smooth pb-64 [-webkit-overflow-scrolling:touch]"
       >
-        <div className="mx-auto block md:max-w-3xl md:gap-5 lg:max-w-[40rem] lg:gap-6 xl:mr-64 xl:max-w-[48rem] 2xl:mx-auto">
+        <div className="mx-auto block md:max-w-3xl md:gap-5 lg:max-w-[40rem] lg:gap-6 xl:max-w-[48rem] 2xl:mx-auto">
           <ChatMessageList>
             {promptGroups?.map((promptGroup) => {
               return (
