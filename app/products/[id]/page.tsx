@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card'
 import { ProductEntity } from '@/domains/entities/product.entity'
 import { useRouter, useParams, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { ArrowLeft, ShoppingCart, Share2, ExternalLink } from 'lucide-react'
+import { ArrowLeft, ShoppingCart, Share2, ExternalLink, Heart } from 'lucide-react'
 import { usePromptGroup } from '@/hooks/resources/prompt-groups/usePromptGroup'
 import { LLMResponseEntity } from '@/domains/entities/llm-response.entity'
 import { OThemeChangeButton } from '@/components/02_organisms/OThemeChangeButton'
@@ -28,6 +28,7 @@ export default function ProductDetailPage() {
   const [cursorVisible, setCursorVisible] = useState(true)
   const [hoverButton1, setHoverButton1] = useState(false)
   const [hoverButton2, setHoverButton2] = useState(false)
+  const [hoverFavorite, setHoverFavorite] = useState(false)
   const { theme } = useTheme()
   const isDarkMode = theme === 'dark'
 
@@ -263,7 +264,7 @@ export default function ProductDetailPage() {
                       text={product.title.en}
                       className="text-xl font-bold text-foreground-strong md:text-2xl"
                       animate={true}
-                      speed={3}
+                      speed={1}
                       delay={0}
                     />
                   </div>
@@ -273,8 +274,8 @@ export default function ProductDetailPage() {
                       className="text-sm text-foreground-muted"
                       isJapanese={true}
                       animate={true}
-                      speed={2}
-                      delay={100}
+                      speed={1}
+                      delay={10}
                     />
                   </div>
                 </div>
@@ -296,8 +297,8 @@ export default function ProductDetailPage() {
                         text={product.shopName || 'Unknown Shop'}
                         className="text-sm text-foreground-muted"
                         animate={true}
-                        speed={2}
-                        delay={200}
+                        speed={1}
+                        delay={20}
                       />
                     </div>
                   </div>
@@ -309,8 +310,8 @@ export default function ProductDetailPage() {
                         text={`$${Math.round(product.price / 150).toLocaleString()}`}
                         className="text-3xl font-bold text-accent-1"
                         animate={true}
-                        speed={2}
-                        delay={300}
+                        speed={1}
+                        delay={30}
                       />
                     </div>
                     <div className="text-sm text-foreground-muted">
@@ -318,8 +319,8 @@ export default function ProductDetailPage() {
                         text={`${product.currency} ${product.price.toLocaleString()}`}
                         className="text-sm text-foreground-muted"
                         animate={true}
-                        speed={2}
-                        delay={400}
+                        speed={1}
+                        delay={40}
                       />
                     </div>
                   </div>
@@ -335,7 +336,7 @@ export default function ProductDetailPage() {
                             : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100'
                       }`}
                     >
-                      <EDotFont text={product.status} animate={true} speed={2} delay={500} />
+                      <EDotFont text={product.status} animate={true} speed={1} delay={50} />
                     </div>
                   </div>
 
@@ -343,14 +344,14 @@ export default function ProductDetailPage() {
                   {product.description && (
                     <div className="mb-6">
                       <h2 className="mb-2 text-lg font-semibold text-foreground-strong">
-                        <EDotFont text="Description" animate={true} speed={2} delay={600} />
+                        <EDotFont text="Description" animate={true} speed={1} delay={60} />
                       </h2>
                       <EDotFont
                         text={product.description}
                         className="text-sm text-foreground"
                         animate={true}
                         speed={1}
-                        delay={700}
+                        delay={70}
                       />
                     </div>
                   )}
@@ -359,14 +360,14 @@ export default function ProductDetailPage() {
                   {product.condition && (
                     <div className="mb-6">
                       <h2 className="mb-2 text-lg font-semibold text-foreground-strong">
-                        <EDotFont text="Condition" animate={true} speed={2} delay={800} />
+                        <EDotFont text="Condition" animate={true} speed={1} delay={80} />
                       </h2>
                       <EDotFont
                         text={product.condition}
                         className="text-sm text-foreground"
                         animate={true}
                         speed={1}
-                        delay={900}
+                        delay={90}
                       />
                     </div>
                   )}
@@ -374,17 +375,41 @@ export default function ProductDetailPage() {
                   {/* RPG Style Action Buttons */}
                   <div className="mt-auto">
                     <div className="mb-2 text-lg font-semibold text-foreground-strong">
-                      <EDotFont text="Actions" animate={true} speed={2} delay={1000} />
+                      <EDotFont text="Actions" animate={true} speed={1} delay={100} />
                     </div>
 
-                    <div className="mb-4 flex flex-col gap-2 md:flex-row md:gap-4">
+                    <div className="mb-4 grid grid-cols-1 gap-2 md:grid-cols-2">
+                      {/* Favorite Button */}
+                      <button
+                        className={`flex w-full items-center rounded-lg border-2 ${
+                          isDarkMode ? 'border-white/60' : 'border-black/60'
+                        } px-4 py-3 text-left ${
+                          hoverFavorite ? (isDarkMode ? 'bg-gray-800/50' : 'bg-gray-100/70') : ''
+                        }`}
+                        onClick={() => {}}
+                        onMouseEnter={() => setHoverFavorite(true)}
+                        onMouseLeave={() => setHoverFavorite(false)}
+                      >
+                        <span className={`mr-2 ${hoverFavorite ? 'opacity-100' : 'opacity-20'}`}>
+                          ▶
+                        </span>
+                        <EDotFont
+                          text="Add Favorite"
+                          className="flex-1"
+                          animate={true}
+                          speed={1}
+                          delay={100}
+                        />
+                        <Heart className="ml-2 h-5 w-5" />
+                      </button>
+
                       {/* Purchase Button */}
                       <button
                         className={`flex w-full items-center rounded-lg border-2 ${
                           isDarkMode ? 'border-white/60' : 'border-black/60'
                         } px-4 py-3 text-left ${
                           hoverButton1 ? (isDarkMode ? 'bg-gray-800/50' : 'bg-gray-100/70') : ''
-                        } ${product.status === 'Out of Stock' ? 'opacity-50' : ''} md:flex-1`}
+                        } ${product.status === 'Out of Stock' ? 'opacity-50' : ''}`}
                         disabled={product.status === 'Out of Stock'}
                         onClick={() => window.open(product.url, '_blank')}
                         onMouseEnter={() => setHoverButton1(true)}
@@ -397,17 +422,17 @@ export default function ProductDetailPage() {
                           text="Go to Purchase Page"
                           className="flex-1"
                           animate={true}
-                          speed={2}
-                          delay={1100}
+                          speed={1}
+                          delay={100}
                         />
                         <ShoppingCart className="ml-2 h-5 w-5" />
                       </button>
 
-                      {/* View as RWA Button */}
+                      {/* View as RWA Button - Full width in the second row */}
                       <button
                         className={`flex w-full items-center rounded-lg border-2 border-red-600 px-4 py-3 text-left ${
                           hoverButton2 ? 'bg-red-700 text-white' : 'bg-red-600 text-white'
-                        } md:flex-1`}
+                        } md:col-span-2`}
                         onClick={() => window.open(product.url, '_blank')}
                         onMouseEnter={() => setHoverButton2(true)}
                         onMouseLeave={() => setHoverButton2(false)}
@@ -419,8 +444,8 @@ export default function ProductDetailPage() {
                           text="Buy as RWA NFT"
                           className="flex-1"
                           animate={true}
-                          speed={2}
-                          delay={1300}
+                          speed={1}
+                          delay={100}
                         />
                         <ExternalLink className="ml-2 h-5 w-5" />
                       </button>
