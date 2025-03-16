@@ -1,7 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { Connection, Keypair, PublicKey } from '@solana/web3.js'
-import { getServerSession } from 'next-auth/next'
-import { authOptions } from './auth/[...nextauth]'
+import { PrivyClient } from '@privy-io/server-auth'
 import { mintNFT } from '@/services/nft.service'
 import { SOLANA_RPC_ENDPOINT } from '@/config/solana.config'
 import { prisma } from '@/lib/prisma'
@@ -13,12 +12,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   // ユーザー認証
-  const session = await getServerSession(req, res, authOptions)
-  if (!session) {
+  const authToken = req.headers.authorization?.replace('Bearer ', '')
+  if (!authToken) {
     return res.status(401).json({ error: 'Unauthorized' })
   }
 
   try {
+    const privy = new PrivyClient(
+      process.env.NEXT_PUBLIC_PRIVY_APP_ID || '',
+      process.env.PRIVY_APP_SECRET || '',
+    )
+
+    // トークンを検証
+    const verifiedClaims = await privy.verifyAuthToken(authToken)
+    const privyId = verifiedClaims.userId
+
+    if (!privyId) {
+      return res.status(401).json({ error: 'Unauthorized' })
+    }
+
     const { productId, walletAddress } = req.body
 
     if (!productId || !walletAddress) {
@@ -27,7 +39,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     // ユーザー情報を取得
     const user = await prisma.user.findUnique({
-      where: { uniqueKey: session.user.uniqueKey },
+      where: { privyId },
     })
 
     if (!user) {

@@ -1,6 +1,6 @@
 import { FC, useState } from 'react'
 import { useWallet } from '@solana/wallet-adapter-react'
-import { useSession } from 'next-auth/react'
+import { usePrivy } from '@privy-io/react-auth'
 import { useRouter } from 'next/navigation'
 import { ProductEntity } from '@/domains/entities/product.entity'
 import EDotFont from '@/components/01_elements/EDotFont'
@@ -8,13 +8,16 @@ import { ExternalLink, X, ShoppingCart } from 'lucide-react'
 import { useDeposit } from '@/hooks/useDeposit'
 import { OWalletConnect } from '../OWalletConnect'
 
+// デモモード用の固定SOL金額
+const DEMO_SOL_AMOUNT = 0.001
+
 type Props = {
   product: ProductEntity
 }
 
 const Component: FC<Props> = ({ product }) => {
   const router = useRouter()
-  const { data: session } = useSession()
+  const { authenticated } = usePrivy()
   const { publicKey } = useWallet()
   const { deposit, isLoading: depositLoading, error: depositError } = useDeposit()
 
@@ -26,7 +29,7 @@ const Component: FC<Props> = ({ product }) => {
   const [mintAddress, setMintAddress] = useState<string | null>(null)
 
   const handleClick = () => {
-    if (!session) {
+    if (!authenticated) {
       setStep('initial')
       setShowModal(true)
       return
@@ -50,8 +53,8 @@ const Component: FC<Props> = ({ product }) => {
 
     setError(null)
 
-    // 商品価格をSOLに変換（仮の変換率）
-    const solAmount = product.price / 15000 // 例: 1 SOL = 15000円
+    // デモモードでは固定の0.001 SOLを使用
+    const solAmount = DEMO_SOL_AMOUNT
 
     const success = await deposit(solAmount)
     if (success) {
@@ -195,13 +198,23 @@ const Component: FC<Props> = ({ product }) => {
               />
             </div>
 
-            <div className="mb-6 text-center">
+            <div className="mb-2 text-center">
               <EDotFont
-                text={`To purchase this RWA NFT, you need to deposit ${(product.price / 15000).toFixed(2)} SOL.`}
+                text={`To purchase this RWA NFT, you need to deposit ${DEMO_SOL_AMOUNT} SOL.`}
                 className="text-foreground"
                 animate={true}
                 speed={1}
                 delay={50}
+              />
+            </div>
+
+            <div className="mb-6 text-center">
+              <EDotFont
+                text="(Demo Mode: Reduced price for testing)"
+                className="text-sm text-accent-1"
+                animate={true}
+                speed={1}
+                delay={100}
               />
             </div>
 
@@ -218,7 +231,7 @@ const Component: FC<Props> = ({ product }) => {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-foreground-muted">Deposit Amount:</span>
-                <span className="font-medium">{(product.price / 15000).toFixed(2)} SOL</span>
+                <span className="font-medium">{DEMO_SOL_AMOUNT} SOL</span>
               </div>
             </div>
 

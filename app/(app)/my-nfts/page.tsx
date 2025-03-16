@@ -2,12 +2,14 @@
 
 import { useEffect, useState } from 'react'
 import { useWallet } from '@solana/wallet-adapter-react'
-import { useSession } from 'next-auth/react'
+import { usePrivy } from '@privy-io/react-auth'
 import EDotFont from '@/components/01_elements/EDotFont'
 import { OWalletConnect } from '@/components/02_organisms/OWalletConnect'
-import { SOLANA_EXPLORER_URL } from '@/config/solana.config'
 import Link from 'next/link'
 import { ExternalLink } from 'lucide-react'
+
+// 直接定義
+const SOLANA_EXPLORER_URL = 'https://explorer.solana.com'
 
 type NFT = {
   id: number
@@ -20,18 +22,18 @@ type NFT = {
 }
 
 export default function MyNFTsPage() {
-  const { data: session } = useSession()
+  const { authenticated } = usePrivy()
   const { publicKey } = useWallet()
   const [nfts, setNfts] = useState<NFT[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    if (session && publicKey) {
+    if (authenticated && publicKey) {
       fetchNFTs()
     } else {
       setLoading(false)
     }
-  }, [session, publicKey])
+  }, [authenticated, publicKey])
 
   const fetchNFTs = async () => {
     try {
@@ -45,7 +47,7 @@ export default function MyNFTsPage() {
     }
   }
 
-  if (!session) {
+  if (!authenticated) {
     return (
       <div className="flex h-full flex-col items-center justify-center p-4">
         <div className="mb-4 text-center">

@@ -2,14 +2,25 @@ import { Connection, Keypair, PublicKey } from '@solana/web3.js'
 import { Metaplex, keypairIdentity } from '@metaplex-foundation/js'
 import { ProductEntity } from '@/domains/entities/product.entity'
 
+type MintNFTResult = {
+  success: boolean
+  mintAddress: string
+  metadata: string
+  error?: string
+}
+
 // サーバーサイドで実行する関数
 export async function mintNFT(
   connection: Connection,
-  userWallet: PublicKey,
+  walletAddress: PublicKey,
   adminKeypair: Uint8Array, // 管理者の秘密鍵（サーバーサイドのみ）
   product: ProductEntity,
-) {
+): Promise<MintNFTResult> {
   try {
+    console.log('デモモード: NFTミント処理を開始します')
+    console.log(`ウォレットアドレス: ${walletAddress.toString()}`)
+    console.log(`商品ID: ${product.uniqueKey}`)
+
     // 管理者のKeypairを作成
     const keypair = Keypair.fromSecretKey(adminKeypair)
 
@@ -45,8 +56,10 @@ export async function mintNFT(
     await metaplex.nfts().transfer({
       nftOrSft: nft,
       authority: keypair,
-      toOwner: userWallet,
+      toOwner: walletAddress,
     })
+
+    console.log(`デモモード: NFTミント成功 - ${nft.address.toString()}`)
 
     return {
       success: true,
@@ -57,7 +70,9 @@ export async function mintNFT(
     console.error('NFT発行エラー:', error)
     return {
       success: false,
-      error: error.message,
+      mintAddress: '',
+      metadata: '',
+      error: error.message || '不明なエラー',
     }
   }
 }

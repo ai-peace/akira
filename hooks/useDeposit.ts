@@ -20,6 +20,11 @@ export function useDeposit() {
       return false
     }
 
+    // デモモードであることを確認
+    if (amountInSOL <= 0.001) {
+      console.log('デモモード: 少額のSOL送金を行います')
+    }
+
     setIsLoading(true)
     setError(null)
 
@@ -33,7 +38,9 @@ export function useDeposit() {
       )
 
       const signature = await sendTransaction(transaction, connection)
+      console.log(`トランザクション送信: ${signature}`)
       await connection.confirmTransaction(signature, 'confirmed')
+      console.log(`トランザクション確認完了: ${signature}`)
 
       // デポジット情報をサーバーに記録
       await fetch('/api/deposits', {
