@@ -5,15 +5,17 @@ import { Card } from '@/components/ui/card'
 import { ProductEntity } from '@/domains/entities/product.entity'
 import { useRouter, useParams, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { ArrowLeft, ShoppingCart, Share2 } from 'lucide-react'
+import { ArrowLeft, ShoppingCart, Share2, ExternalLink } from 'lucide-react'
 import { usePromptGroup } from '@/hooks/resources/prompt-groups/usePromptGroup'
 import { LLMResponseEntity } from '@/domains/entities/llm-response.entity'
 import { OThemeChangeButton } from '@/components/02_organisms/OThemeChangeButton'
 import EShareButton from '@/components/01_elements/EShareButton'
 import { TProductSearch } from '@/components/03_templates/TProductSearch'
 import ELogoAkira from '@/components/01_elements/ELogoAkira'
+import EDotFont from '@/components/01_elements/EDotFont'
 import { Metadata } from 'next'
 import Head from 'next/head'
+import { useTheme } from 'next-themes'
 
 export default function ProductDetailPage() {
   const router = useRouter()
@@ -23,6 +25,11 @@ export default function ProductDetailPage() {
   const [loading, setLoading] = useState(true)
   const [pageTitle, setPageTitle] = useState('Product Detail - AKIRA')
   const [pageDescription, setPageDescription] = useState('View product details on AKIRA')
+  const [cursorVisible, setCursorVisible] = useState(true)
+  const [hoverButton1, setHoverButton1] = useState(false)
+  const [hoverButton2, setHoverButton2] = useState(false)
+  const { theme } = useTheme()
+  const isDarkMode = theme === 'dark'
 
   // Get information from URL parameters
   const productUniqueKey = params.id as string
@@ -35,6 +42,14 @@ export default function ProductDetailPage() {
 
   // Store all products for related products section
   const [allProducts, setAllProducts] = useState<ProductEntity[]>([])
+
+  // Blinking cursor effect
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCursorVisible((prev) => !prev)
+    }, 500)
+    return () => clearInterval(interval)
+  }, [])
 
   useEffect(() => {
     if (promptGroupIsLoading || !promptGroup) return
@@ -223,94 +238,216 @@ export default function ProductDetailPage() {
 
         <div className="container mx-auto pb-16">
           <div className="px-4 py-4">
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-              {/* Product Image */}
-              <div className="relative h-[300px] w-full overflow-hidden rounded-lg md:h-[500px]">
+            {/* Main Product Layout - Desktop: Image | Title+Info, Mobile: Stacked */}
+            <div className="flex flex-col gap-6 md:flex-row md:gap-4">
+              {/* Product Image with RPG Style Border - Left side on desktop, full width on mobile */}
+              <div
+                className={`md:border-3 relative flex items-center justify-center overflow-hidden rounded-lg border-2 ${
+                  isDarkMode ? 'border-white/80' : 'border-black/80'
+                } bg-background-muted p-2 md:w-1/2`}
+              >
                 {product.imageUrl && (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={product.imageUrl}
                     alt={product.title.en}
-                    className="h-full w-full object-contain"
+                    className="mx-auto h-[280px] w-full object-contain md:h-[480px]"
                   />
                 )}
               </div>
 
-              {/* Product Information */}
-              <div className="flex flex-col">
-                <h1 className="mb-2 text-2xl font-bold text-foreground-strong md:text-3xl">
-                  {product.title.en}
-                </h1>
-                <p className="mb-4 text-sm text-foreground-muted">{product.title.ja}</p>
+              {/* Title and Info - Right side on desktop, below image on mobile */}
+              <div className="flex flex-col gap-4 md:w-1/2">
+                {/* RPG Style Title Box */}
+                <div
+                  className={`md:border-3 rounded-lg border-2 ${
+                    isDarkMode ? 'border-white/80' : 'border-black/80'
+                  } p-3`}
+                >
+                  <div className="mb-2">
+                    <EDotFont
+                      text={product.title.en}
+                      className="text-xl font-bold text-foreground-strong md:text-2xl"
+                      animate={true}
+                      speed={3}
+                      delay={0}
+                    />
+                  </div>
+                  <div>
+                    <EDotFont
+                      text={product.title.ja}
+                      className="text-sm text-foreground-muted"
+                      isJapanese={true}
+                      animate={true}
+                      speed={2}
+                      delay={100}
+                    />
+                  </div>
+                </div>
 
-                <div className="mb-4 flex items-center">
-                  {/* Shop Information */}
-                  <div className="flex items-center">
-                    {product.shopIconUrl && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={product.shopIconUrl}
-                        alt={product.shopName}
-                        className="mr-2 h-5 w-5"
+                {/* Product Information */}
+                <div
+                  className={`md:border-3 flex flex-1 flex-col rounded-lg border-2 ${
+                    isDarkMode ? 'border-white/80' : 'border-black/80'
+                  } bg-background p-4`}
+                >
+                  <div className="mb-4 flex items-center">
+                    {/* Shop Information */}
+                    <div className="flex items-center">
+                      {product.shopIconUrl && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={product.shopIconUrl}
+                          alt={product.shopName}
+                          className="mr-2 h-5 w-5"
+                        />
+                      )}
+                      <EDotFont
+                        text={product.shopName || 'Unknown Shop'}
+                        className="text-sm text-foreground-muted"
+                        animate={true}
+                        speed={2}
+                        delay={200}
                       />
-                    )}
-                    <span className="text-sm text-foreground-muted">{product.shopName}</span>
+                    </div>
                   </div>
-                </div>
 
-                {/* Price */}
-                <div className="mb-6">
-                  <div className="text-3xl font-bold text-accent-1">
-                    ${Math.round(product.price / 150).toLocaleString()}
-                  </div>
-                  <div className="text-sm text-foreground-muted">
-                    {product.currency} {product.price.toLocaleString()}
-                  </div>
-                </div>
-
-                {/* Stock Status */}
-                <div className="mb-6">
-                  <div
-                    className={`inline-block rounded-full px-3 py-1 text-sm ${
-                      product.status === 'In Stock'
-                        ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
-                        : product.status === 'Out of Stock'
-                          ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100'
-                          : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100'
-                    }`}
-                  >
-                    {product.status}
-                  </div>
-                </div>
-
-                {/* Product Description */}
-                {product.description && (
+                  {/* Price */}
                   <div className="mb-6">
-                    <h2 className="mb-2 text-lg font-semibold text-foreground-strong">
-                      Description
-                    </h2>
-                    <p className="text-sm text-foreground">{product.description}</p>
+                    <div className="text-3xl font-bold text-accent-1">
+                      <EDotFont
+                        text={`$${Math.round(product.price / 150).toLocaleString()}`}
+                        className="text-3xl font-bold text-accent-1"
+                        animate={true}
+                        speed={2}
+                        delay={300}
+                      />
+                    </div>
+                    <div className="text-sm text-foreground-muted">
+                      <EDotFont
+                        text={`${product.currency} ${product.price.toLocaleString()}`}
+                        className="text-sm text-foreground-muted"
+                        animate={true}
+                        speed={2}
+                        delay={400}
+                      />
+                    </div>
                   </div>
-                )}
 
-                {/* Condition */}
-                {product.condition && (
+                  {/* Stock Status */}
                   <div className="mb-6">
-                    <h2 className="mb-2 text-lg font-semibold text-foreground-strong">Condition</h2>
-                    <p className="text-sm text-foreground">{product.condition}</p>
+                    <div
+                      className={`inline-block rounded-full px-3 py-1 text-sm ${
+                        product.status === 'In Stock'
+                          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
+                          : product.status === 'Out of Stock'
+                            ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100'
+                            : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100'
+                      }`}
+                    >
+                      <EDotFont text={product.status} animate={true} speed={2} delay={500} />
+                    </div>
                   </div>
-                )}
 
-                {/* Purchase Button */}
-                <div className="mt-auto flex flex-col gap-4 sm:flex-row">
-                  <Button
-                    className="flex items-center justify-center"
-                    disabled={product.status === 'Out of Stock'}
-                    onClick={() => window.open(product.url, '_blank')}
-                  >
-                    <ShoppingCart className="mr-2 h-5 w-5" />
-                    Go to Purchase Page
-                  </Button>
+                  {/* Product Description */}
+                  {product.description && (
+                    <div className="mb-6">
+                      <h2 className="mb-2 text-lg font-semibold text-foreground-strong">
+                        <EDotFont text="Description" animate={true} speed={2} delay={600} />
+                      </h2>
+                      <EDotFont
+                        text={product.description}
+                        className="text-sm text-foreground"
+                        animate={true}
+                        speed={1}
+                        delay={700}
+                      />
+                    </div>
+                  )}
+
+                  {/* Condition */}
+                  {product.condition && (
+                    <div className="mb-6">
+                      <h2 className="mb-2 text-lg font-semibold text-foreground-strong">
+                        <EDotFont text="Condition" animate={true} speed={2} delay={800} />
+                      </h2>
+                      <EDotFont
+                        text={product.condition}
+                        className="text-sm text-foreground"
+                        animate={true}
+                        speed={1}
+                        delay={900}
+                      />
+                    </div>
+                  )}
+
+                  {/* RPG Style Action Buttons */}
+                  <div className="mt-auto">
+                    <div className="mb-2 text-lg font-semibold text-foreground-strong">
+                      <EDotFont text="Actions" animate={true} speed={2} delay={1000} />
+                    </div>
+
+                    <div
+                      className={`mb-4 rounded-lg border-2 ${isDarkMode ? 'border-white/60' : 'border-black/60'} overflow-hidden md:flex`}
+                    >
+                      {/* Purchase Button */}
+                      <button
+                        className={`flex w-full items-center px-4 py-3 text-left ${
+                          hoverButton1 ? (isDarkMode ? 'bg-gray-800/50' : 'bg-gray-100/70') : ''
+                        } ${product.status === 'Out of Stock' ? 'opacity-50' : ''} md:flex-1`}
+                        disabled={product.status === 'Out of Stock'}
+                        onClick={() => window.open(product.url, '_blank')}
+                        onMouseEnter={() => setHoverButton1(true)}
+                        onMouseLeave={() => setHoverButton1(false)}
+                      >
+                        <span className={`mr-2 ${hoverButton1 ? 'opacity-100' : 'opacity-20'}`}>
+                          ▶
+                        </span>
+                        <EDotFont
+                          text="Go to Purchase Page"
+                          className="flex-1"
+                          animate={true}
+                          speed={2}
+                          delay={1100}
+                        />
+                        <ShoppingCart className="ml-2 h-5 w-5" />
+                      </button>
+
+                      {/* Divider - vertical for desktop, horizontal for mobile */}
+                      <div
+                        className={`h-px w-full md:h-auto md:w-px ${isDarkMode ? 'bg-white/30' : 'bg-black/30'}`}
+                      ></div>
+
+                      {/* View as RWA Button */}
+                      <button
+                        className={`flex w-full items-center px-4 py-3 text-left ${
+                          hoverButton2 ? 'bg-red-700 text-white' : 'bg-red-600 text-white'
+                        } md:flex-1`}
+                        onClick={() => window.open(product.url, '_blank')}
+                        onMouseEnter={() => setHoverButton2(true)}
+                        onMouseLeave={() => setHoverButton2(false)}
+                      >
+                        <span className={`mr-2 ${hoverButton2 ? 'opacity-100' : 'opacity-20'}`}>
+                          ▶
+                        </span>
+                        <EDotFont
+                          text="Buy as RWA NFT"
+                          className="flex-1"
+                          animate={true}
+                          speed={2}
+                          delay={1300}
+                        />
+                        <ExternalLink className="ml-2 h-5 w-5" />
+                      </button>
+                    </div>
+
+                    {/* Blinking cursor at the end */}
+                    <div className="flex justify-end">
+                      <span className={`text-xl ${cursorVisible ? 'opacity-100' : 'opacity-0'}`}>
+                        ▼
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -320,7 +457,7 @@ export default function ProductDetailPage() {
           {allProducts.length > 1 && (
             <div className="mt-8 border-t border-border pt-8">
               <h3 className="mb-6 text-center text-base font-medium text-foreground-strong">
-                Others
+                <EDotFont text="Others" className="text-lg" />
               </h3>
               {promptGroup && (
                 <TProductSearch
