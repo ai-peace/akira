@@ -12,6 +12,8 @@ import { OThemeChangeButton } from '@/components/02_organisms/OThemeChangeButton
 import EShareButton from '@/components/01_elements/EShareButton'
 import { TProductSearch } from '@/components/03_templates/TProductSearch'
 import ELogoAkira from '@/components/01_elements/ELogoAkira'
+import { Metadata } from 'next'
+import Head from 'next/head'
 
 export default function ProductDetailPage() {
   const router = useRouter()
@@ -19,6 +21,8 @@ export default function ProductDetailPage() {
   const searchParams = useSearchParams()
   const [product, setProduct] = useState<ProductEntity | null>(null)
   const [loading, setLoading] = useState(true)
+  const [pageTitle, setPageTitle] = useState('Product Detail - AKIRA')
+  const [pageDescription, setPageDescription] = useState('View product details on AKIRA')
 
   // Get information from URL parameters
   const productUniqueKey = params.id as string
@@ -45,6 +49,18 @@ export default function ProductDetailPage() {
 
         if (foundProduct) {
           setProduct(foundProduct)
+          // Update page title and description with product info
+          setPageTitle(`${foundProduct.title.en} - AKIRA`)
+          setPageDescription(
+            foundProduct.description
+              ? `${foundProduct.description.substring(0, 150)}${
+                  foundProduct.description.length > 150 ? '...' : ''
+                }`
+              : `View ${foundProduct.title.en} on AKIRA`,
+          )
+
+          // Update document title dynamically
+          document.title = `${foundProduct.title.en} | AKIRA`
         }
 
         // Store all products for related products section
@@ -59,14 +75,104 @@ export default function ProductDetailPage() {
 
   if (loading || promptGroupIsLoading) {
     return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-border-strong"></div>
-      </div>
+      <>
+        <Head>
+          <title>Loading Product - AKIRA</title>
+          <meta name="description" content="Loading product details..." />
+        </Head>
+        <div className="flex h-screen items-center justify-center">
+          <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-border-strong"></div>
+        </div>
+      </>
     )
   }
 
   if (!product) {
     return (
+      <>
+        <Head>
+          <title>Product Not Found - AKIRA</title>
+          <meta name="description" content="The requested product could not be found." />
+        </Head>
+        <div>
+          {/* Header */}
+          <div className="sticky top-0 z-10 flex w-full items-center justify-between bg-background p-2">
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                onClick={() => router.back()}
+                className="flex items-center justify-center p-2 text-foreground"
+                size="icon"
+              >
+                <ArrowLeft className="h-5 w-5" />
+              </Button>
+
+              {promptGroup?.chatUniqueKey && (
+                <Button
+                  variant="ghost"
+                  onClick={() => router.push(`/chats/${promptGroup.chatUniqueKey}`)}
+                  className="flex items-center justify-center p-2 text-foreground"
+                  size="icon"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-5 w-5"
+                  >
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                  </svg>
+                </Button>
+              )}
+            </div>
+
+            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+              <ELogoAkira width={80} height={34} />
+            </div>
+
+            <div className="flex items-center gap-2">
+              <EShareButton className="static bottom-auto right-auto z-auto" />
+              <OThemeChangeButton />
+            </div>
+          </div>
+
+          <div className="container mx-auto px-4">
+            <Card className="p-8 text-center">
+              <h1 className="mb-4 text-2xl font-bold text-foreground-strong">Product Not Found</h1>
+              <p className="text-foreground">
+                Sorry, we couldn&apos;t find the product you&apos;re looking for.
+              </p>
+              <Button onClick={() => router.back()} className="mt-4">
+                Return to Previous Page
+              </Button>
+            </Card>
+          </div>
+        </div>
+      </>
+    )
+  }
+
+  // At this point, product is guaranteed to be non-null due to the if (!product) check above
+  return (
+    <>
+      <Head>
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDescription} />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={pageDescription} />
+        {product.imageUrl && <meta property="og:image" content={product.imageUrl} />}
+        <meta property="og:type" content="product" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={pageDescription} />
+        {product.imageUrl && <meta name="twitter:image" content={product.imageUrl} />}
+      </Head>
       <div>
         {/* Header */}
         <div className="sticky top-0 z-10 flex w-full items-center justify-between bg-background p-2">
@@ -115,180 +221,118 @@ export default function ProductDetailPage() {
           </div>
         </div>
 
-        <div className="container mx-auto px-4">
-          <Card className="p-8 text-center">
-            <h1 className="mb-4 text-2xl font-bold text-foreground-strong">Product Not Found</h1>
-            <p className="text-foreground">
-              Sorry, we couldn&apos;t find the product you&apos;re looking for.
-            </p>
-            <Button onClick={() => router.back()} className="mt-4">
-              Return to Previous Page
-            </Button>
-          </Card>
-        </div>
-      </div>
-    )
-  }
+        <div className="container mx-auto pb-16">
+          <div className="px-4 py-4">
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+              {/* Product Image */}
+              <div className="relative h-[300px] w-full overflow-hidden rounded-lg md:h-[500px]">
+                {product.imageUrl && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={product.imageUrl}
+                    alt={product.title.en}
+                    className="h-full w-full object-contain"
+                  />
+                )}
+              </div>
 
-  // At this point, product is guaranteed to be non-null due to the if (!product) check above
-  return (
-    <div>
-      {/* Header */}
-      <div className="sticky top-0 z-10 flex w-full items-center justify-between bg-background p-2">
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            onClick={() => router.back()}
-            className="flex items-center justify-center p-2 text-foreground"
-            size="icon"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
+              {/* Product Information */}
+              <div className="flex flex-col">
+                <h1 className="mb-2 text-2xl font-bold text-foreground-strong md:text-3xl">
+                  {product.title.en}
+                </h1>
+                <p className="mb-4 text-sm text-foreground-muted">{product.title.ja}</p>
 
-          {promptGroup?.chatUniqueKey && (
-            <Button
-              variant="ghost"
-              onClick={() => router.push(`/chats/${promptGroup.chatUniqueKey}`)}
-              className="flex items-center justify-center p-2 text-foreground"
-              size="icon"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="h-5 w-5"
-              >
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-              </svg>
-            </Button>
-          )}
-        </div>
+                <div className="mb-4 flex items-center">
+                  {/* Shop Information */}
+                  <div className="flex items-center">
+                    {product.shopIconUrl && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={product.shopIconUrl}
+                        alt={product.shopName}
+                        className="mr-2 h-5 w-5"
+                      />
+                    )}
+                    <span className="text-sm text-foreground-muted">{product.shopName}</span>
+                  </div>
+                </div>
 
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-          <ELogoAkira width={80} height={34} />
-        </div>
+                {/* Price */}
+                <div className="mb-6">
+                  <div className="text-3xl font-bold text-accent-1">
+                    ${Math.round(product.price / 150).toLocaleString()}
+                  </div>
+                  <div className="text-sm text-foreground-muted">
+                    {product.currency} {product.price.toLocaleString()}
+                  </div>
+                </div>
 
-        <div className="flex items-center gap-2">
-          <EShareButton className="static bottom-auto right-auto z-auto" />
-          <OThemeChangeButton />
-        </div>
-      </div>
+                {/* Stock Status */}
+                <div className="mb-6">
+                  <div
+                    className={`inline-block rounded-full px-3 py-1 text-sm ${
+                      product.status === 'In Stock'
+                        ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
+                        : product.status === 'Out of Stock'
+                          ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100'
+                          : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100'
+                    }`}
+                  >
+                    {product.status}
+                  </div>
+                </div>
 
-      <div className="container mx-auto pb-16">
-        <div className="px-4 py-4">
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-            {/* Product Image */}
-            <div className="relative h-[300px] w-full overflow-hidden rounded-lg md:h-[500px]">
-              {product.imageUrl && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={product.imageUrl}
-                  alt={product.title.en}
-                  className="h-full w-full object-contain"
+                {/* Product Description */}
+                {product.description && (
+                  <div className="mb-6">
+                    <h2 className="mb-2 text-lg font-semibold text-foreground-strong">
+                      Description
+                    </h2>
+                    <p className="text-sm text-foreground">{product.description}</p>
+                  </div>
+                )}
+
+                {/* Condition */}
+                {product.condition && (
+                  <div className="mb-6">
+                    <h2 className="mb-2 text-lg font-semibold text-foreground-strong">Condition</h2>
+                    <p className="text-sm text-foreground">{product.condition}</p>
+                  </div>
+                )}
+
+                {/* Purchase Button */}
+                <div className="mt-auto flex flex-col gap-4 sm:flex-row">
+                  <Button
+                    className="flex items-center justify-center"
+                    disabled={product.status === 'Out of Stock'}
+                    onClick={() => window.open(product.url, '_blank')}
+                  >
+                    <ShoppingCart className="mr-2 h-5 w-5" />
+                    Go to Purchase Page
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Related Products Section */}
+          {allProducts.length > 1 && (
+            <div className="mt-8 border-t border-border pt-8">
+              <h3 className="mb-6 text-center text-base font-medium text-foreground-strong">
+                Others
+              </h3>
+              {promptGroup && (
+                <TProductSearch
+                  products={allProducts.filter((p) => p.uniqueKey !== productUniqueKey)}
+                  chatUniqueKey={promptGroup.chatUniqueKey}
+                  promptGroupUniqueKey={promptGroupUniqueKey}
                 />
               )}
             </div>
-
-            {/* Product Information */}
-            <div className="flex flex-col">
-              <h1 className="mb-2 text-2xl font-bold text-foreground-strong md:text-3xl">
-                {product.title.en}
-              </h1>
-              <p className="mb-4 text-sm text-foreground-muted">{product.title.ja}</p>
-
-              <div className="mb-4 flex items-center">
-                {/* Shop Information */}
-                <div className="flex items-center">
-                  {product.shopIconUrl && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={product.shopIconUrl}
-                      alt={product.shopName}
-                      className="mr-2 h-5 w-5"
-                    />
-                  )}
-                  <span className="text-sm text-foreground-muted">{product.shopName}</span>
-                </div>
-              </div>
-
-              {/* Price */}
-              <div className="mb-6">
-                <div className="text-3xl font-bold text-accent-1">
-                  ${Math.round(product.price / 150).toLocaleString()}
-                </div>
-                <div className="text-sm text-foreground-muted">
-                  {product.currency} {product.price.toLocaleString()}
-                </div>
-              </div>
-
-              {/* Stock Status */}
-              <div className="mb-6">
-                <div
-                  className={`inline-block rounded-full px-3 py-1 text-sm ${
-                    product.status === 'In Stock'
-                      ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
-                      : product.status === 'Out of Stock'
-                        ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100'
-                        : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100'
-                  }`}
-                >
-                  {product.status}
-                </div>
-              </div>
-
-              {/* Product Description */}
-              {product.description && (
-                <div className="mb-6">
-                  <h2 className="mb-2 text-lg font-semibold text-foreground-strong">Description</h2>
-                  <p className="text-sm text-foreground">{product.description}</p>
-                </div>
-              )}
-
-              {/* Condition */}
-              {product.condition && (
-                <div className="mb-6">
-                  <h2 className="mb-2 text-lg font-semibold text-foreground-strong">Condition</h2>
-                  <p className="text-sm text-foreground">{product.condition}</p>
-                </div>
-              )}
-
-              {/* Purchase Button */}
-              <div className="mt-auto flex flex-col gap-4 sm:flex-row">
-                <Button
-                  className="flex items-center justify-center"
-                  disabled={product.status === 'Out of Stock'}
-                  onClick={() => window.open(product.url, '_blank')}
-                >
-                  <ShoppingCart className="mr-2 h-5 w-5" />
-                  Go to Purchase Page
-                </Button>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
-
-        {/* Related Products Section */}
-        {allProducts.length > 1 && (
-          <div className="mt-8 border-t border-border pt-8">
-            <h3 className="mb-6 text-center text-base font-medium text-foreground-strong">
-              Others
-            </h3>
-            {promptGroup && (
-              <TProductSearch
-                products={allProducts.filter((p) => p.uniqueKey !== productUniqueKey)}
-                chatUniqueKey={promptGroup.chatUniqueKey}
-                promptGroupUniqueKey={promptGroupUniqueKey}
-              />
-            )}
-          </div>
-        )}
       </div>
-    </div>
+    </>
   )
 }
