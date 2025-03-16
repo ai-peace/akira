@@ -60,7 +60,7 @@ const Component: FC<Props> = ({ products, chatUniqueKey, promptGroupUniqueKey })
 
   return (
     <>
-      <div className="relative bg-background md:rounded-xl">
+      <div className="relative bg-background">
         {/* Search filter */}
         <div className="mx-auto flex max-w-3xl items-center gap-2 px-2 pb-2 md:px-4 md:pb-4">
           <div className="flex-1">

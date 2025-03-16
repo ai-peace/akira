@@ -11,6 +11,7 @@ import { LLMResponseEntity } from '@/domains/entities/llm-response.entity'
 import { OThemeChangeButton } from '@/components/02_organisms/OThemeChangeButton'
 import EShareButton from '@/components/01_elements/EShareButton'
 import { TProductSearch } from '@/components/03_templates/TProductSearch'
+import ELogoAkira from '@/components/01_elements/ELogoAkira'
 
 export default function ProductDetailPage() {
   const router = useRouter()
@@ -68,7 +69,7 @@ export default function ProductDetailPage() {
     return (
       <div>
         {/* Header */}
-        <div className="sticky top-0 z-10 mb-4 flex w-full items-center justify-between bg-background p-2">
+        <div className="sticky top-0 z-10 flex w-full items-center justify-between bg-background p-2">
           <div className="flex items-center gap-2">
             <Button
               variant="ghost"
@@ -103,6 +104,11 @@ export default function ProductDetailPage() {
               </Button>
             )}
           </div>
+
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+            <ELogoAkira width={80} height={34} />
+          </div>
+
           <div className="flex items-center gap-2">
             <EShareButton className="static bottom-auto right-auto z-auto" />
             <OThemeChangeButton />
@@ -124,6 +130,7 @@ export default function ProductDetailPage() {
     )
   }
 
+  // At this point, product is guaranteed to be non-null due to the if (!product) check above
   return (
     <div>
       {/* Header */}
@@ -162,6 +169,11 @@ export default function ProductDetailPage() {
             </Button>
           )}
         </div>
+
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+          <ELogoAkira width={80} height={34} />
+        </div>
+
         <div className="flex items-center gap-2">
           <EShareButton className="static bottom-auto right-auto z-auto" />
           <OThemeChangeButton />
