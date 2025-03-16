@@ -6,6 +6,13 @@ import { PropsWithChildren, useEffect } from 'react'
 import PrivyCallback from '@/app/privy-callback'
 import { ThemeProvider } from 'next-themes'
 
+import { toSolanaWalletConnectors } from '@privy-io/react-auth/solana'
+
+const solanaConnectors = toSolanaWalletConnectors({
+  // デフォルトでは、shouldAutoConnectは有効になっています
+  shouldAutoConnect: true,
+})
+
 export function Providers({ children }: PropsWithChildren) {
   useEffect(() => {
     if ('serviceWorker' in navigator) {
@@ -28,6 +35,9 @@ export function Providers({ children }: PropsWithChildren) {
         appearance: {
           theme: 'light',
           accentColor: '#676FFF',
+        },
+        externalWallets: {
+          solana: { connectors: solanaConnectors },
         },
       }}
     >
