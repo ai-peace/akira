@@ -16,11 +16,11 @@ export default function ProductDetailPage() {
   const [product, setProduct] = useState<ProductEntity | null>(null)
   const [loading, setLoading] = useState(true)
 
-  // URLパラメータから情報を取得
+  // Get information from URL parameters
   const productUniqueKey = params.id as string
   const promptGroupUniqueKey = searchParams.get('pgKey') || ''
 
-  // promptGroupのデータを取得
+  // Fetch promptGroup data
   const { promptGroup, promptGroupIsLoading } = usePromptGroup({
     uniqueKey: promptGroupUniqueKey,
   })
@@ -29,10 +29,10 @@ export default function ProductDetailPage() {
     if (promptGroupIsLoading || !promptGroup) return
 
     try {
-      // promptGroupからproductsを取得
+      // Get products from promptGroup
       const firstPrompt = promptGroup.prompts?.[0]
       if (firstPrompt && firstPrompt.result && Array.isArray(firstPrompt.result.data)) {
-        // 商品データの配列から該当する商品を検索
+        // Find the matching product from the product data array
         const products = firstPrompt.result.data as ProductEntity[]
         const foundProduct = products.find((p) => p.uniqueKey === productUniqueKey)
 
@@ -50,7 +50,7 @@ export default function ProductDetailPage() {
   if (loading || promptGroupIsLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-gray-900"></div>
+        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-border-strong"></div>
       </div>
     )
   }
@@ -59,16 +59,22 @@ export default function ProductDetailPage() {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="mb-4">
-          <Button variant="ghost" onClick={() => router.back()} className="flex items-center">
+          <Button
+            variant="ghost"
+            onClick={() => router.back()}
+            className="flex items-center text-foreground"
+          >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            戻る
+            Back
           </Button>
         </div>
         <Card className="p-8 text-center">
-          <h1 className="mb-4 text-2xl font-bold">商品が見つかりませんでした</h1>
-          <p>申し訳ありませんが、指定された商品情報が見つかりませんでした。</p>
+          <h1 className="mb-4 text-2xl font-bold text-foreground-strong">Product Not Found</h1>
+          <p className="text-foreground">
+            Sorry, we couldn&apos;t find the product you&apos;re looking for.
+          </p>
           <Button onClick={() => router.back()} className="mt-4">
-            前のページに戻る
+            Return to Previous Page
           </Button>
         </Card>
       </div>
@@ -78,14 +84,18 @@ export default function ProductDetailPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-4">
-        <Button variant="ghost" onClick={() => router.back()} className="flex items-center">
+        <Button
+          variant="ghost"
+          onClick={() => router.back()}
+          className="flex items-center text-foreground"
+        >
           <ArrowLeft className="mr-2 h-4 w-4" />
-          戻る
+          Back
         </Button>
       </div>
 
       <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-        {/* 商品画像 */}
+        {/* Product Image */}
         <div className="relative h-[300px] w-full overflow-hidden rounded-lg md:h-[500px]">
           {product.imageUrl && (
             // eslint-disable-next-line @next/next/no-img-element
@@ -97,64 +107,66 @@ export default function ProductDetailPage() {
           )}
         </div>
 
-        {/* 商品情報 */}
+        {/* Product Information */}
         <div className="flex flex-col">
-          <h1 className="mb-2 text-2xl font-bold md:text-3xl">{product.title.en}</h1>
-          <p className="mb-4 text-sm text-gray-600">{product.title.ja}</p>
+          <h1 className="mb-2 text-2xl font-bold text-foreground-strong md:text-3xl">
+            {product.title.en}
+          </h1>
+          <p className="mb-4 text-sm text-foreground-muted">{product.title.ja}</p>
 
           <div className="mb-4 flex items-center">
-            {/* ショップ情報 */}
+            {/* Shop Information */}
             <div className="flex items-center">
               {product.shopIconUrl && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={product.shopIconUrl} alt={product.shopName} className="mr-2 h-5 w-5" />
               )}
-              <span className="text-sm text-gray-600">{product.shopName}</span>
+              <span className="text-sm text-foreground-muted">{product.shopName}</span>
             </div>
           </div>
 
-          {/* 価格 */}
+          {/* Price */}
           <div className="mb-6">
-            <div className="text-3xl font-bold text-red-500">
+            <div className="text-3xl font-bold text-accent-1">
               ${Math.round(product.price / 150).toLocaleString()}
             </div>
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-foreground-muted">
               {product.currency} {product.price.toLocaleString()}
             </div>
           </div>
 
-          {/* 在庫状況 */}
+          {/* Stock Status */}
           <div className="mb-6">
             <div
               className={`inline-block rounded-full px-3 py-1 text-sm ${
                 product.status === 'In Stock'
-                  ? 'bg-green-100 text-green-800'
+                  ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
                   : product.status === 'Out of Stock'
-                    ? 'bg-red-100 text-red-800'
-                    : 'bg-yellow-100 text-yellow-800'
+                    ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100'
+                    : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100'
               }`}
             >
               {product.status}
             </div>
           </div>
 
-          {/* 商品説明 */}
+          {/* Product Description */}
           {product.description && (
             <div className="mb-6">
-              <h2 className="mb-2 text-lg font-semibold">商品説明</h2>
-              <p className="text-sm text-gray-700">{product.description}</p>
+              <h2 className="mb-2 text-lg font-semibold text-foreground-strong">Description</h2>
+              <p className="text-sm text-foreground">{product.description}</p>
             </div>
           )}
 
-          {/* コンディション */}
+          {/* Condition */}
           {product.condition && (
             <div className="mb-6">
-              <h2 className="mb-2 text-lg font-semibold">コンディション</h2>
-              <p className="text-sm text-gray-700">{product.condition}</p>
+              <h2 className="mb-2 text-lg font-semibold text-foreground-strong">Condition</h2>
+              <p className="text-sm text-foreground">{product.condition}</p>
             </div>
           )}
 
-          {/* 購入ボタン */}
+          {/* Purchase Button */}
           <div className="mt-auto flex flex-col gap-4 sm:flex-row">
             <Button
               className="flex items-center justify-center"
@@ -162,7 +174,7 @@ export default function ProductDetailPage() {
               onClick={() => window.open(product.url, '_blank')}
             >
               <ShoppingCart className="mr-2 h-5 w-5" />
-              購入ページへ
+              Go to Purchase Page
             </Button>
           </div>
         </div>

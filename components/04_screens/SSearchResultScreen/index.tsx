@@ -21,14 +21,14 @@ const Component: FC<Props> = ({ promptGroupUniqueKey }) => {
         <div className="relative flex items-center justify-between p-2 md:p-2">
           {promptGroup?.chatUniqueKey ? (
             <Link href={`/chats/${promptGroup?.chatUniqueKey}`}>
-              <button className="flex items-center gap-2 rounded-full p-2 hover:bg-gray-100 hover:text-background">
+              <button className="flex items-center gap-2 rounded-full p-2 text-foreground hover:bg-secondary">
                 <ArrowLeftIcon className="h-5 w-5" />
               </button>
             </Link>
           ) : (
             <div className="h-6" />
           )}
-          <h2 className="text-md absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-bold">
+          <h2 className="text-md absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-bold text-foreground-strong">
             All products
           </h2>
           <div className="flex items-center gap-2">
@@ -37,7 +37,7 @@ const Component: FC<Props> = ({ promptGroupUniqueKey }) => {
           </div>
         </div>
       </div>
-      {/* ここから */}
+      {/* Product search results */}
       {promptGroup?.prompts.map((prompt) => {
         return (
           <div key={prompt.uniqueKey} className="w-full">

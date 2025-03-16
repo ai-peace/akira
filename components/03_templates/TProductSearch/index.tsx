@@ -35,14 +35,14 @@ const Component: FC<Props> = ({ products, chatUniqueKey, promptGroupUniqueKey })
   const filteredProducts = useMemo(() => {
     return products
       .filter((product) => {
-        // フィルタリング: 検索語句
+        // Filter by search term
         const matchesSearch =
           searchTerm === '' ||
           product.title.en.toLowerCase().includes(searchTerm.toLowerCase()) ||
           product.title.ja.toLowerCase().includes(searchTerm.toLowerCase()) ||
           product.description?.toLowerCase().includes(searchTerm.toLowerCase())
 
-        // フィルタリング: ショップ
+        // Filter by shop
         const matchesShop =
           activeTab === 'all' ||
           product.shopName === activeTab ||
@@ -51,7 +51,7 @@ const Component: FC<Props> = ({ products, chatUniqueKey, promptGroupUniqueKey })
         return matchesSearch && matchesShop
       })
       .sort((a, b) => {
-        // 並び替え: 価格
+        // Sort by price
         const priceA = a.price || 0
         const priceB = b.price || 0
         return sortOrder === 'asc' ? priceA - priceB : priceB - priceA
@@ -69,19 +69,19 @@ const Component: FC<Props> = ({ products, chatUniqueKey, promptGroupUniqueKey })
               placeholder="Search products..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full rounded-md border px-2 py-1 md:px-3 md:py-2"
+              className="w-full rounded-md border border-input bg-background px-2 py-1 text-foreground md:px-3 md:py-2"
             />
           </div>
           <button
             onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-            className="flex items-center gap-2 rounded-md border px-3 py-2 hover:bg-gray-50"
+            className="flex items-center gap-2 rounded-md border border-input bg-background px-3 py-2 text-foreground hover:bg-secondary"
           >
             <ListFilter className="h-4 w-4" />
           </button>
         </div>
 
-        {/* タブバー - スクロール可能なコンテナ */}
-        <div className="relative w-full max-w-[100vw] border-b md:mx-auto md:max-w-3xl">
+        {/* Tab bar - scrollable container */}
+        <div className="relative w-full max-w-[100vw] border-b border-border md:mx-auto md:max-w-3xl">
           <div
             className="-mb-[1px] overflow-x-auto overflow-y-hidden"
             style={{
@@ -98,7 +98,7 @@ const Component: FC<Props> = ({ products, chatUniqueKey, promptGroupUniqueKey })
             `}</style>
             <div className="flex whitespace-nowrap px-4">
               {shops.map((shop) => {
-                // 現在の店舗のアイコンURLを取得
+                // Get current shop icon URL
                 const shopIconUrl =
                   shop === 'all' || shop === 'unknown'
                     ? null
@@ -110,8 +110,8 @@ const Component: FC<Props> = ({ products, chatUniqueKey, promptGroupUniqueKey })
                     onClick={() => setActiveTab(shop)}
                     className={`flex-shrink-0 border-b-2 px-4 py-2 text-sm transition-all duration-200 ${
                       activeTab === shop
-                        ? 'border-blue-500 text-blue-500'
-                        : 'hover:text-foreground-hover border-transparent text-foreground-muted hover:border-gray-300'
+                        ? 'border-accent-2 text-accent-2'
+                        : 'border-transparent text-foreground-muted hover:border-border-strong hover:text-foreground'
                     }`}
                     style={{
                       marginBottom: '-1px',
@@ -127,7 +127,7 @@ const Component: FC<Props> = ({ products, chatUniqueKey, promptGroupUniqueKey })
                             alt={shop}
                             className="mr-1.5 h-4 w-4 rounded-full object-contain"
                             onError={(e) => {
-                              // 画像読み込みエラー時に代替表示
+                              // Hide on image load error
                               e.currentTarget.style.display = 'none'
                             }}
                           />
@@ -135,7 +135,7 @@ const Component: FC<Props> = ({ products, chatUniqueKey, promptGroupUniqueKey })
                         <span>{shop === 'unknown' ? 'Other' : shop === 'all' ? 'All' : shop}</span>
                       </div>
                       <span
-                        className={`text-xs ${activeTab === shop ? 'text-blue-400' : 'text-gray-400'}`}
+                        className={`text-xs ${activeTab === shop ? 'text-accent-2' : 'text-foreground-subtle'}`}
                       >
                         ({shopCounts[shop]})
                       </span>
