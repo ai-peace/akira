@@ -12,7 +12,7 @@ type Props = {
 
 const Component: FC<Props> = ({ products, chatUniqueKey, promptGroupUniqueKey }) => {
   const [searchTerm, setSearchTerm] = useState('')
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   const [activeTab, setActiveTab] = useState<string>('all')
 
   const shops = useMemo(() => {
