@@ -16,18 +16,19 @@ const route = createUserPrivate.post('/users', privyAuthMiddleware, async (c) =>
   try {
     const privyId = c.get('privyId')
     const privyUser = c.get('privyUser')
+    const walletAddress = c.get('walletAddress')
 
     const userCount = await prisma.user.count()
     if (userCount >= clientApplicationProperties.userRegistrationCap) {
       return c.json<HcApiResponseType<never>>(
         {
-          error: createHcApiError('USER_REGISTRATION_CAP_EXCEEDED', {
-            message: 'ユーザー登録の上限に達しました。',
-          }),
+          error: createHcApiError('USER_REGISTRATION_CAP_EXCEEDED'),
         },
         403,
       )
     }
+
+    console.log('privyUser', privyUser)
 
     const email =
       typeof privyUser.email === 'string' ? privyUser.email : privyUser.email?.address || ''
@@ -35,9 +36,6 @@ const route = createUserPrivate.post('/users', privyAuthMiddleware, async (c) =>
 
     // ランダムなニックネームを生成
     const name = faker.internet.userName()
-
-    // solana privy接続ができるまでの暫定
-    const walletAddress = privyUser.wallet?.address || ''
 
     const userPrivate = await prisma.user.create({
       data: {

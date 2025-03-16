@@ -8,6 +8,7 @@ export const privyAuthMiddleware = createMiddleware<{
   Variables: {
     privyId: string
     privyUser: User
+    walletAddress: string
   }
 }>(async (c, next) => {
   try {
@@ -34,8 +35,12 @@ export const privyAuthMiddleware = createMiddleware<{
 
       const privyUser = await privy.getUserById(privyId)
 
+      // ウォレットアドレスを取得
+      const walletAddress = privyUser.wallet?.address || ''
+
       c.set('privyId', privyId)
       c.set('privyUser', privyUser)
+      c.set('walletAddress', walletAddress)
       await next()
     } catch (verifyError) {
       console.error('Privy token verification error:', verifyError)
