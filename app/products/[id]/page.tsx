@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card'
 import { ProductEntity } from '@/domains/entities/product.entity'
 import { useRouter, useParams, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { ArrowLeft, ShoppingCart, Share2, ExternalLink, Heart } from 'lucide-react'
+import { ArrowLeft, ShoppingCart, Share2, ExternalLink, Heart, X } from 'lucide-react'
 import { usePromptGroup } from '@/hooks/resources/prompt-groups/usePromptGroup'
 import { LLMResponseEntity } from '@/domains/entities/llm-response.entity'
 import { OThemeChangeButton } from '@/components/02_organisms/OThemeChangeButton'
@@ -31,6 +31,8 @@ export default function ProductDetailPage() {
   const [hoverFavorite, setHoverFavorite] = useState(false)
   const { theme } = useTheme()
   const isDarkMode = theme === 'dark'
+  const [showModal, setShowModal] = useState(false)
+  const [modalType, setModalType] = useState<'favorite' | 'rwa'>('favorite')
 
   // Get information from URL parameters
   const productUniqueKey = params.id as string
@@ -88,6 +90,18 @@ export default function ProductDetailPage() {
       setLoading(false)
     }
   }, [promptGroup, productUniqueKey, promptGroupIsLoading])
+
+  // Function to handle favorite button click
+  const handleFavoriteClick = () => {
+    setModalType('favorite')
+    setShowModal(true)
+  }
+
+  // Function to handle RWA NFT button click
+  const handleRwaClick = () => {
+    setModalType('rwa')
+    setShowModal(true)
+  }
 
   if (loading || promptGroupIsLoading) {
     return (
@@ -258,7 +272,7 @@ export default function ProductDetailPage() {
               {/* Title and Info - Right side on desktop, below image on mobile */}
               <div className="flex flex-col gap-4 md:w-1/2">
                 {/* RPG Style Title Box */}
-                <div className={`rounded-lg p-3`}>
+                <div className="rounded-lg p-1 md:p-4">
                   <div className="mb-2">
                     <EDotFont
                       text={product.title.en}
@@ -281,7 +295,7 @@ export default function ProductDetailPage() {
                 </div>
 
                 {/* Product Information */}
-                <div className={`flex flex-1 flex-col rounded-lg bg-background p-4`}>
+                <div className={'flex flex-1 flex-col rounded-lg bg-background p-1 md:p-4'}>
                   <div className="mb-4 flex items-center">
                     {/* Shop Information */}
                     <div className="flex items-center">
@@ -386,7 +400,7 @@ export default function ProductDetailPage() {
                         } px-4 py-3 text-left ${
                           hoverFavorite ? (isDarkMode ? 'bg-gray-800/50' : 'bg-gray-100/70') : ''
                         }`}
-                        onClick={() => {}}
+                        onClick={handleFavoriteClick}
                         onMouseEnter={() => setHoverFavorite(true)}
                         onMouseLeave={() => setHoverFavorite(false)}
                       >
@@ -433,7 +447,7 @@ export default function ProductDetailPage() {
                         className={`flex w-full items-center rounded-lg border-2 border-red-600 px-4 py-3 text-left ${
                           hoverButton2 ? 'bg-red-700 text-white' : 'bg-red-600 text-white'
                         } md:col-span-2`}
-                        onClick={() => window.open(product.url, '_blank')}
+                        onClick={handleRwaClick}
                         onMouseEnter={() => setHoverButton2(true)}
                         onMouseLeave={() => setHoverButton2(false)}
                       >
@@ -480,6 +494,67 @@ export default function ProductDetailPage() {
           )}
         </div>
       </div>
+
+      {/* Modal for Under Construction */}
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div
+            className={`relative mx-4 max-w-md rounded-lg border-2 ${isDarkMode ? 'border-white/60' : 'border-black/60'} bg-background p-6 shadow-lg`}
+          >
+            <button
+              onClick={() => setShowModal(false)}
+              className="absolute right-4 top-4 text-foreground hover:text-foreground-muted"
+            >
+              <X className="h-5 w-5" />
+            </button>
+
+            <div className="mb-4 text-center">
+              <EDotFont
+                text={modalType === 'favorite' ? 'Feature Coming Soon' : 'RWA NFT Coming Soon'}
+                className="text-xl font-bold text-foreground-strong"
+                animate={true}
+                speed={1}
+                delay={0}
+              />
+            </div>
+
+            <div className="mb-6 text-center">
+              <EDotFont
+                text={
+                  modalType === 'favorite'
+                    ? "We're currently building the favorites feature. Thank you for your interest and patience as we work to enhance your experience."
+                    : "The RWA NFT marketplace integration is under construction. We're working diligently to bring this exciting feature to you soon."
+                }
+                className="text-foreground"
+                animate={true}
+                speed={1}
+                delay={50}
+              />
+            </div>
+
+            <div className="flex flex-col items-center justify-center gap-4 md:flex-row">
+              <button
+                onClick={() => setShowModal(false)}
+                className={`w-full rounded-lg border-2 ${
+                  isDarkMode ? 'border-white/60' : 'border-black/60'
+                } px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800`}
+              >
+                <EDotFont text="Close" animate={true} speed={1} delay={100} />
+              </button>
+
+              <button
+                onClick={() => {
+                  setShowModal(false)
+                  router.push('/waitlists')
+                }}
+                className="w-full rounded-lg border-2 border-accent-1 bg-accent-1 px-4 py-2 text-white hover:bg-accent-1/90"
+              >
+                <EDotFont text="Join Waitlist" animate={true} speed={1} delay={100} />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }
