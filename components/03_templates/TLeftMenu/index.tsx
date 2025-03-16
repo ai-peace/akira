@@ -9,6 +9,9 @@ import { useUserPrivate } from '@/hooks/resources/user-private/useUserPrivate'
 import { leftMenuVisibleAtom } from '@/store/atoms/menuAtoms'
 import { useAtom } from 'jotai'
 import { useEffect, useRef, useState } from 'react'
+import Link from 'next/link'
+import { Coins } from 'lucide-react'
+import EDotFont from '@/components/01_elements/EDotFont'
 
 const Component = () => {
   const { userPrivate } = useUserPrivate()
@@ -136,6 +139,20 @@ const Component = () => {
             {userPrivate && !chatsIsLoading && !chatsError && chats && (
               <div className="flex min-h-full flex-col px-4 py-3">
                 <OChatList chats={chats} onChatSelect={() => setIsVisible(false)} />
+
+                {/* My RWA NFTsへのリンク（モバイル） */}
+                <div className="mt-6 border-t border-border-subtle pt-4">
+                  <Link
+                    href="/my-nfts"
+                    className="flex items-center gap-2 rounded-lg p-2 hover:bg-background-muted"
+                    onClick={() => setIsVisible(false)}
+                  >
+                    <Coins className="h-5 w-5 text-accent-1" />
+                    <span className="text-sm font-medium">
+                      <EDotFont text="My RWA NFTs" animate={false} speed={1} />
+                    </span>
+                  </Link>
+                </div>
               </div>
             )}
             {!userPrivate && (
@@ -169,6 +186,20 @@ const Component = () => {
             {!chatsIsLoading && !chatsError && chats && (
               <div className="flex h-full min-h-full flex-col overflow-x-auto overflow-y-auto px-4 py-3">
                 <OChatList chats={chats} />
+
+                {/* My RWA NFTsへのリンク */}
+                <div className="mt-6 border-t border-border-subtle pt-4">
+                  <Link
+                    href="/my-nfts"
+                    className="flex items-center gap-2 rounded-lg p-2 hover:bg-background-muted"
+                    onClick={() => setIsVisible(false)}
+                  >
+                    <Coins className="h-5 w-5 text-accent-1" />
+                    <span className="text-sm font-medium">
+                      <EDotFont text="My RWA NFTs" animate={false} speed={1} />
+                    </span>
+                  </Link>
+                </div>
               </div>
             )}
           </div>

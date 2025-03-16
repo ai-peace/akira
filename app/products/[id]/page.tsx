@@ -442,8 +442,10 @@ export default function ProductDetailPage() {
                         />
                         <ShoppingCart className="ml-2 h-5 w-5" />
                       </button>
+                    </div>
 
-                      {/* RWA NFT Button */}
+                    {/* RWA NFT Button - 別の行に配置 */}
+                    <div className="mb-4">
                       <ORwaNftButton
                         product={product}
                         promptGroupUniqueKey={promptGroupUniqueKey}

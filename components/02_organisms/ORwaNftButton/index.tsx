@@ -512,10 +512,10 @@ const Component: FC<Props> = ({ product, promptGroupUniqueKey }) => {
   return (
     <>
       <button
-        className="flex w-full items-center rounded-lg border-2 border-red-600 bg-red-600 px-4 py-3 text-left text-white hover:bg-red-700 md:w-1/3"
+        className="flex w-full items-center rounded-lg border-2 border-red-600 bg-red-600 px-4 py-3 text-left text-white hover:bg-red-700"
         onClick={handleClick}
       >
-        <span className="mr-2 opacity-20">▶</span>
+        <span className="mr-2 opacity-100">▶</span>
         <EDotFont text="Buy as RWA NFT" className="flex-1" animate={true} speed={1} delay={100} />
         <ExternalLink className="ml-2 h-5 w-5" />
       </button>
