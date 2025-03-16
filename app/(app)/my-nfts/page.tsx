@@ -164,42 +164,65 @@ export default function MyNFTsPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {nfts.map((nft) => (
-            <div
-              key={nft.uniqueKey}
-              className="overflow-hidden rounded-lg border-2 bg-background-muted"
-            >
-              <div className="p-4">
-                <h2 className="mb-2 text-lg font-semibold">
-                  <EDotFont text={`NFT #${nft.id}`} animate={true} speed={1} />
-                </h2>
-                <div className="mb-4 text-sm">
-                  <div className="mb-1 flex items-center justify-between">
-                    <span className="text-foreground-muted">Mint Address:</span>
+          {nfts.map((nft) => {
+            // メタデータをパースして image URL を取得
+            let metadataObj: any = {}
+            try {
+              metadataObj = JSON.parse(nft.metadata || '{}')
+            } catch (err) {
+              console.error('Error parsing NFT metadata:', err)
+            }
+            const imageUrl = metadataObj.image
+
+            return (
+              <div
+                key={nft.uniqueKey}
+                className="overflow-hidden rounded-lg border-2 bg-background-muted"
+              >
+                <div className="p-4">
+                  {/* 画像URLがあれば表示 */}
+                  {imageUrl && (
+                    <div className="mb-4 flex items-center justify-center">
+                      <img
+                        src={imageUrl}
+                        alt={`NFT #${nft.id}`}
+                        className="max-h-60 w-auto object-contain"
+                      />
+                    </div>
+                  )}
+
+                  <h2 className="mb-2 text-lg font-semibold">
+                    <EDotFont text={`NFT #${nft.id}`} animate={true} speed={1} />
+                  </h2>
+                  <div className="mb-4 text-sm">
+                    <div className="mb-1 flex items-center justify-between">
+                      <span className="text-foreground-muted">Mint Address:</span>
+                    </div>
+                    <div className="overflow-hidden text-ellipsis whitespace-nowrap">
+                      {nft.mintAddress.substring(0, 8)}...
+                      {nft.mintAddress.substring(nft.mintAddress.length - 8)}
+                    </div>
                   </div>
-                  <div className="overflow-hidden text-ellipsis whitespace-nowrap">
-                    {nft.mintAddress.substring(0, 8)}...
-                    {nft.mintAddress.substring(nft.mintAddress.length - 8)}
+                  <div className="mb-4 text-sm">
+                    <div className="mb-1 text-foreground-muted">Created:</div>
+                    <div>{new Date(nft.createdAt).toLocaleString()}</div>
                   </div>
-                </div>
-                <div className="mb-4 text-sm">
-                  <div className="mb-1 text-foreground-muted">Created:</div>
-                  <div>{new Date(nft.createdAt).toLocaleString()}</div>
-                </div>
-                <div className="flex justify-between">
-                  <Link
-                    href={`${SOLANA_EXPLORER_URL}/${nft.mintAddress}?cluster=devnet`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center text-accent-1 hover:underline"
-                  >
-                    <span className="mr-1">View on Explorer</span>
-                    <ExternalLink className="h-4 w-4" />
-                  </Link>
+                  <div className="flex justify-between">
+                    {/* ExplorerのURLを「/address/〜」形式に修正 */}
+                    <Link
+                      href={`${SOLANA_EXPLORER_URL}/address/${nft.mintAddress}?cluster=devnet`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center text-accent-1 hover:underline"
+                    >
+                      <span className="mr-1">View on Explorer</span>
+                      <ExternalLink className="h-4 w-4" />
+                    </Link>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
     </div>

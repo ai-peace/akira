@@ -36,8 +36,8 @@ export default function ProductDetailPage() {
   const [modalType, setModalType] = useState<'favorite' | 'rwa'>('favorite')
 
   // Get information from URL parameters
-  const productUniqueKey = params.id as string
-  const promptGroupUniqueKey = searchParams.get('pgKey') || ''
+  const productUniqueKey = (params?.id as string) || ''
+  const promptGroupUniqueKey = searchParams?.get('pgKey') || ''
 
   // Fetch promptGroup data
   const { promptGroup, promptGroupIsLoading } = usePromptGroup({
@@ -444,7 +444,10 @@ export default function ProductDetailPage() {
                       </button>
 
                       {/* RWA NFT Button */}
-                      <ORwaNftButton product={product} />
+                      <ORwaNftButton
+                        product={product}
+                        promptGroupUniqueKey={promptGroupUniqueKey}
+                      />
                     </div>
 
                     {/* Blinking cursor at the end */}

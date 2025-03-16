@@ -20,9 +20,10 @@ const MINT_TIMEOUT = 60000
 
 type Props = {
   product: ProductEntity
+  promptGroupUniqueKey?: string
 }
 
-const Component: FC<Props> = ({ product }) => {
+const Component: FC<Props> = ({ product, promptGroupUniqueKey }) => {
   const router = useRouter()
   const { authenticated } = usePrivy()
   const { publicKey } = useWallet()
@@ -149,8 +150,8 @@ const Component: FC<Props> = ({ product }) => {
           Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({
-          productId: product.uniqueKey,
-          walletAddress: publicKey.toString(),
+          productUniqueKey: product.uniqueKey,
+          promptGroupUniqueKey: promptGroupUniqueKey,
         }),
       })
 

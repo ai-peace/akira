@@ -170,19 +170,21 @@ model Deposit {
 }
 
 model NFT {
-  id            Int      @id @default(autoincrement())
-  uniqueKey     String   @unique @map("unique_key") @db.VarChar(255)
-  mintAddress   String   @unique @map("mint_address") @db.VarChar(255)
-  metadata      String   @db.Text
-  productId     String   @map("product_id") @db.VarChar(255)
-  userId        Int      @map("user_id")
-  walletAddress String   @map("wallet_address") @db.VarChar(255)
-  createdAt     DateTime @default(now()) @map("created_at")
-  updatedAt     DateTime @updatedAt @map("updated_at")
+  id                   Int      @id @default(autoincrement())
+  uniqueKey            String   @unique @map("unique_key") @db.VarChar(255)
+  mintAddress          String   @unique @map("mint_address") @db.VarChar(255)
+  metadata             String   @db.Text
+  productId            String   @map("product_id") @db.VarChar(255)
+  promptGroupUniqueKey String?  @map("prompt_group_unique_key") @db.VarChar(255)
+  userId               Int      @map("user_id")
+  walletAddress        String   @map("wallet_address") @db.VarChar(255)
+  createdAt            DateTime @default(now()) @map("created_at")
+  updatedAt            DateTime @updatedAt @map("updated_at")
 
   user User @relation(fields: [userId], references: [id])
 
   @@index([userId])
   @@index([walletAddress])
+  @@index([promptGroupUniqueKey])
   @@map("nfts")
 }
