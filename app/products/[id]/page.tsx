@@ -242,9 +242,7 @@ export default function ProductDetailPage() {
             <div className="flex flex-col gap-6 md:flex-row md:gap-4">
               {/* Product Image with RPG Style Border - Left side on desktop, full width on mobile */}
               <div
-                className={`md:border-3 relative flex items-center justify-center overflow-hidden rounded-lg border-2 ${
-                  isDarkMode ? 'border-white/80' : 'border-black/80'
-                } bg-background-muted p-2 md:w-1/2`}
+                className={`relative flex items-center justify-center overflow-hidden rounded-lg bg-background-muted p-2 md:w-1/2`}
               >
                 {product.imageUrl && (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -259,11 +257,7 @@ export default function ProductDetailPage() {
               {/* Title and Info - Right side on desktop, below image on mobile */}
               <div className="flex flex-col gap-4 md:w-1/2">
                 {/* RPG Style Title Box */}
-                <div
-                  className={`md:border-3 rounded-lg border-2 ${
-                    isDarkMode ? 'border-white/80' : 'border-black/80'
-                  } p-3`}
-                >
+                <div className={`rounded-lg p-3`}>
                   <div className="mb-2">
                     <EDotFont
                       text={product.title.en}
@@ -286,11 +280,7 @@ export default function ProductDetailPage() {
                 </div>
 
                 {/* Product Information */}
-                <div
-                  className={`md:border-3 flex flex-1 flex-col rounded-lg border-2 ${
-                    isDarkMode ? 'border-white/80' : 'border-black/80'
-                  } bg-background p-4`}
-                >
+                <div className={`flex flex-1 flex-col rounded-lg bg-background p-4`}>
                   <div className="mb-4 flex items-center">
                     {/* Shop Information */}
                     <div className="flex items-center">
@@ -387,12 +377,12 @@ export default function ProductDetailPage() {
                       <EDotFont text="Actions" animate={true} speed={2} delay={1000} />
                     </div>
 
-                    <div
-                      className={`mb-4 rounded-lg border-2 ${isDarkMode ? 'border-white/60' : 'border-black/60'} overflow-hidden md:flex`}
-                    >
+                    <div className="mb-4 flex flex-col gap-2 md:flex-row md:gap-4">
                       {/* Purchase Button */}
                       <button
-                        className={`flex w-full items-center px-4 py-3 text-left ${
+                        className={`flex w-full items-center rounded-lg border-2 ${
+                          isDarkMode ? 'border-white/60' : 'border-black/60'
+                        } px-4 py-3 text-left ${
                           hoverButton1 ? (isDarkMode ? 'bg-gray-800/50' : 'bg-gray-100/70') : ''
                         } ${product.status === 'Out of Stock' ? 'opacity-50' : ''} md:flex-1`}
                         disabled={product.status === 'Out of Stock'}
@@ -413,14 +403,9 @@ export default function ProductDetailPage() {
                         <ShoppingCart className="ml-2 h-5 w-5" />
                       </button>
 
-                      {/* Divider - vertical for desktop, horizontal for mobile */}
-                      <div
-                        className={`h-px w-full md:h-auto md:w-px ${isDarkMode ? 'bg-white/30' : 'bg-black/30'}`}
-                      ></div>
-
                       {/* View as RWA Button */}
                       <button
-                        className={`flex w-full items-center px-4 py-3 text-left ${
+                        className={`flex w-full items-center rounded-lg border-2 border-red-600 px-4 py-3 text-left ${
                           hoverButton2 ? 'bg-red-700 text-white' : 'bg-red-600 text-white'
                         } md:flex-1`}
                         onClick={() => window.open(product.url, '_blank')}
