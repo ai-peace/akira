@@ -5,6 +5,7 @@ import { PrivyProvider } from '@privy-io/react-auth'
 import { PropsWithChildren, useEffect } from 'react'
 import PrivyCallback from '@/app/privy-callback'
 import { ThemeProvider } from 'next-themes'
+import { SolanaProvider } from '@/providers/SolanaProvider'
 
 import { toSolanaWalletConnectors } from '@privy-io/react-auth/solana'
 
@@ -51,7 +52,7 @@ export function Providers({ children }: PropsWithChildren) {
     >
       <PrivyCallback>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          {children}
+          <SolanaProvider>{children}</SolanaProvider>
         </ThemeProvider>
       </PrivyCallback>
     </PrivyProvider>

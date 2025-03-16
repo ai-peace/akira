@@ -16,6 +16,7 @@ import EDotFont from '@/components/01_elements/EDotFont'
 import { Metadata } from 'next'
 import Head from 'next/head'
 import { useTheme } from 'next-themes'
+import { ORwaNftButton } from '@/components/02_organisms/ORwaNftButton'
 
 export default function ProductDetailPage() {
   const router = useRouter()
@@ -442,27 +443,8 @@ export default function ProductDetailPage() {
                         <ShoppingCart className="ml-2 h-5 w-5" />
                       </button>
 
-                      {/* View as RWA Button - Full width in the second row */}
-                      <button
-                        className={`flex w-full items-center rounded-lg border-2 border-red-600 px-4 py-3 text-left ${
-                          hoverButton2 ? 'bg-red-700 text-white' : 'bg-red-600 text-white'
-                        } md:col-span-2`}
-                        onClick={handleRwaClick}
-                        onMouseEnter={() => setHoverButton2(true)}
-                        onMouseLeave={() => setHoverButton2(false)}
-                      >
-                        <span className={`mr-2 ${hoverButton2 ? 'opacity-100' : 'opacity-20'}`}>
-                          ▶
-                        </span>
-                        <EDotFont
-                          text="Buy as RWA NFT"
-                          className="flex-1"
-                          animate={true}
-                          speed={1}
-                          delay={100}
-                        />
-                        <ExternalLink className="ml-2 h-5 w-5" />
-                      </button>
+                      {/* RWA NFT Button */}
+                      <ORwaNftButton product={product} />
                     </div>
 
                     {/* Blinking cursor at the end */}

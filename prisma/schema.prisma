@@ -24,6 +24,8 @@ model User {
 
   chats            Chat[]
   userPromptUsages UserPromptUsage[]
+  deposits         Deposit[]
+  nfts             NFT[]
 
   @@unique([uniqueKey])
   @@unique([privyId])
@@ -147,4 +149,40 @@ enum WaitListStatus {
   WAITING
   INVITED
   REGISTERED
+}
+
+model Deposit {
+  id            Int      @id @default(autoincrement())
+  uniqueKey     String   @unique @map("unique_key") @db.VarChar(255)
+  userId        Int      @map("user_id")
+  walletAddress String   @map("wallet_address") @db.VarChar(255)
+  amount        Float
+  signature     String   @db.VarChar(255)
+  used          Boolean  @default(false)
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([walletAddress])
+  @@map("deposits")
+}
+
+model NFT {
+  id            Int      @id @default(autoincrement())
+  uniqueKey     String   @unique @map("unique_key") @db.VarChar(255)
+  mintAddress   String   @unique @map("mint_address") @db.VarChar(255)
+  metadata      String   @db.Text
+  productId     String   @map("product_id") @db.VarChar(255)
+  userId        Int      @map("user_id")
+  walletAddress String   @map("wallet_address") @db.VarChar(255)
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([walletAddress])
+  @@map("nfts")
 }
