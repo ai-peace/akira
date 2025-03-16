@@ -46,6 +46,7 @@ const Component: FC<Props> = ({ promptGroupUniqueKey }) => {
                 key={prompt.uniqueKey}
                 products={prompt.result?.data}
                 chatUniqueKey={promptGroup?.chatUniqueKey}
+                promptGroupUniqueKey={promptGroupUniqueKey}
               />
             )}
           </div>

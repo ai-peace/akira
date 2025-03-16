@@ -15,7 +15,11 @@ const Component: FC<Props> = ({ products, displayCount, promptGroupUniqueKey }) 
     <>
       <div className="grid w-full grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4">
         {products.slice(0, displayCount).map((product) => (
-          <OProductListItem key={product.itemCode} product={product} />
+          <OProductListItem
+            key={product.uniqueKey || product.itemCode}
+            product={product}
+            promptGroupUniqueKey={promptGroupUniqueKey}
+          />
         ))}
       </div>
       {promptGroupUniqueKey && (

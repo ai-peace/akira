@@ -8,6 +8,7 @@ import { MandarakeCrawlerTool } from '../server-service/tools/mandarake-crawler/
 import { TranslateToJapaneseTool } from '../server-service/tools/translate-to-japanese/index.tool'
 import { SurugayaCrawlerTool } from '../server-service/tools/surugaya-crawler/index.tool'
 import { logLLMCost } from '../server-lib/llm-cost-logger'
+import { generateUniqueKey } from '../server-lib/uuid'
 
 const execute = async (promptUniqueKey: string, query: string) => {
   // キーワードを日本語に変換
@@ -151,7 +152,9 @@ const parseResult = async (promptUniqueKey: string, result: any): Promise<Produc
     items = Array.isArray(parsed) ? parsed : parsed.items || []
 
     const transformedItems = items.map((item: any) => {
+      const itemCode = item.itemCode || item.url.split('itemCode=')[1]?.split('&')[0] || 'Unknown'
       return {
+        uniqueKey: generateUniqueKey(),
         title: item.title,
         price: item.price,
         priceWithTax: item.priceWithTax,
@@ -161,7 +164,7 @@ const parseResult = async (promptUniqueKey: string, result: any): Promise<Produc
         imageUrl: item.imageUrl,
         url: item.url,
         status: item.status || 'Unknown',
-        itemCode: item.itemCode || item.url.split('itemCode=')[1]?.split('&')[0] || 'Unknown',
+        itemCode,
         shopName: item.shopName,
         shopIconUrl: item.shopIconUrl,
       }

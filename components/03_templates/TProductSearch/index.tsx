@@ -7,9 +7,10 @@ import Link from 'next/link'
 type Props = {
   products: ProductEntity[]
   chatUniqueKey: string
+  promptGroupUniqueKey?: string
 }
 
-const Component: FC<Props> = ({ products, chatUniqueKey }) => {
+const Component: FC<Props> = ({ products, chatUniqueKey, promptGroupUniqueKey }) => {
   const [searchTerm, setSearchTerm] = useState('')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
   const [activeTab, setActiveTab] = useState<string>('all')
@@ -151,6 +152,7 @@ const Component: FC<Props> = ({ products, chatUniqueKey }) => {
         <OProductListItemCollection
           products={filteredProducts}
           displayCount={filteredProducts.length}
+          promptGroupUniqueKey={promptGroupUniqueKey}
         />
       </div>
     </>

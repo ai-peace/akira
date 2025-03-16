@@ -5,16 +5,16 @@ import { useRouter } from 'next/navigation'
 
 type Props = {
   product: ProductEntity
+  promptGroupUniqueKey?: string
 }
 
-const Component: FC<Props> = ({ product }) => {
+const Component: FC<Props> = ({ product, promptGroupUniqueKey }) => {
   const router = useRouter()
 
   const handleProductClick = (e: React.MouseEvent) => {
     e.preventDefault()
-    // 商品データをURLパラメータとして渡す
-    const productData = encodeURIComponent(JSON.stringify(product))
-    router.push(`/products/${product.itemCode}?productData=${productData}`)
+    // 商品のuniqueKeyとpromptGroupUniqueKeyをURLパラメータとして渡す
+    router.push(`/products/${product.uniqueKey}?pgKey=${promptGroupUniqueKey || ''}`)
   }
 
   return (

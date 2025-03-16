@@ -3,31 +3,51 @@
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { ProductEntity } from '@/domains/entities/product.entity'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter, useParams, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { ArrowLeft, ShoppingCart } from 'lucide-react'
+import { usePromptGroup } from '@/hooks/resources/prompt-groups/usePromptGroup'
+import { LLMResponseEntity } from '@/domains/entities/llm-response.entity'
 
 export default function ProductDetailPage() {
   const router = useRouter()
+  const params = useParams()
   const searchParams = useSearchParams()
   const [product, setProduct] = useState<ProductEntity | null>(null)
   const [loading, setLoading] = useState(true)
 
+  // URLパラメータから情報を取得
+  const productUniqueKey = params.id as string
+  const promptGroupUniqueKey = searchParams.get('pgKey') || ''
+
+  // promptGroupのデータを取得
+  const { promptGroup, promptGroupIsLoading } = usePromptGroup({
+    uniqueKey: promptGroupUniqueKey,
+  })
+
   useEffect(() => {
+    if (promptGroupIsLoading || !promptGroup) return
+
     try {
-      // URLパラメータから商品情報を取得
-      const productData = searchParams.get('productData')
-      if (productData) {
-        setProduct(JSON.parse(decodeURIComponent(productData)))
+      // promptGroupからproductsを取得
+      const firstPrompt = promptGroup.prompts?.[0]
+      if (firstPrompt && firstPrompt.result && Array.isArray(firstPrompt.result.data)) {
+        // 商品データの配列から該当する商品を検索
+        const products = firstPrompt.result.data as ProductEntity[]
+        const foundProduct = products.find((p) => p.uniqueKey === productUniqueKey)
+
+        if (foundProduct) {
+          setProduct(foundProduct)
+        }
       }
     } catch (error) {
-      console.error('Failed to parse product data:', error)
+      console.error('Failed to find product data:', error)
     } finally {
       setLoading(false)
     }
-  }, [searchParams])
+  }, [promptGroup, productUniqueKey, promptGroupIsLoading])
 
-  if (loading) {
+  if (loading || promptGroupIsLoading) {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-gray-900"></div>

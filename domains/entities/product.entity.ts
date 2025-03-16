@@ -1,4 +1,5 @@
 export type ProductEntity = {
+  uniqueKey: string
   title: {
     en: string
     ja: string
