@@ -39,6 +39,14 @@ export function Providers({ children }: PropsWithChildren) {
         externalWallets: {
           solana: { connectors: solanaConnectors },
         },
+        embeddedWallets: {
+          ethereum: {
+            createOnLogin: 'off',
+          },
+          solana: {
+            createOnLogin: 'users-without-wallets', // defaults to 'off'
+          },
+        },
       }}
     >
       <PrivyCallback>

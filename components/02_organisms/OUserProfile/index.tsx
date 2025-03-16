@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useUserPrivate } from '@/hooks/resources/user-private/useUserPrivate'
+import { rootUrl } from '@/utils/url.helper'
 import { usePrivy } from '@privy-io/react-auth'
 import { Loader2, LogOut } from 'lucide-react'
 import { useState } from 'react'
@@ -52,9 +53,11 @@ const Component = () => {
   }
 
   const handleLogout = () => {
-    logout()
-    toast.info('Logged out', {
-      description: 'You have been logged out successfully.',
+    logout().then(() => {
+      toast.info('Logged out', {
+        description: 'You have been logged out successfully.',
+      })
+      window.location.href = rootUrl()
     })
   }
 

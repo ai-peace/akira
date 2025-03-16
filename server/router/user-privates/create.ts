@@ -9,6 +9,13 @@ import { UserPrivateEntity } from '@/domains/entities/user-private.entity'
 import { HcApiResponseType } from '@/domains/errors/hc-api.error'
 import { clientApplicationProperties } from '@/consts/client-application-properties'
 
+type LinkedAccount = {
+  type: string
+  chainType?: string
+  address?: string
+  walletClientType?: string
+}
+
 export const createUserPrivate = new Hono()
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -16,7 +23,6 @@ const route = createUserPrivate.post('/users', privyAuthMiddleware, async (c) =>
   try {
     const privyId = c.get('privyId')
     const privyUser = c.get('privyUser')
-    const walletAddress = c.get('walletAddress')
 
     const userCount = await prisma.user.count()
     if (userCount >= clientApplicationProperties.userRegistrationCap) {
@@ -37,6 +43,12 @@ const route = createUserPrivate.post('/users', privyAuthMiddleware, async (c) =>
     // ランダムなニックネームを生成
     const name = faker.internet.userName()
 
+    // Privyのウォレットアドレスを使用
+    const solanaSystemAccountAddresses = (privyUser.linkedAccounts as LinkedAccount[]).filter(
+      (account) => account.type === 'wallet' && account.chainType === 'solana',
+    )
+    const solanaSystemAccountAddress = solanaSystemAccountAddresses[0]?.address || ''
+
     const userPrivate = await prisma.user.create({
       data: {
         uniqueKey: generateUniqueKey(),
@@ -44,7 +56,7 @@ const route = createUserPrivate.post('/users', privyAuthMiddleware, async (c) =>
         loginMethod,
         privyId,
         name,
-        solanaSystemAccountAddress: walletAddress,
+        solanaSystemAccountAddress,
       },
     })
 
