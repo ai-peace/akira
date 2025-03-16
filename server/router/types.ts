@@ -9,6 +9,10 @@ import { InitializeUserPromptUsageRoute } from './user-prompt-usages/initialize'
 import { UpsertUserPromptUsageRoute } from './user-prompt-usages/upsert'
 import { GetPromptGroupRoute } from './prompt-groups/show'
 import { CreateWaitListRoute } from './wait-lists/create'
+import { CreateDepositRoute } from './deposits/create'
+import { MintNftRoute } from './nfts/mint'
+import { NftStatusRoute } from './nfts/status'
+import { ListNftsRoute } from './nfts/list'
 
 export type ApiRoutes =
   | CreateChatRoute
@@ -22,3 +26,7 @@ export type ApiRoutes =
   | UpsertUserPromptUsageRoute
   | GetPromptGroupRoute
   | CreateWaitListRoute
+  | CreateDepositRoute
+  | MintNftRoute
+  | NftStatusRoute
+  | ListNftsRoute

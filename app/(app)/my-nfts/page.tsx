@@ -7,6 +7,7 @@ import EDotFont from '@/components/01_elements/EDotFont'
 import { OWalletConnect } from '@/components/02_organisms/OWalletConnect'
 import Link from 'next/link'
 import { ExternalLink } from 'lucide-react'
+import { PrivyAccessTokenRepository } from '@/repository/privy-access-token.repository'
 
 // 直接定義
 const SOLANA_EXPLORER_URL = 'https://explorer.solana.com'
@@ -26,6 +27,7 @@ export default function MyNFTsPage() {
   const { publicKey } = useWallet()
   const [nfts, setNfts] = useState<NFT[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     if (authenticated && publicKey) {
@@ -37,11 +39,39 @@ export default function MyNFTsPage() {
 
   const fetchNFTs = async () => {
     try {
-      const response = await fetch(`/api/my-nfts?wallet=${publicKey?.toString()}`)
+      setError(null)
+
+      // Privyのアクセストークンを取得
+      console.log('Privyアクセストークンの取得を試みます...')
+      const accessToken = await PrivyAccessTokenRepository.get()
+      console.log(`アクセストークン取得結果: ${accessToken ? '成功' : '失敗'}`)
+
+      if (!accessToken) {
+        throw new Error('認証情報が取得できませんでした')
+      }
+
+      const response = await fetch('/api/my-nfts', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error?.message || 'NFTの取得に失敗しました')
+      }
+
       const data = await response.json()
-      setNfts(data.nfts || [])
-    } catch (error) {
-      console.error('NFT取得エラー:', error)
+      console.log('NFT取得結果:', data)
+
+      if (data.data && data.data.nfts) {
+        setNfts(data.data.nfts)
+      } else {
+        setNfts([])
+      }
+    } catch (err) {
+      console.error('NFT取得エラー:', err)
+      setError(err instanceof Error ? err.message : 'NFTの取得中にエラーが発生しました')
     } finally {
       setLoading(false)
     }
@@ -103,6 +133,22 @@ export default function MyNFTsPage() {
       {loading ? (
         <div className="flex h-40 items-center justify-center">
           <div className="h-12 w-12 animate-spin rounded-full border-4 border-accent-1 border-t-transparent"></div>
+        </div>
+      ) : error ? (
+        <div className="rounded-lg border-2 border-red-300 bg-red-50 p-8 text-center dark:border-red-800 dark:bg-red-950">
+          <EDotFont
+            text="Error loading NFTs"
+            className="text-lg text-red-600 dark:text-red-400"
+            animate={true}
+            speed={1}
+          />
+          <p className="mt-4 text-red-500 dark:text-red-300">{error}</p>
+          <button
+            onClick={fetchNFTs}
+            className="mt-4 rounded-lg border-2 border-accent-1 bg-accent-1 px-4 py-2 text-white hover:bg-accent-1/90"
+          >
+            <EDotFont text="Try Again" animate={true} speed={1} />
+          </button>
         </div>
       ) : nfts.length === 0 ? (
         <div className="rounded-lg border-2 p-8 text-center">

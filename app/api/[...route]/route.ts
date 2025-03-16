@@ -11,6 +11,10 @@ import { createWaitList } from '@/server/router/wait-lists/create'
 import { Hono } from 'hono'
 import { handle } from 'hono/vercel'
 import { getPromptGroup } from '@/server/router/prompt-groups/show'
+import { createDeposit } from '@/server/router/deposits/create'
+import { mintNft } from '@/server/router/nfts/mint'
+import { nftStatus } from '@/server/router/nfts/status'
+import { listNfts } from '@/server/router/nfts/list'
 
 const hono = new Hono().basePath('/api')
 
@@ -25,7 +29,10 @@ hono.route('/', initializeUserPromptUsage)
 hono.route('/', upsertUserPromptUsage)
 hono.route('/', getPromptGroup)
 hono.route('/', createWaitList)
-hono.route('/', createWaitList)
+hono.route('/', createDeposit)
+hono.route('/', mintNft)
+hono.route('/', nftStatus)
+hono.route('/', listNfts)
 
 export const GET = handle(hono)
 export const POST = handle(hono)

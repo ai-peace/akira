@@ -1,4 +1,4 @@
-import { FC, useState } from 'react'
+import { FC, useState, useEffect, useRef } from 'react'
 import { useWallet } from '@solana/wallet-adapter-react'
 import { usePrivy } from '@privy-io/react-auth'
 import { useRouter } from 'next/navigation'
@@ -7,9 +7,16 @@ import EDotFont from '@/components/01_elements/EDotFont'
 import { ExternalLink, X, ShoppingCart } from 'lucide-react'
 import { useDeposit } from '@/hooks/useDeposit'
 import { OWalletConnect } from '../OWalletConnect'
+import { PrivyAccessTokenRepository } from '@/repository/privy-access-token.repository'
 
 // デモモード用の固定SOL金額
 const DEMO_SOL_AMOUNT = 0.001
+
+// ポーリング間隔（ミリ秒）
+const POLLING_INTERVAL = 3000
+
+// タイムアウト時間（ミリ秒）
+const MINT_TIMEOUT = 60000
 
 type Props = {
   product: ProductEntity
@@ -27,6 +34,23 @@ const Component: FC<Props> = ({ product }) => {
   >('initial')
   const [error, setError] = useState<string | null>(null)
   const [mintAddress, setMintAddress] = useState<string | null>(null)
+  const [mintingProgress, setMintingProgress] = useState(0)
+
+  // タイマー参照用
+  const pollingTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const timeoutTimerRef = useRef<NodeJS.Timeout | null>(null)
+
+  // コンポーネントのクリーンアップ
+  useEffect(() => {
+    return () => {
+      if (pollingTimerRef.current) {
+        clearInterval(pollingTimerRef.current)
+      }
+      if (timeoutTimerRef.current) {
+        clearTimeout(timeoutTimerRef.current)
+      }
+    }
+  }, [])
 
   const handleClick = () => {
     if (!authenticated) {
@@ -65,40 +89,122 @@ const Component: FC<Props> = ({ product }) => {
     }
   }
 
+  // NFTのステータスをポーリングで確認する関数
+  const checkNftStatus = async (txSignature: string, accessToken: string) => {
+    try {
+      const response = await fetch(`/api/nft-status?signature=${txSignature}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      })
+
+      if (!response.ok) {
+        return null
+      }
+
+      const data = await response.json()
+      return data.data
+    } catch (err) {
+      console.error('NFTステータス確認エラー:', err)
+      return null
+    }
+  }
+
   const handleMintNFT = async () => {
     if (!publicKey) return
 
     setStep('minting')
+    setMintingProgress(0)
 
     try {
+      // Privyのアクセストークンを取得
+      console.log('Privyアクセストークンの取得を試みます...')
+      const accessToken = await PrivyAccessTokenRepository.get()
+      console.log(`アクセストークン取得結果: ${accessToken ? '成功' : '失敗'}`)
+
+      if (!accessToken) {
+        throw new Error('認証情報が取得できませんでした')
+      }
+
+      // タイムアウトタイマーを設定
+      timeoutTimerRef.current = setTimeout(() => {
+        if (step === 'minting') {
+          // ポーリングタイマーをクリア
+          if (pollingTimerRef.current) {
+            clearInterval(pollingTimerRef.current)
+            pollingTimerRef.current = null
+          }
+
+          setStep('error')
+          setError(
+            'NFTミントがタイムアウトしました。マイNFTページで確認するか、後でもう一度お試しください。',
+          )
+        }
+      }, MINT_TIMEOUT)
+
       const response = await fetch('/api/mint-nft', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
         body: JSON.stringify({
           productId: product.uniqueKey,
           walletAddress: publicKey.toString(),
         }),
       })
 
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error?.message || 'NFT発行に失敗しました')
+      }
+
       const data = await response.json()
 
-      if (data.success) {
-        setMintAddress(data.mintAddress)
+      if (data.data) {
+        // タイムアウトタイマーをクリア
+        if (timeoutTimerRef.current) {
+          clearTimeout(timeoutTimerRef.current)
+          timeoutTimerRef.current = null
+        }
+
+        setMintAddress(data.data.mintAddress)
         setStep('success')
       } else {
+        // ポーリングを開始する場合はここに実装
+        // 現在のAPIはポーリングをサポートしていないため、成功または失敗を即時に返す
         setStep('error')
-        setError(data.error || 'NFT発行に失敗しました')
+        setError('NFT発行に失敗しました')
       }
     } catch (err) {
+      console.error('NFT発行エラー:', err)
+
+      // タイムアウトタイマーをクリア
+      if (timeoutTimerRef.current) {
+        clearTimeout(timeoutTimerRef.current)
+        timeoutTimerRef.current = null
+      }
+
       setStep('error')
-      setError('サーバーエラーが発生しました')
+      setError(err instanceof Error ? err.message : 'サーバーエラーが発生しました')
     }
   }
 
   const handleClose = () => {
+    // タイマーをクリア
+    if (pollingTimerRef.current) {
+      clearInterval(pollingTimerRef.current)
+      pollingTimerRef.current = null
+    }
+    if (timeoutTimerRef.current) {
+      clearTimeout(timeoutTimerRef.current)
+      timeoutTimerRef.current = null
+    }
+
     setShowModal(false)
     setStep('initial')
     setError(null)
+    setMintingProgress(0)
   }
 
   const renderModalContent = () => {
@@ -273,7 +379,7 @@ const Component: FC<Props> = ({ product }) => {
               />
             </div>
 
-            <div className="mb-6 text-center">
+            <div className="mb-4 text-center">
               <EDotFont
                 text="Please wait while we mint your RWA NFT. This may take a few moments."
                 className="text-foreground"
@@ -283,8 +389,31 @@ const Component: FC<Props> = ({ product }) => {
               />
             </div>
 
-            <div className="mb-6 flex justify-center">
+            <div className="mb-2 flex justify-center">
               <div className="h-12 w-12 animate-spin rounded-full border-4 border-accent-1 border-t-transparent"></div>
+            </div>
+
+            <div className="mb-6 text-center text-sm text-foreground-muted">
+              {mintingProgress > 0 ? (
+                <p>Progress: {mintingProgress}%</p>
+              ) : (
+                <p>Initializing transaction...</p>
+              )}
+              <p className="mt-1 text-xs">
+                (This process may take up to 1 minute. Please do not close this window.)
+              </p>
+            </div>
+
+            <div className="text-center">
+              <button
+                onClick={() => {
+                  router.push('/my-nfts')
+                  handleClose()
+                }}
+                className="text-sm text-accent-1 hover:underline"
+              >
+                Check My NFTs page instead
+              </button>
             </div>
           </>
         )

@@ -4,6 +4,6 @@ export const SOLANA_RPC_ENDPOINT =
   process.env.NEXT_PUBLIC_SOLANA_RPC_ENDPOINT || 'https://api.devnet.solana.com'
 export const SOLANA_EXPLORER_URL = 'https://explorer.solana.com'
 
-// トレジャリーウォレット
+// トレジャリーウォレット（デモ用にシステムプログラムアドレスを使用）
 export const TREASURY_WALLET =
-  process.env.NEXT_PUBLIC_TREASURY_WALLET || '11111111111111111111111111111111'
+  process.env.NEXT_PUBLIC_TREASURY_WALLET || 'Gh9ZwEmdLJ8DscKNTkTqPbNwLNNBjuSzaG9Vp2KGtKJr'

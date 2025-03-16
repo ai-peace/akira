@@ -1,5 +1,5 @@
 import { Connection, Keypair, PublicKey } from '@solana/web3.js'
-import { Metaplex, keypairIdentity } from '@metaplex-foundation/js'
+import { Metaplex, keypairIdentity, CreateNftInput } from '@metaplex-foundation/js'
 import { ProductEntity } from '@/domains/entities/product.entity'
 
 type MintNFTResult = {
@@ -27,32 +27,31 @@ export async function mintNFT(
     // Metaplexインスタンスを初期化
     const metaplex = Metaplex.make(connection).use(keypairIdentity(keypair))
 
-    // NFTメタデータを作成
-    const { uri } = await metaplex.nfts().uploadMetadata({
-      name: product.title.en,
-      description: product.description || `RWA NFT for ${product.title.en}`,
-      image: product.imageUrl,
-      attributes: [
-        { trait_type: 'Shop', value: product.shopName },
-        { trait_type: 'Price', value: product.price.toString() },
-        { trait_type: 'Currency', value: product.currency },
-        { trait_type: 'Item Code', value: product.itemCode },
-        { trait_type: 'Status', value: product.status },
-      ],
-      properties: {
-        files: [{ uri: product.imageUrl, type: 'image/jpeg' }],
-      },
-    })
+    console.log('オンチェーンメタデータを使用してNFTを発行します')
 
-    // NFTを発行
-    const { nft } = await metaplex.nfts().create({
-      uri,
+    // デフォルトの画像URL
+    const defaultImageUrl = 'https://placehold.co/600x400?text=RWA+NFT'
+    const imageUrl = product.imageUrl || defaultImageUrl
+
+    // NFTを発行（オンチェーンメタデータを使用）
+    const nftInput: CreateNftInput = {
       name: product.title.en,
+      symbol: 'RWA',
+      uri: imageUrl, // 画像URLを直接使用
       sellerFeeBasisPoints: 500, // 5% royalty
       creators: [{ address: keypair.publicKey, share: 100 }],
-    })
+      isMutable: true,
+    }
+
+    console.log('NFT作成パラメータ:', JSON.stringify(nftInput, null, 2))
+
+    // NFTを発行
+    const { nft } = await metaplex.nfts().create(nftInput)
+
+    console.log(`NFT発行成功: ${nft.address.toString()}`)
 
     // NFTを送信
+    console.log(`NFTを${walletAddress.toString()}に転送します`)
     await metaplex.nfts().transfer({
       nftOrSft: nft,
       authority: keypair,
@@ -61,10 +60,24 @@ export async function mintNFT(
 
     console.log(`デモモード: NFTミント成功 - ${nft.address.toString()}`)
 
+    // メタデータ情報を作成（JSONとして）
+    const metadata = JSON.stringify({
+      name: product.title.en,
+      description: product.description || `RWA NFT for ${product.title.en}`,
+      image: imageUrl,
+      attributes: [
+        { trait_type: 'Shop', value: product.shopName },
+        { trait_type: 'Price', value: product.price.toString() },
+        { trait_type: 'Currency', value: product.currency },
+        { trait_type: 'Item Code', value: product.itemCode },
+        { trait_type: 'Status', value: product.status },
+      ],
+    })
+
     return {
       success: true,
       mintAddress: nft.address.toString(),
-      metadata: uri,
+      metadata: metadata,
     }
   } catch (error: any) {
     console.error('NFT発行エラー:', error)
