@@ -1,16 +1,16 @@
 'use client'
 
-import { useEffect, useState } from 'react'
-import { useWallet } from '@solana/wallet-adapter-react'
-import { usePrivy } from '@privy-io/react-auth'
 import EDotFont from '@/components/01_elements/EDotFont'
 import { OWalletConnect } from '@/components/02_organisms/OWalletConnect'
-import Link from 'next/link'
-import { ExternalLink } from 'lucide-react'
 import { useNfts } from '@/hooks/resources/nfts/useNfts'
+import { usePrivy } from '@privy-io/react-auth'
+import { useWallet } from '@solana/wallet-adapter-react'
+import { ExternalLink } from 'lucide-react'
+import Link from 'next/link'
+import { useEffect, useState } from 'react'
 
 // 直接定義
-const SOLANA_EXPLORER_URL = 'https://explorer.solana.com'
+const SOLANA_EXPLORER_URL = 'https://explorer.sonic.game'
 
 export default function MyNFTsPage() {
   const { authenticated } = usePrivy()
@@ -18,19 +18,16 @@ export default function MyNFTsPage() {
   const { nfts, nftsIsLoading, nftsError, refreshNfts } = useNfts()
   const [isClient, setIsClient] = useState(false)
 
-  // クライアントサイドレンダリングの確認
   useEffect(() => {
     setIsClient(true)
   }, [])
 
-  // ウォレット接続時にNFTを再取得
   useEffect(() => {
     if (authenticated && publicKey) {
       refreshNfts()
     }
   }, [authenticated, publicKey, refreshNfts])
 
-  // サーバーサイドレンダリング時はローディング表示
   if (!isClient) {
     return (
       <div className="flex h-full w-full flex-col overflow-y-auto p-4 md:p-4">
@@ -132,7 +129,6 @@ export default function MyNFTsPage() {
       ) : (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {nfts.map((nft) => {
-            // メタデータをパースして image URL を取得
             let metadataObj: any = {}
             try {
               metadataObj = JSON.parse(nft.metadata || '{}')
@@ -147,7 +143,6 @@ export default function MyNFTsPage() {
                 className="overflow-hidden rounded-lg border-2 bg-background-muted"
               >
                 <div className="p-4">
-                  {/* 画像URLがあれば表示 */}
                   {imageUrl && (
                     <div className="mb-4 flex items-center justify-center">
                       <img
@@ -177,7 +172,7 @@ export default function MyNFTsPage() {
                   <div className="flex justify-between">
                     {/* ExplorerのURLを「/address/〜」形式に修正 */}
                     <Link
-                      href={`${SOLANA_EXPLORER_URL}/address/${nft.mintAddress}?cluster=devnet`}
+                      href={`${SOLANA_EXPLORER_URL}/address/${nft.mintAddress}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="flex items-center text-accent-1 hover:underline"

@@ -9,7 +9,6 @@ type MintNFTResult = {
   error?: string
 }
 
-// 文字列を最大バイト数で切り詰める関数
 const truncateStringByBytes = (str: string, maxBytes: number): string => {
   if (!str) return ''
   const encoder = new TextEncoder()
@@ -28,9 +27,9 @@ const truncateStringByBytes = (str: string, maxBytes: number): string => {
 export async function mintNFT(
   connection: Connection,
   walletAddress: PublicKey,
-  adminKeypair: Uint8Array, // 管理者の秘密鍵（サーバーサイドのみ）
+  adminKeypair: Uint8Array,
   product: ProductEntity,
-  promptGroupUniqueKey?: string, // プロンプトグループのuniqueKey
+  promptGroupUniqueKey?: string,
 ): Promise<MintNFTResult> {
   try {
     console.log('デモモード: NFTミント処理を開始します')
@@ -40,56 +39,52 @@ export async function mintNFT(
       console.log(`プロンプトグループID: ${promptGroupUniqueKey}`)
     }
 
-    // 管理者のKeypairを作成
     const keypair = Keypair.fromSecretKey(adminKeypair)
 
-    // Metaplexインスタンスを初期化
     const metaplex = Metaplex.make(connection).use(keypairIdentity(keypair))
 
-    console.log('オンチェーンメタデータを使用してNFTを発行します')
+    console.log('オンチェーンメタデータを使用してNFTを発行')
 
     // デフォルトの画像URL
     const defaultImageUrl = 'https://placehold.co/600x400?text=RWA+NFT'
     const imageUrl = product.imageUrl || defaultImageUrl
 
-    // 名前を32バイトに制限（Solanaの制限は32バイト単位）
     const nftName = truncateStringByBytes(product.title.en, 32)
     console.log(`元の商品名: ${product.title.en}, 切り詰め後: ${nftName}`)
 
-    // NFTを発行（オンチェーンメタデータを使用）
     const nftInput: CreateNftInput = {
       name: nftName,
       symbol: 'RWA',
-      uri: imageUrl, // 画像URLを直接使用
-      sellerFeeBasisPoints: 500, // 5% royalty
+      uri: imageUrl,
+      sellerFeeBasisPoints: 500,
       creators: [{ address: keypair.publicKey, share: 100 }],
       isMutable: true,
     }
 
     console.log('NFT作成パラメータ:', JSON.stringify(nftInput, null, 2))
+    console.log('Creating NFT with parameters:', nftInput)
 
     // NFTを発行
-    const { nft } = await metaplex.nfts().create(nftInput)
+    const { nft, response } = await metaplex.nfts().create(
+      {
+        ...nftInput,
+        tokenOwner: walletAddress,
+      },
+      {
+        commitment: 'confirmed',
+      },
+    )
 
-    console.log(`NFT発行成功: ${nft.address.toString()}`)
+    await connection.confirmTransaction(response.signature, 'confirmed')
 
-    // NFTを送信
-    console.log(`NFTを${walletAddress.toString()}に転送します`)
-    await metaplex.nfts().transfer({
-      nftOrSft: nft,
-      authority: keypair,
-      toOwner: walletAddress,
-    })
+    console.log('NFT created with mint:', nft.address.toString())
+    console.log('Transaction signature:', response.signature)
 
-    console.log(`デモモード: NFTミント成功 - ${nft.address.toString()}`)
-
-    // 説明文も制限
     const description = truncateStringByBytes(
       product.description || `RWA NFT for ${product.title.en}`,
       200,
     )
 
-    // 属性値も制限
     const truncatedShopName = truncateStringByBytes(product.shopName, 50)
     const truncatedItemCode = truncateStringByBytes(product.itemCode, 50)
     const truncatedStatus = truncateStringByBytes(product.status, 50)
@@ -97,7 +92,6 @@ export async function mintNFT(
       ? truncateStringByBytes(promptGroupUniqueKey, 50)
       : null
 
-    // メタデータ情報を作成（JSONとして）
     const metadata = JSON.stringify({
       name: nftName,
       description: description,
@@ -112,7 +106,6 @@ export async function mintNFT(
           ? [{ trait_type: 'Prompt Group', value: truncatedPromptGroup }]
           : []),
       ],
-      // プロンプトグループ情報を追加
       promptGroup: truncatedPromptGroup || null,
     })
 
@@ -122,7 +115,10 @@ export async function mintNFT(
       metadata: metadata,
     }
   } catch (error: any) {
-    console.error('NFT発行エラー:', error)
+    console.error('Detailed error:', error)
+    if (error.logs) {
+      console.error('Transaction logs:', error.logs)
+    }
     return {
       success: false,
       mintAddress: '',
