@@ -68,7 +68,7 @@ const Component: FC = () => {
 
       <div className="absolute bottom-4 left-0 right-0 flex items-center justify-center">
         <EDotFont
-          text="AKIRA - Japanese Rare Item Search Agent "
+          text="AKIRA - AI Buyer for Rare RWA NFTs"
           className="font-[400] text-foreground-strong"
           animate={true}
           delay={200}
