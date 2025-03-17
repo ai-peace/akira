@@ -39,22 +39,3 @@ https://edge-akira.up.railway.app/
 #### 11.	The RWA is minted on the Sonic chain.
 <img width="500" alt="スクリーンショット 2025-03-18 2 51 57" src="https://github.com/user-attachments/assets/1e3c8aeb-7fe7-428f-8039-0f2a6360034e" />
 
-
-
-# Install and launch
-
-```
-pnpm install
-```
-
-```
-docker compose up
-```
-
-```
-cp .env.sample .env
-```
-
-```
-pnpm dev
-```
