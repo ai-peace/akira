@@ -10,7 +10,7 @@ import { OWalletConnect } from '../OWalletConnect'
 import { PrivyAccessTokenRepository } from '@/repository/privy-access-token.repository'
 
 // デモモード用の固定SOL金額
-const DEMO_SOL_AMOUNT = 0.001
+const DEMO_SOL_AMOUNT = 0.0005
 
 // ポーリング間隔（ミリ秒）
 const POLLING_INTERVAL = 3000
