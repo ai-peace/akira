@@ -4,7 +4,7 @@ import { usePrivy } from '@privy-io/react-auth'
 import { useRouter } from 'next/navigation'
 import { ProductEntity } from '@/domains/entities/product.entity'
 import EDotFont from '@/components/01_elements/EDotFont'
-import { ExternalLink, X, ShoppingCart } from 'lucide-react'
+import { ExternalLink, X, ShoppingCart, Orbit } from 'lucide-react'
 import { useDeposit } from '@/hooks/useDeposit'
 import { OWalletConnect } from '../OWalletConnect'
 import { PrivyAccessTokenRepository } from '@/repository/privy-access-token.repository'
@@ -517,7 +517,7 @@ const Component: FC<Props> = ({ product, promptGroupUniqueKey }) => {
       >
         <span className="mr-2 opacity-100">▶</span>
         <EDotFont text="Buy as RWA NFT" className="flex-1" animate={true} speed={1} delay={100} />
-        <ExternalLink className="ml-2 h-5 w-5" />
+        <Orbit className="ml-2 h-5 w-5" />
       </button>
 
       {/* モーダル */}

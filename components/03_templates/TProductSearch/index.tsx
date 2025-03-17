@@ -81,7 +81,7 @@ const Component: FC<Props> = ({ products, chatUniqueKey, promptGroupUniqueKey })
         </div>
 
         {/* Tab bar - scrollable container */}
-        <div className="relative w-full max-w-[100vw] border-b border-border md:mx-auto md:max-w-3xl">
+        {/* <div className="relative w-full max-w-[100vw] border-b border-border md:mx-auto md:max-w-3xl">
           <div
             className="-mb-[1px] overflow-x-auto overflow-y-hidden"
             style={{
@@ -145,7 +145,7 @@ const Component: FC<Props> = ({ products, chatUniqueKey, promptGroupUniqueKey })
               })}
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
 
       <div className="mx-auto max-w-3xl p-2 md:p-4">

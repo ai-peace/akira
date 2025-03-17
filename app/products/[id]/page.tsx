@@ -5,7 +5,7 @@ import { Card } from '@/components/ui/card'
 import { ProductEntity } from '@/domains/entities/product.entity'
 import { useRouter, useParams, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { ArrowLeft, ShoppingCart, Share2, ExternalLink, Heart, X } from 'lucide-react'
+import { ArrowLeft, ShoppingCart, Share2, ExternalLink, Heart, X, Orbit } from 'lucide-react'
 import { usePromptGroup } from '@/hooks/resources/prompt-groups/usePromptGroup'
 import { LLMResponseEntity } from '@/domains/entities/llm-response.entity'
 import { OThemeChangeButton } from '@/components/02_organisms/OThemeChangeButton'
@@ -255,11 +255,9 @@ export default function ProductDetailPage() {
         <div className="container mx-auto pb-16">
           <div className="px-4 py-4">
             {/* Main Product Layout - Desktop: Image | Title+Info, Mobile: Stacked */}
-            <div className="flex flex-col gap-6 md:flex-row md:gap-4">
+            <div className="flex flex-col gap-4 md:flex-row md:gap-4">
               {/* Product Image with RPG Style Border - Left side on desktop, full width on mobile */}
-              <div
-                className={`relative flex items-center justify-center overflow-hidden rounded-lg bg-background-muted p-2 md:w-1/2`}
-              >
+              <div className="relative flex items-center justify-center overflow-hidden rounded-lg bg-background-muted p-2 md:w-1/2">
                 {product.imageUrl && (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -271,9 +269,9 @@ export default function ProductDetailPage() {
               </div>
 
               {/* Title and Info - Right side on desktop, below image on mobile */}
-              <div className="flex flex-col gap-4 md:w-1/2">
+              <div className="flex flex-col gap-4 md:w-1/2 md:gap-2">
                 {/* RPG Style Title Box */}
-                <div className="rounded-lg p-1 md:p-4">
+                <div className="rounded-lg p-1 md:px-4">
                   <div className="mb-2">
                     <EDotFont
                       text={product.title.en}
@@ -295,29 +293,27 @@ export default function ProductDetailPage() {
                   </div>
                 </div>
 
-                {/* Product Information */}
-                <div className={'flex flex-1 flex-col rounded-lg bg-background p-1 md:p-4'}>
-                  <div className="mb-4 flex items-center">
-                    {/* Shop Information */}
-                    <div className="flex items-center">
-                      {product.shopIconUrl && (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={product.shopIconUrl}
-                          alt={product.shopName}
-                          className="mr-2 h-5 w-5"
-                        />
-                      )}
-                      <EDotFont
-                        text={product.shopName || 'Unknown Shop'}
-                        className="text-sm text-foreground-muted"
-                        animate={true}
-                        speed={1}
-                        delay={20}
-                      />
-                    </div>
-                  </div>
+                {/* Favorite Button */}
+                <button
+                  className={`flex w-full items-center rounded-lg border-2 border-white/0 px-0 py-4 text-left md:px-4 ${
+                    hoverFavorite ? (isDarkMode ? 'bg-gray-800/50' : 'bg-gray-100/70') : ''
+                  }`}
+                  onClick={handleFavoriteClick}
+                  onMouseEnter={() => setHoverFavorite(true)}
+                  onMouseLeave={() => setHoverFavorite(false)}
+                >
+                  <Heart className="mr-2 h-5 w-5" />
+                  <EDotFont
+                    text="Add Favorite"
+                    className="flex-1"
+                    animate={true}
+                    speed={1}
+                    delay={100}
+                  />
+                </button>
 
+                {/* Product Information */}
+                <div className={'flex flex-1 flex-col rounded-lg bg-background p-1 md:px-4'}>
                   {/* Price */}
                   <div className="mb-6">
                     <div className="text-3xl font-bold text-accent-1">
@@ -394,30 +390,6 @@ export default function ProductDetailPage() {
                     </div>
 
                     <div className="mb-4 grid grid-cols-1 gap-2 md:grid-cols-2">
-                      {/* Favorite Button */}
-                      <button
-                        className={`flex w-full items-center rounded-lg border-2 ${
-                          isDarkMode ? 'border-white/60' : 'border-black/60'
-                        } px-4 py-3 text-left ${
-                          hoverFavorite ? (isDarkMode ? 'bg-gray-800/50' : 'bg-gray-100/70') : ''
-                        }`}
-                        onClick={handleFavoriteClick}
-                        onMouseEnter={() => setHoverFavorite(true)}
-                        onMouseLeave={() => setHoverFavorite(false)}
-                      >
-                        <span className={`mr-2 ${hoverFavorite ? 'opacity-100' : 'opacity-20'}`}>
-                          ▶
-                        </span>
-                        <EDotFont
-                          text="Add Favorite"
-                          className="flex-1"
-                          animate={true}
-                          speed={1}
-                          delay={100}
-                        />
-                        <Heart className="ml-2 h-5 w-5" />
-                      </button>
-
                       {/* Purchase Button */}
                       <button
                         className={`flex w-full items-center rounded-lg border-2 ${
@@ -434,7 +406,7 @@ export default function ProductDetailPage() {
                           ▶
                         </span>
                         <EDotFont
-                          text="Go to Purchase Page"
+                          text="Purchase"
                           className="flex-1"
                           animate={true}
                           speed={1}
@@ -442,18 +414,39 @@ export default function ProductDetailPage() {
                         />
                         <ShoppingCart className="ml-2 h-5 w-5" />
                       </button>
-                    </div>
-
-                    {/* RWA NFT Button - 別の行に配置 */}
-                    <div className="mb-4">
                       <ORwaNftButton
                         product={product}
                         promptGroupUniqueKey={promptGroupUniqueKey}
                       />
                     </div>
 
+                    {/* RWA NFT Button - 別の行に配置 */}
+                    <div className="mb-4">
+                      {/* View as RWA Button - Full width in the second row */}
+                      {/* <button
+                        className={`flex w-full items-center rounded-lg border-2 border-red-600 px-4 py-3 text-left ${
+                          hoverButton2 ? 'bg-red-700 text-white' : 'bg-red-600 text-white'
+                        }`}
+                        onClick={handleRwaClick}
+                        onMouseEnter={() => setHoverButton2(true)}
+                        onMouseLeave={() => setHoverButton2(false)}
+                      >
+                        <span className={`mr-2 ${hoverButton2 ? 'opacity-100' : 'opacity-20'}`}>
+                          ▶
+                        </span>
+                        <EDotFont
+                          text="Purchase as RWA"
+                          className="flex-1"
+                          animate={true}
+                          speed={1}
+                          delay={100}
+                        />
+                        <Orbit className="ml-2 h-5 w-5" />
+                      </button> */}
+                    </div>
+
                     {/* Blinking cursor at the end */}
-                    <div className="flex justify-end">
+                    <div className="flex justify-center md:justify-end">
                       <span className={`text-xl ${cursorVisible ? 'opacity-100' : 'opacity-0'}`}>
                         ▼
                       </span>
