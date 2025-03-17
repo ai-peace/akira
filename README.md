@@ -1,19 +1,19 @@
 # Demo
 
-https://jp-rare-items-production.up.railway.app/
+https://edge-akira.up.railway.app/
 
-# 起動
+# Install and launch
 
 ```
 pnpm install
 ```
+
 ```
 docker compose up
 ```
 
 ```
 cp .env.sample .env
-# 各種キーを設定
 ```
 
 ```
