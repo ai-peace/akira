@@ -349,7 +349,13 @@ export default function ProductDetailPage() {
                             : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100'
                       }`}
                     >
-                      <EDotFont text={product.status} animate={true} speed={1} delay={50} />
+                      <EDotFont
+                        // text={product.status === 'In Stock' ? 'In Stock' : 'Out of Stock'}
+                        text={'In Stock'}
+                        animate={true}
+                        speed={1}
+                        delay={50}
+                      />
                     </div>
                   </div>
 

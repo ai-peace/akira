@@ -53,7 +53,7 @@ const Component: FC<Props> = ({ product, promptGroupUniqueKey }) => {
               <div className="text-sm font-bold text-red-500">
                 ${Math.round(product.price / 150).toLocaleString()}
               </div>
-              <div
+              {/* <div
                 className={`text-xs ${
                   product.status === 'In Stock'
                     ? 'text-green-600'
@@ -63,7 +63,7 @@ const Component: FC<Props> = ({ product, promptGroupUniqueKey }) => {
                 }`}
               >
                 {product.status}
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
