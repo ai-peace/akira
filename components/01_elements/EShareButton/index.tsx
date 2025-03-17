@@ -12,7 +12,7 @@ export default function EShareButton({ className }: Props) {
   const [isOpen, setIsOpen] = useState(false)
 
   const shareUrl = typeof window !== 'undefined' ? window.location.href : ''
-  const shareTitle = 'AKIRA - SEARCH AI AGENT'
+  const shareTitle = 'AKIRA - AI Buyer for Rare RWA NFTs'
 
   const shareOptions = [
     {
