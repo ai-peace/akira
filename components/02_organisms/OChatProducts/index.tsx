@@ -1,5 +1,5 @@
 import { ProductEntity } from '@/domains/entities/product.entity'
-import { FC, useEffect, useState } from 'react'
+import { FC, useEffect, useMemo, useState } from 'react'
 import { OProductCarousel } from '../OProductCarousel'
 import { OProductListItemCollection } from '../OProductListItem/collection'
 
@@ -30,17 +30,26 @@ const Component: FC<Props> = ({ products, promptGroupUniqueKey }) => {
     }
   }, [])
 
+  // 商品をユニークIDでソート
+  const sortedProducts = useMemo(() => {
+    return [...products].sort((a, b) => {
+      const uniqueKeyA = a.uniqueKey || ''
+      const uniqueKeyB = b.uniqueKey || ''
+      return uniqueKeyA.localeCompare(uniqueKeyB)
+    })
+  }, [products])
+
   return (
     <>
       {isMobile ? (
         <OProductCarousel
-          products={products}
+          products={sortedProducts}
           displayCount={displayCount}
           promptGroupUniqueKey={promptGroupUniqueKey}
         />
       ) : (
         <OProductListItemCollection
-          products={products}
+          products={sortedProducts}
           displayCount={displayCount}
           promptGroupUniqueKey={promptGroupUniqueKey}
         />

@@ -1,7 +1,15 @@
 import { ProductEntity } from '@/domains/entities/product.entity'
 import { FC, useMemo, useState } from 'react'
 import { OProductListItemCollection } from '../../02_organisms/OProductListItem/collection'
-import { ArrowLeftIcon, ListFilter } from 'lucide-react'
+import {
+  ArrowLeftIcon,
+  ListFilter,
+  SortAsc,
+  SortDesc,
+  Shuffle,
+  Hash,
+  AlignJustify,
+} from 'lucide-react'
 import Link from 'next/link'
 
 type Props = {
@@ -10,8 +18,12 @@ type Props = {
   promptGroupUniqueKey?: string
 }
 
+// ソートタイプの定義
+type SortType = 'price' | 'itemCode' | 'random' | 'uniqueKey'
+
 const Component: FC<Props> = ({ products, chatUniqueKey, promptGroupUniqueKey }) => {
   const [searchTerm, setSearchTerm] = useState('')
+  const [sortType, setSortType] = useState<SortType>('price')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   const [activeTab, setActiveTab] = useState<string>('all')
 
@@ -33,30 +45,99 @@ const Component: FC<Props> = ({ products, chatUniqueKey, promptGroupUniqueKey })
   }, [products])
 
   const filteredProducts = useMemo(() => {
-    return products
-      .filter((product) => {
-        // Filter by search term
-        const matchesSearch =
-          searchTerm === '' ||
-          product.title.en.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          product.title.ja.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          product.description?.toLowerCase().includes(searchTerm.toLowerCase())
+    let filtered = products.filter((product) => {
+      // Filter by search term
+      const matchesSearch =
+        searchTerm === '' ||
+        product.title.en.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.title.ja.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        product.description?.toLowerCase().includes(searchTerm.toLowerCase())
 
-        // Filter by shop
-        const matchesShop =
-          activeTab === 'all' ||
-          product.shopName === activeTab ||
-          (activeTab === 'unknown' && !product.shopName)
+      // Filter by shop
+      const matchesShop =
+        activeTab === 'all' ||
+        product.shopName === activeTab ||
+        (activeTab === 'unknown' && !product.shopName)
 
-        return matchesSearch && matchesShop
+      return matchesSearch && matchesShop
+    })
+
+    // ソートタイプに応じてソート
+    if (sortType === 'random') {
+      // ランダムソート
+      return [...filtered].sort(() => Math.random() - 0.5)
+    } else {
+      // 価格、itemCode、またはuniqueKeyでソート
+      return filtered.sort((a, b) => {
+        if (sortType === 'price') {
+          // 価格順
+          const priceA = a.price || 0
+          const priceB = b.price || 0
+          return sortOrder === 'asc' ? priceA - priceB : priceB - priceA
+        } else if (sortType === 'itemCode') {
+          // itemCode順
+          const itemCodeA = a.itemCode || ''
+          const itemCodeB = b.itemCode || ''
+          return sortOrder === 'asc'
+            ? itemCodeA.localeCompare(itemCodeB)
+            : itemCodeB.localeCompare(itemCodeA)
+        } else {
+          // uniqueKey順（アルファベット順）
+          const uniqueKeyA = a.uniqueKey || ''
+          const uniqueKeyB = b.uniqueKey || ''
+          return sortOrder === 'asc'
+            ? uniqueKeyA.localeCompare(uniqueKeyB)
+            : uniqueKeyB.localeCompare(uniqueKeyA)
+        }
       })
-      .sort((a, b) => {
-        // Sort by price
-        const priceA = a.price || 0
-        const priceB = b.price || 0
-        return sortOrder === 'asc' ? priceA - priceB : priceB - priceA
-      })
-  }, [products, searchTerm, sortOrder, activeTab])
+    }
+  }, [products, searchTerm, sortType, sortOrder, activeTab])
+
+  // ソートタイプを切り替える関数
+  const toggleSortType = () => {
+    if (sortType === 'price') {
+      setSortType('itemCode')
+    } else if (sortType === 'itemCode') {
+      setSortType('uniqueKey')
+    } else if (sortType === 'uniqueKey') {
+      setSortType('random')
+    } else {
+      setSortType('price')
+    }
+  }
+
+  // ソートアイコンを取得する関数
+  const getSortIcon = () => {
+    if (sortType === 'price') {
+      return sortOrder === 'asc' ? (
+        <SortAsc className="h-4 w-4" />
+      ) : (
+        <SortDesc className="h-4 w-4" />
+      )
+    } else if (sortType === 'itemCode') {
+      return <Hash className="h-4 w-4" />
+    } else if (sortType === 'uniqueKey') {
+      return <AlignJustify className="h-4 w-4" />
+    } else {
+      return <Shuffle className="h-4 w-4" />
+    }
+  }
+
+  // ソートタイプの表示名を取得する関数
+  const getSortTypeName = () => {
+    switch (sortType) {
+      case 'price':
+        return '価格順'
+      case 'itemCode':
+        return '商品コード順'
+      case 'uniqueKey':
+        return 'ユニークID順'
+      case 'random':
+        return 'ランダム'
+      default:
+        return 'ソート'
+    }
+  }
 
   return (
     <>
@@ -73,11 +154,21 @@ const Component: FC<Props> = ({ products, chatUniqueKey, promptGroupUniqueKey })
             />
           </div>
           <button
-            onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+            onClick={toggleSortType}
             className="flex items-center gap-2 rounded-md border border-input bg-background px-3 py-2 text-foreground hover:bg-secondary"
+            title={`ソート: ${getSortTypeName()}`}
           >
-            <ListFilter className="h-4 w-4" />
+            {getSortIcon()}
           </button>
+          {sortType !== 'random' && (
+            <button
+              onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+              className="flex items-center gap-2 rounded-md border border-input bg-background px-3 py-2 text-foreground hover:bg-secondary"
+              title={`順序: ${sortOrder === 'asc' ? '昇順' : '降順'}`}
+            >
+              <ListFilter className="h-4 w-4" />
+            </button>
+          )}
         </div>
 
         {/* Tab bar - scrollable container */}
