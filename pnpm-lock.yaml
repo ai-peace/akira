@@ -203,6 +203,10 @@ importers:
       zod:
         specifier: ^3.24.1
         version: 3.24.1
+    optionalDependencies:
+      usb:
+        specifier: ^2.15.0
+        version: 2.15.0
     devDependencies:
       '@faker-js/faker':
         specifier: ^9.3.0
