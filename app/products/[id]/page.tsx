@@ -28,11 +28,13 @@ export default function ProductDetailPage() {
   const [cursorVisible, setCursorVisible] = useState(true)
   const [hoverButton1, setHoverButton1] = useState(false)
   const [hoverButton2, setHoverButton2] = useState(false)
+  const [hoverButton3, setHoverButton3] = useState(false)
   const [hoverFavorite, setHoverFavorite] = useState(false)
   const { theme } = useTheme()
   const isDarkMode = theme === 'dark'
   const [showModal, setShowModal] = useState(false)
   const [modalType, setModalType] = useState<'favorite' | 'rwa'>('favorite')
+  const [showFeatureModal, setShowFeatureModal] = useState(false)
 
   // Get information from URL parameters
   const productUniqueKey = params.id as string
@@ -389,7 +391,7 @@ export default function ProductDetailPage() {
                     </div>
 
                     <div className="mb-4 grid grid-cols-1 gap-2 md:grid-cols-2">
-                      {/* Purchase Button */}
+                      {/* Order Button */}
                       <button
                         className={`flex w-full items-center rounded-lg border-2 ${
                           isDarkMode ? 'border-white/60' : 'border-black/60'
@@ -397,7 +399,10 @@ export default function ProductDetailPage() {
                           hoverButton1 ? (isDarkMode ? 'bg-gray-800/50' : 'bg-gray-100/70') : ''
                         } ${product.status === 'Out of Stock' ? 'opacity-50' : ''}`}
                         disabled={product.status === 'Out of Stock'}
-                        onClick={() => window.open(product.url, '_blank')}
+                        onClick={(e) => {
+                          e.preventDefault()
+                          setShowFeatureModal(true)
+                        }}
                         onMouseEnter={() => setHoverButton1(true)}
                         onMouseLeave={() => setHoverButton1(false)}
                       >
@@ -405,7 +410,7 @@ export default function ProductDetailPage() {
                           ▶
                         </span>
                         <EDotFont
-                          text="Purchase"
+                          text="Order"
                           className="flex-1"
                           animate={true}
                           speed={1}
@@ -427,7 +432,7 @@ export default function ProductDetailPage() {
                           ▶
                         </span>
                         <EDotFont
-                          text="Purchase as RWA"
+                          text="Order as RWA"
                           className="flex-1"
                           animate={true}
                           speed={1}
@@ -517,6 +522,63 @@ export default function ProductDetailPage() {
               <button
                 onClick={() => {
                   setShowModal(false)
+                  router.push('/waitlists')
+                }}
+                className="w-full rounded-lg border-2 border-accent-1 bg-accent-1 px-4 py-2 text-white hover:bg-accent-1/90"
+              >
+                <EDotFont text="Join Waitlist" animate={true} speed={1} delay={100} />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 機能開発中モーダル */}
+      {showFeatureModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div
+            className={`relative mx-4 max-w-md rounded-lg border-2 ${isDarkMode ? 'border-white/60' : 'border-black/60'} bg-background p-6 shadow-lg`}
+          >
+            <button
+              onClick={() => setShowFeatureModal(false)}
+              className="absolute right-4 top-4 text-foreground hover:text-foreground-muted"
+            >
+              <X className="h-5 w-5" />
+            </button>
+
+            <div className="mb-4 text-center">
+              <EDotFont
+                text="Feature Under Construction"
+                className="text-xl font-bold text-foreground-strong"
+                animate={true}
+                speed={1}
+                delay={0}
+              />
+            </div>
+
+            <div className="mb-6 text-center">
+              <EDotFont
+                text="The ordering system is currently being developed. Our merchants are preparing their inventory for your future adventures."
+                className="text-foreground"
+                animate={true}
+                speed={1}
+                delay={50}
+              />
+            </div>
+
+            <div className="flex flex-col items-center justify-center gap-4 md:flex-row">
+              <button
+                onClick={() => setShowFeatureModal(false)}
+                className={`w-full rounded-lg border-2 ${
+                  isDarkMode ? 'border-white/60' : 'border-black/60'
+                } px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800`}
+              >
+                <EDotFont text="Close" animate={true} speed={1} delay={100} />
+              </button>
+
+              <button
+                onClick={() => {
+                  setShowFeatureModal(false)
                   router.push('/waitlists')
                 }}
                 className="w-full rounded-lg border-2 border-accent-1 bg-accent-1 px-4 py-2 text-white hover:bg-accent-1/90"
