@@ -65,11 +65,6 @@ const Component: FC<Props> = ({ product, promptGroupUniqueKey }) => {
                 {product.status}
               </div>
             </div>
-            <div className="mt-2 flex items-center">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={product.shopIconUrl} alt={product.shopName} width={16} height={16} />
-              <div className="ml-1 text-[10px] text-gray-500">{product.shopName}</div>
-            </div>
           </div>
         </div>
       </Card>
