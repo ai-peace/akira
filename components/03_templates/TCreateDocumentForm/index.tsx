@@ -1,17 +1,17 @@
 'use client'
 
 import ETypewriterText from '@/components/01_elements/ETypewriterText'
-import { ORecommendKeywordListItemCollection } from '@/components/02_organisms/ORecommendKeywordListItem/collection'
+import { ORecommendKeywordListItem } from '@/components/02_organisms/ORecommendKeywordListItem'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { RecommendKeywordEntity } from '@/domains/entities/recommend-keyword.entity'
+import { RecommendKeywordEntity, PriceRange } from '@/domains/entities/recommend-keyword.entity'
 import { recommendKeywords } from '@/domains/mocks/recommend-keywords'
 import { cn } from '@/lib/utils'
 import { PrivyAccessTokenRepository } from '@/repository/privy-access-token.repository'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { usePrivy } from '@privy-io/react-auth'
-import { ArrowUp, ChevronLeft, Loader2 } from 'lucide-react'
+import { ArrowUp, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react'
 import { FC, useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
@@ -132,6 +132,25 @@ const Component: FC<Props> = ({ onSubmit }) => {
         textareaElement.style.height = `${newHeight}px`
         setTextareaHeight(`${newHeight}px`)
       }
+      // 子キーワードクリック後、価格帯のみを表示
+      if (parentKeyword) {
+        setCurrentKeywords([])
+      }
+    }
+  }
+
+  const handlePriceRangeClick = (priceRange: PriceRange) => {
+    const currentPrompt = form.getValues('prompt')
+    const priceFilter = priceRange.label.en
+    const newPrompt = currentPrompt ? `${currentPrompt} ${priceFilter}` : priceFilter
+    form.setValue('prompt', newPrompt)
+    const textareaElement = document.querySelector('textarea')
+    if (textareaElement) {
+      textareaElement.style.height = 'auto'
+      const maxHeight = lineHeight * (isMobile ? 12 : 18)
+      const newHeight = Math.min(textareaElement.scrollHeight, maxHeight)
+      textareaElement.style.height = `${newHeight}px`
+      setTextareaHeight(`${newHeight}px`)
     }
   }
 
@@ -155,7 +174,7 @@ const Component: FC<Props> = ({ onSubmit }) => {
             onChange={(e) => {
               form.setValue('prompt', e.target.value)
               e.target.style.height = 'auto'
-              const maxHeight = lineHeight * (isMobile ? 12 : 18) // モバイルでは最大行数を減らす
+              const maxHeight = lineHeight * (isMobile ? 12 : 18)
               const newHeight = Math.min(e.target.scrollHeight, maxHeight)
               e.target.style.height = `${newHeight}px`
               setTextareaHeight(`${newHeight}px`)
@@ -168,12 +187,12 @@ const Component: FC<Props> = ({ onSubmit }) => {
                 parseInt(textareaHeight) >= lineHeight * (isMobile ? 12 : 18) ? 'auto' : 'hidden',
               lineHeight: `${lineHeight}px`,
               height: textareaHeight,
-              fontSize: isMobile ? '16px' : '', // iOSでの自動ズームを防止するために16px以上に設定
-              touchAction: 'manipulation', // タッチ操作の最適化
-              WebkitAppearance: 'none', // iOSのデフォルトスタイルを無効化
+              fontSize: isMobile ? '16px' : '',
+              touchAction: 'manipulation',
+              WebkitAppearance: 'none',
             }}
             disabled={isSubmitting}
-            data-lpignore="true" // LastPassなどのフォーム自動入力を無効化
+            data-lpignore="true"
           />
           {form.formState.errors.prompt && (
             <p className="mt-1 text-xs text-red-500 md:text-sm">
@@ -181,7 +200,6 @@ const Component: FC<Props> = ({ onSubmit }) => {
             </p>
           )}
 
-          {/* 下部のボタングループ */}
           <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between md:bottom-4 md:left-4 md:right-4">
             <div className="flex gap-2" />
 
@@ -202,24 +220,69 @@ const Component: FC<Props> = ({ onSubmit }) => {
 
         <div className="mt-4">
           {parentKeyword && (
-            <div className="mb-3 flex items-center justify-center">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleBackToParent}
-                className="flex items-center gap-1 text-xs"
-              >
-                <ChevronLeft size={14} />
-                <span>Go back to the main category</span>
-              </Button>
-            </div>
+            <>
+              {parentKeyword.priceRanges && currentKeywords.length === 0 ? (
+                <div className="flex flex-wrap justify-center gap-3">
+                  <ORecommendKeywordListItem
+                    keyword={{
+                      thumbnailUrl: '',
+                      value: { en: 'Back', ja: '戻る' },
+                      children: [],
+                    }}
+                    isSubmitting={isSubmitting}
+                    onClick={handleBackToParent}
+                  />
+                  {parentKeyword.priceRanges.map((priceRange) => (
+                    <ORecommendKeywordListItem
+                      key={priceRange.label.en}
+                      keyword={{
+                        thumbnailUrl: '',
+                        value: priceRange.label,
+                      }}
+                      isSubmitting={isSubmitting}
+                      onClick={() => handlePriceRangeClick(priceRange)}
+                    />
+                  ))}
+                </div>
+              ) : null}
+            </>
           )}
 
-          <ORecommendKeywordListItemCollection
-            keywords={currentKeywords}
-            isSubmitting={isSubmitting}
-            onClick={handleKeywordClick}
-          />
+          {currentKeywords.length > 0 && (
+            <div className="flex flex-wrap justify-center gap-3">
+              {parentKeyword && (
+                <ORecommendKeywordListItem
+                  keyword={{
+                    thumbnailUrl: '',
+                    value: { en: 'Back', ja: '戻る' },
+                    children: [],
+                  }}
+                  isSubmitting={isSubmitting}
+                  onClick={handleBackToParent}
+                />
+              )}
+              {currentKeywords.map((keyword, index) => (
+                <ORecommendKeywordListItem
+                  key={keyword.value.en}
+                  keyword={keyword}
+                  index={index}
+                  isSubmitting={isSubmitting}
+                  onClick={() => handleKeywordClick(keyword)}
+                />
+              ))}
+              {currentKeywords !== recommendKeywords && (
+                <ORecommendKeywordListItem
+                  keyword={{
+                    thumbnailUrl: '',
+                    value: { en: 'Next', ja: '次へ' },
+                    children: [],
+                  }}
+                  isSubmitting={isSubmitting}
+                  onClick={() => setCurrentKeywords([])}
+                />
+              )}
+            </div>
+          )}
         </div>
       </form>
     </>

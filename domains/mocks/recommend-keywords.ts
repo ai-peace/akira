@@ -1,4 +1,54 @@
-import { RecommendKeywordEntity, KeywordChild } from '../entities/recommend-keyword.entity'
+import {
+  RecommendKeywordEntity,
+  KeywordChild,
+  PriceRange,
+} from '../entities/recommend-keyword.entity'
+
+const commonPriceRanges: PriceRange[] = [
+  {
+    max: 100,
+    label: { en: 'Under $100', ja: '10,000円未満' },
+  },
+  {
+    min: 100,
+    max: 500,
+    label: { en: '$100 - $500', ja: '10,000円 - 50,000円' },
+  },
+  {
+    min: 500,
+    max: 1000,
+    label: { en: '$500 - $1,000', ja: '50,000円 - 100,000円' },
+  },
+  {
+    min: 1000,
+    max: 3000,
+    label: { en: '$1,000 - $3,000', ja: '10万円 - 30万円' },
+  },
+  {
+    min: 3000,
+    max: 5000,
+    label: { en: '$3,000 - $5,000', ja: '30万円 - 50万円' },
+  },
+  {
+    min: 5000,
+    max: 10000,
+    label: { en: '$5,000 - $10,000', ja: '50万円 - 100万円' },
+  },
+  {
+    min: 10000,
+    max: 100000,
+    label: { en: '$10,000 - $100,000', ja: '100万円 - 1,000万円' },
+  },
+  {
+    min: 100000,
+    max: 1000000,
+    label: { en: '$100,000 - $1,000,000', ja: '1,000万円 - 1億円' },
+  },
+  {
+    min: 1000000,
+    label: { en: 'Over $1,000,000', ja: '1億円以上' },
+  },
+]
 
 const recommendKeywords: RecommendKeywordEntity[] = [
   {
@@ -26,6 +76,7 @@ const recommendKeywords: RecommendKeywordEntity[] = [
         value: { en: 'movie items', ja: '映画グッズ' },
       },
     ],
+    priceRanges: commonPriceRanges,
   },
   {
     thumbnailUrl: '/images/keywords/one-piece-01.png',
@@ -52,6 +103,7 @@ const recommendKeywords: RecommendKeywordEntity[] = [
         value: { en: 'jump magazine', ja: 'ジャンプ雑誌' },
       },
     ],
+    priceRanges: commonPriceRanges,
   },
   {
     thumbnailUrl: '/images/keywords/dragon-ball-01.png',
@@ -78,6 +130,7 @@ const recommendKeywords: RecommendKeywordEntity[] = [
         value: { en: 'movie pamphlet', ja: '映画パンフレット' },
       },
     ],
+    priceRanges: commonPriceRanges,
   },
   {
     thumbnailUrl: '/images/keywords/yu-gi-oh-01.png',
@@ -104,6 +157,7 @@ const recommendKeywords: RecommendKeywordEntity[] = [
         value: { en: 'art book', ja: 'アートブック' },
       },
     ],
+    priceRanges: commonPriceRanges,
   },
   {
     thumbnailUrl: '/images/keywords/bearbrick-01.png',
@@ -130,6 +184,7 @@ const recommendKeywords: RecommendKeywordEntity[] = [
         value: { en: 'special editions', ja: '特別版' },
       },
     ],
+    priceRanges: commonPriceRanges,
   },
 ]
 
