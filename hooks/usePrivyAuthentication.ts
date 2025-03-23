@@ -74,9 +74,20 @@ export const usePrivyAuthentication = ({ redirectUrl }: Variables = {}) => {
     },
   })
 
+  // トークン期限切れを検知して自動的にログアウト
+  const handleTokenExpired = async () => {
+    await PrivyAccessTokenRepository.remove()
+    logout()
+    toast.error('Session expired', {
+      description: 'Please log in again to continue.',
+    })
+    router.push(rootUrl())
+  }
+
   return {
     login,
     ready,
     authenticated,
+    handleTokenExpired,
   }
 }

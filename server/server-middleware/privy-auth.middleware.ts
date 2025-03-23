@@ -42,8 +42,15 @@ export const privyAuthMiddleware = createMiddleware<{
       c.set('privyUser', privyUser)
       c.set('walletAddress', walletAddress)
       await next()
-    } catch (verifyError) {
+    } catch (verifyError: any) {
       console.error('Privy token verification error:', verifyError)
+
+      // JWTの期限切れエラーを具体的にハンドリング
+      if (verifyError.code === 'ERR_JWT_EXPIRED') {
+        return c.json<HcApiResponseType<never>>({ error: createHcApiError('TOKEN_EXPIRED') }, 401)
+      }
+
+      // その他の認証エラー
       return c.json<HcApiResponseType<never>>(
         { error: createHcApiError('VERIFICATION_ERROR') },
         401,

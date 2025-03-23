@@ -24,6 +24,7 @@ export const hcApiErrorCodes = {
   WAITLIST_REGISTRATION_ERROR: 'WAITLIST_REGISTRATION_ERROR',
   NOT_FOUND: 'NOT_FOUND',
   UNKNOWN_ERROR: 'UNKNOWN_ERROR',
+  TOKEN_EXPIRED: 'TOKEN_EXPIRED',
 } as const
 
 export const hcApiErrorMessages = {
@@ -43,7 +44,7 @@ export const hcApiErrorMessages = {
     en: () => 'Server error',
   },
   [hcApiErrorCodes.DAILY_PROMPT_USAGE_LIMIT_EXCEEDED]: {
-    en: () => 'Daily usage limit  xceeded',
+    en: () => 'Daily usage limit exceeded',
   },
   [hcApiErrorCodes.USER_REGISTRATION_CAP_EXCEEDED]: {
     en: () => 'User registration cap exceeded',
@@ -56,6 +57,9 @@ export const hcApiErrorMessages = {
   },
   [hcApiErrorCodes.UNKNOWN_ERROR]: {
     en: () => 'Unknown error',
+  },
+  [hcApiErrorCodes.TOKEN_EXPIRED]: {
+    en: () => 'Authentication token has expired. Please log in again.',
   },
 } as const
 
