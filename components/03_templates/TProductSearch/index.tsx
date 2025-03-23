@@ -1,11 +1,12 @@
 import { ProductEntity } from '@/domains/entities/product.entity'
-import { FC, useMemo, useState } from 'react'
+import { FC, useMemo, useState, useEffect } from 'react'
 import { OProductListItemCollection } from '../../02_organisms/OProductListItem/collection'
-import { Filter, ArrowUpDown } from 'lucide-react'
+import { Filter, ArrowUpDown, Check } from 'lucide-react'
 import Link from 'next/link'
 import { STOCK_STATUS, getStockStatusDisplay } from '@/domains/types/stock-status'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { StockFilterStatusRepository } from '@/repository/stock-filter-status.repository'
 
 type Props = {
   products: ProductEntity[]
@@ -17,35 +18,27 @@ const Component: FC<Props> = ({ products, chatUniqueKey, promptGroupUniqueKey })
   const [searchTerm, setSearchTerm] = useState('')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   const [activeTab, setActiveTab] = useState<string>('all')
-  const [stockFilter, setStockFilter] = useState<string>('all')
   const [open, setOpen] = useState(false)
 
-  const shops = useMemo(() => {
-    const shopSet = new Set<string>()
-    products.forEach((product) => {
-      shopSet.add(product.shopName || 'unknown')
-    })
-    return ['all', ...Array.from(shopSet)]
-  }, [products])
+  // Initialize with stored statuses
+  const [selectedStatuses, setSelectedStatuses] = useState<string[]>(() => {
+    return StockFilterStatusRepository.get()
+  })
+
+  // Save to storage whenever selectedStatuses changes
+  useEffect(() => {
+    StockFilterStatusRepository.set(selectedStatuses)
+  }, [selectedStatuses])
 
   const stockStatuses = useMemo(() => {
-    return ['all', ...Object.values(STOCK_STATUS)]
+    return Object.values(STOCK_STATUS)
   }, [])
 
   const stockCounts = useMemo(() => {
-    const counts: Record<string, number> = { all: products.length }
+    const counts: Record<string, number> = {}
     products.forEach((product) => {
       const status = product.status || STOCK_STATUS.UNKNOWN
       counts[status] = (counts[status] || 0) + 1
-    })
-    return counts
-  }, [products])
-
-  const shopCounts = useMemo(() => {
-    const counts: Record<string, number> = { all: products.length }
-    products.forEach((product) => {
-      const shop = product.shopName || 'unknown'
-      counts[shop] = (counts[shop] || 0) + 1
     })
     return counts
   }, [products])
@@ -66,11 +59,8 @@ const Component: FC<Props> = ({ products, chatUniqueKey, promptGroupUniqueKey })
           product.shopName === activeTab ||
           (activeTab === 'unknown' && !product.shopName)
 
-        // Filter by stock status
-        const matchesStock =
-          stockFilter === 'all' ||
-          product.status === stockFilter ||
-          (stockFilter === STOCK_STATUS.UNKNOWN && !product.status)
+        // Filter by stock status - show if status is in selectedStatuses
+        const matchesStock = selectedStatuses.includes(product.status || STOCK_STATUS.UNKNOWN)
 
         return matchesSearch && matchesShop && matchesStock
       })
@@ -80,12 +70,23 @@ const Component: FC<Props> = ({ products, chatUniqueKey, promptGroupUniqueKey })
         const priceB = b.price || 0
         return sortOrder === 'asc' ? priceA - priceB : priceB - priceA
       })
-  }, [products, searchTerm, sortOrder, activeTab, stockFilter])
+  }, [products, searchTerm, sortOrder, activeTab, selectedStatuses])
 
-  const selectedStatusLabel = useMemo(() => {
-    if (stockFilter === 'all') return 'All Status'
-    return getStockStatusDisplay(stockFilter)
-  }, [stockFilter])
+  const handleStatusToggle = (status: string) => {
+    setSelectedStatuses((prev) => {
+      if (prev.includes(status)) {
+        return prev.filter((s) => s !== status)
+      } else {
+        return [...prev, status]
+      }
+    })
+  }
+
+  const selectedStatusesLabel = useMemo(() => {
+    if (selectedStatuses.length === stockStatuses.length) return 'All Status'
+    if (selectedStatuses.length === 0) return 'No Status'
+    return `${selectedStatuses.length} Selected`
+  }, [selectedStatuses, stockStatuses])
 
   return (
     <>
@@ -113,33 +114,24 @@ const Component: FC<Props> = ({ products, chatUniqueKey, promptGroupUniqueKey })
                         </button>
                       </PopoverTrigger>
                       <PopoverContent className="w-56 p-2">
-                        <div className="space-y-1">
+                        <div className="space-y-2">
                           {stockStatuses.map((status) => {
-                            const statusLabel =
-                              status === 'all' ? 'All Status' : getStockStatusDisplay(status)
+                            const statusLabel = getStockStatusDisplay(status)
+                            const isSelected = selectedStatuses.includes(status)
 
                             return (
                               <button
                                 key={status}
-                                onClick={() => {
-                                  setStockFilter(status)
-                                  setOpen(false)
-                                }}
+                                onClick={() => handleStatusToggle(status)}
                                 className="flex w-full items-center justify-between rounded-md px-2 py-1.5 text-sm hover:bg-secondary"
                               >
                                 <div className="flex items-center gap-2">
-                                  <div className="flex h-4 w-4 items-center justify-center">
-                                    <div
-                                      className={`h-3 w-3 rounded-full border-2 ${
-                                        stockFilter === status
-                                          ? 'border-accent-2 bg-accent-2'
-                                          : 'border-input'
-                                      }`}
-                                    />
+                                  <div className="flex h-4 w-4 items-center justify-center rounded border border-input">
+                                    {isSelected && <Check className="h-3 w-3 text-accent-2" />}
                                   </div>
                                   <span>{statusLabel}</span>
                                   <span className="text-xs text-foreground-muted">
-                                    ({stockCounts[status]})
+                                    ({stockCounts[status] || 0})
                                   </span>
                                 </div>
                               </button>
@@ -151,7 +143,7 @@ const Component: FC<Props> = ({ products, chatUniqueKey, promptGroupUniqueKey })
                   </div>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Filter by: {selectedStatusLabel}</p>
+                  <p>Filter by: {selectedStatusesLabel}</p>
                 </TooltipContent>
               </Tooltip>
 
