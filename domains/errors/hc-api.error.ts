@@ -59,7 +59,7 @@ export const hcApiErrorMessages = {
     en: () => 'Unknown error',
   },
   [hcApiErrorCodes.TOKEN_EXPIRED]: {
-    en: () => 'Authentication token has expired. Please log in again.',
+    en: () => 'Authentication token has expired. Please log in or refresh the page.',
   },
 } as const
 

@@ -2,6 +2,7 @@ import { Card } from '@/components/ui/card'
 import { ProductEntity } from '@/domains/entities/product.entity'
 import { FC } from 'react'
 import { useRouter } from 'next/navigation'
+import { STOCK_STATUS, getStockStatusDisplay } from '@/domains/types/stock-status'
 
 type Props = {
   product: ProductEntity
@@ -54,17 +55,20 @@ const Component: FC<Props> = ({ product, promptGroupUniqueKey }) => {
                 ${Math.round(product.price / 150).toLocaleString()}
               </div>
               <div
-                className={`text-xs ${
-                  product.status === 'In Stock'
-                    ? 'text-green-600'
-                    : product.status === 'Out of Stock'
-                      ? 'text-red-600'
-                      : 'text-yellow-600'
+                className={`rounded-full px-2 py-0.5 text-[10px] ${
+                  product.status === STOCK_STATUS.AVAILABLE
+                    ? 'bg-green-100 text-green-700'
+                    : product.status === STOCK_STATUS.OUT_OF_STOCK
+                      ? 'bg-red-100 text-red-700'
+                      : 'bg-yellow-100 text-yellow-700'
                 }`}
               >
-                {product.status}
+                {getStockStatusDisplay(product.status, 'en')}
               </div>
             </div>
+          </div>
+          <div className="flex flex-col p-2">
+            <div className="text-xs">{product.shopName}</div>
           </div>
         </div>
       </Card>

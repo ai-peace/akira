@@ -9,6 +9,7 @@ import { TranslateToJapaneseTool } from '../server-service/tools/translate-to-ja
 import { SurugayaCrawlerTool } from '../server-service/tools/surugaya-crawler/index.tool'
 import { logLLMCost } from '../server-lib/llm-cost-logger'
 import { generateUniqueKey } from '../server-lib/uuid'
+import { STOCK_STATUS, StockStatus } from '@/domains/types/stock-status'
 
 const execute = async (promptUniqueKey: string, query: string) => {
   // キーワードを日本語に変換
@@ -152,6 +153,29 @@ const parseResult = async (promptUniqueKey: string, result: any): Promise<Produc
     items = Array.isArray(parsed) ? parsed : parsed.items || []
 
     const transformedItems = items.map((item: any) => {
+      let status: StockStatus = STOCK_STATUS.UNKNOWN
+      switch (item.status) {
+        case '在庫あり':
+          status = STOCK_STATUS.AVAILABLE
+          break
+        case '在庫あります':
+          status = STOCK_STATUS.AVAILABLE
+          break
+        case '在庫確認します':
+          status = STOCK_STATUS.REQUIRES_USER_CONFIRMATION
+          break
+        case '在庫あり':
+          status = STOCK_STATUS.AVAILABLE
+          break
+        case '在庫なし':
+          status = STOCK_STATUS.OUT_OF_STOCK
+        case '':
+          status = STOCK_STATUS.OUT_OF_STOCK
+          break
+        default:
+          status = STOCK_STATUS.UNKNOWN
+      }
+
       const itemCode = item.itemCode || item.url.split('itemCode=')[1]?.split('&')[0] || 'Unknown'
       return {
         uniqueKey: generateUniqueKey(),
@@ -163,7 +187,7 @@ const parseResult = async (promptUniqueKey: string, result: any): Promise<Produc
         description: `Available at: ${item.shopInfo}${item.priceRange ? ` ${item.priceRange}` : ''}`,
         imageUrl: item.imageUrl,
         url: item.url,
-        status: item.status || 'Unknown',
+        status,
         itemCode,
         shopName: item.shopName,
         shopIconUrl: item.shopIconUrl,

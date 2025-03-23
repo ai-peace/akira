@@ -1,3 +1,5 @@
+import { StockStatus } from '../types/stock-status'
+
 export type ProductEntity = {
   uniqueKey: string
   title: {
@@ -11,7 +13,7 @@ export type ProductEntity = {
   description?: string
   imageUrl?: string
   url?: string
-  status: string
+  status: StockStatus
   itemCode: string
   shopName: string
   shopIconUrl: string

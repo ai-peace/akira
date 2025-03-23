@@ -16,6 +16,7 @@ import EDotFont from '@/components/01_elements/EDotFont'
 import { Metadata } from 'next'
 import Head from 'next/head'
 import { useTheme } from 'next-themes'
+import { STOCK_STATUS, getStockStatusDisplay } from '@/domains/types/stock-status'
 
 export default function ProductDetailPage() {
   const router = useRouter()
@@ -341,14 +342,19 @@ export default function ProductDetailPage() {
                   <div className="mb-6">
                     <div
                       className={`inline-block rounded-full px-3 py-1 text-sm ${
-                        product.status === 'In Stock'
+                        product.status === STOCK_STATUS.AVAILABLE
                           ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100'
-                          : product.status === 'Out of Stock'
+                          : product.status === STOCK_STATUS.OUT_OF_STOCK
                             ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-100'
                             : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100'
                       }`}
                     >
-                      <EDotFont text={product.status} animate={true} speed={1} delay={50} />
+                      <EDotFont
+                        text={getStockStatusDisplay(product.status, 'en')}
+                        animate={true}
+                        speed={1}
+                        delay={50}
+                      />
                     </div>
                   </div>
 
@@ -397,8 +403,11 @@ export default function ProductDetailPage() {
                           isDarkMode ? 'border-white/60' : 'border-black/60'
                         } px-4 py-3 text-left ${
                           hoverButton1 ? (isDarkMode ? 'bg-gray-800/50' : 'bg-gray-100/70') : ''
-                        } ${product.status === 'Out of Stock' ? 'opacity-50' : ''}`}
-                        disabled={product.status === 'Out of Stock'}
+                        } ${product.status === STOCK_STATUS.OUT_OF_STOCK || product.status === STOCK_STATUS.UNKNOWN ? 'opacity-50' : ''}`}
+                        disabled={
+                          product.status === STOCK_STATUS.OUT_OF_STOCK ||
+                          product.status === STOCK_STATUS.UNKNOWN
+                        }
                         onClick={(e) => {
                           e.preventDefault()
                           setShowFeatureModal(true)
@@ -423,7 +432,11 @@ export default function ProductDetailPage() {
                       <button
                         className={`flex w-full items-center rounded-lg border-2 border-red-600 px-4 py-3 text-left ${
                           hoverButton2 ? 'bg-red-700 text-white' : 'bg-red-600 text-white'
-                        }`}
+                        } ${product.status === STOCK_STATUS.OUT_OF_STOCK || product.status === STOCK_STATUS.UNKNOWN ? 'opacity-50' : ''}`}
+                        disabled={
+                          product.status === STOCK_STATUS.OUT_OF_STOCK ||
+                          product.status === STOCK_STATUS.UNKNOWN
+                        }
                         onClick={handleRwaClick}
                         onMouseEnter={() => setHoverButton2(true)}
                         onMouseLeave={() => setHoverButton2(false)}

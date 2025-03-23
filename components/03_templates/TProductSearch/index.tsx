@@ -1,8 +1,11 @@
 import { ProductEntity } from '@/domains/entities/product.entity'
 import { FC, useMemo, useState } from 'react'
 import { OProductListItemCollection } from '../../02_organisms/OProductListItem/collection'
-import { ArrowLeftIcon, ListFilter } from 'lucide-react'
+import { Filter, ArrowUpDown } from 'lucide-react'
 import Link from 'next/link'
+import { STOCK_STATUS, getStockStatusDisplay } from '@/domains/types/stock-status'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 
 type Props = {
   products: ProductEntity[]
@@ -14,6 +17,8 @@ const Component: FC<Props> = ({ products, chatUniqueKey, promptGroupUniqueKey })
   const [searchTerm, setSearchTerm] = useState('')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   const [activeTab, setActiveTab] = useState<string>('all')
+  const [stockFilter, setStockFilter] = useState<string>('all')
+  const [open, setOpen] = useState(false)
 
   const shops = useMemo(() => {
     const shopSet = new Set<string>()
@@ -21,6 +26,19 @@ const Component: FC<Props> = ({ products, chatUniqueKey, promptGroupUniqueKey })
       shopSet.add(product.shopName || 'unknown')
     })
     return ['all', ...Array.from(shopSet)]
+  }, [products])
+
+  const stockStatuses = useMemo(() => {
+    return ['all', ...Object.values(STOCK_STATUS)]
+  }, [])
+
+  const stockCounts = useMemo(() => {
+    const counts: Record<string, number> = { all: products.length }
+    products.forEach((product) => {
+      const status = product.status || STOCK_STATUS.UNKNOWN
+      counts[status] = (counts[status] || 0) + 1
+    })
+    return counts
   }, [products])
 
   const shopCounts = useMemo(() => {
@@ -48,7 +66,13 @@ const Component: FC<Props> = ({ products, chatUniqueKey, promptGroupUniqueKey })
           product.shopName === activeTab ||
           (activeTab === 'unknown' && !product.shopName)
 
-        return matchesSearch && matchesShop
+        // Filter by stock status
+        const matchesStock =
+          stockFilter === 'all' ||
+          product.status === stockFilter ||
+          (stockFilter === STOCK_STATUS.UNKNOWN && !product.status)
+
+        return matchesSearch && matchesShop && matchesStock
       })
       .sort((a, b) => {
         // Sort by price
@@ -56,7 +80,12 @@ const Component: FC<Props> = ({ products, chatUniqueKey, promptGroupUniqueKey })
         const priceB = b.price || 0
         return sortOrder === 'asc' ? priceA - priceB : priceB - priceA
       })
-  }, [products, searchTerm, sortOrder, activeTab])
+  }, [products, searchTerm, sortOrder, activeTab, stockFilter])
+
+  const selectedStatusLabel = useMemo(() => {
+    if (stockFilter === 'all') return 'All Status'
+    return getStockStatusDisplay(stockFilter)
+  }, [stockFilter])
 
   return (
     <>
@@ -69,83 +98,79 @@ const Component: FC<Props> = ({ products, chatUniqueKey, promptGroupUniqueKey })
               placeholder="Search products..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full rounded-md border border-input bg-background px-2 py-1 text-foreground md:px-3 md:py-2"
+              className="h-10 w-full rounded-md border border-input bg-background px-3 text-foreground"
             />
           </div>
-          <button
-            onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-            className="flex items-center gap-2 rounded-md border border-input bg-background px-3 py-2 text-foreground hover:bg-secondary"
-          >
-            <ListFilter className="h-4 w-4" />
-          </button>
-        </div>
+          <div className="flex items-center gap-2">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div>
+                    <Popover open={open} onOpenChange={setOpen}>
+                      <PopoverTrigger asChild>
+                        <button className="flex h-10 w-10 items-center justify-center rounded-md border border-input bg-background hover:bg-secondary">
+                          <Filter className="h-4 w-4" />
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-56 p-2">
+                        <div className="space-y-1">
+                          {stockStatuses.map((status) => {
+                            const statusLabel =
+                              status === 'all' ? 'All Status' : getStockStatusDisplay(status)
 
-        {/* Tab bar - scrollable container */}
-        {/* <div className="relative w-full max-w-[100vw] border-b border-border md:mx-auto md:max-w-3xl">
-          <div
-            className="-mb-[1px] overflow-x-auto overflow-y-hidden"
-            style={{
-              scrollbarWidth: 'none',
-              msOverflowStyle: 'none',
-              WebkitOverflowScrolling: 'touch',
-              scrollSnapType: 'x proximity',
-            }}
-          >
-            <style jsx>{`
-              div::-webkit-scrollbar {
-                display: none;
-              }
-            `}</style>
-            <div className="flex whitespace-nowrap px-4">
-              {shops.map((shop) => {
-                // Get current shop icon URL
-                const shopIconUrl =
-                  shop === 'all' || shop === 'unknown'
-                    ? null
-                    : products.find((product) => product.shopName === shop)?.shopIconUrl
+                            return (
+                              <button
+                                key={status}
+                                onClick={() => {
+                                  setStockFilter(status)
+                                  setOpen(false)
+                                }}
+                                className="flex w-full items-center justify-between rounded-md px-2 py-1.5 text-sm hover:bg-secondary"
+                              >
+                                <div className="flex items-center gap-2">
+                                  <div className="flex h-4 w-4 items-center justify-center">
+                                    <div
+                                      className={`h-3 w-3 rounded-full border-2 ${
+                                        stockFilter === status
+                                          ? 'border-accent-2 bg-accent-2'
+                                          : 'border-input'
+                                      }`}
+                                    />
+                                  </div>
+                                  <span>{statusLabel}</span>
+                                  <span className="text-xs text-foreground-muted">
+                                    ({stockCounts[status]})
+                                  </span>
+                                </div>
+                              </button>
+                            )
+                          })}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Filter by: {selectedStatusLabel}</p>
+                </TooltipContent>
+              </Tooltip>
 
-                return (
+              <Tooltip>
+                <TooltipTrigger asChild>
                   <button
-                    key={shop}
-                    onClick={() => setActiveTab(shop)}
-                    className={`flex-shrink-0 border-b-2 px-4 py-2 text-sm transition-all duration-200 ${
-                      activeTab === shop
-                        ? 'border-accent-2 text-accent-2'
-                        : 'border-transparent text-foreground-muted hover:border-border-strong hover:text-foreground'
-                    }`}
-                    style={{
-                      marginBottom: '-1px',
-                      scrollSnapAlign: 'start',
-                    }}
+                    onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                    className="flex h-10 w-10 items-center justify-center rounded-md border border-input bg-background hover:bg-secondary"
                   >
-                    <div className="flex items-center gap-1 whitespace-nowrap">
-                      <div className="flex items-center">
-                        {shopIconUrl && (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={shopIconUrl}
-                            alt={shop}
-                            className="mr-1.5 h-4 w-4 rounded-full object-contain"
-                            onError={(e) => {
-                              // Hide on image load error
-                              e.currentTarget.style.display = 'none'
-                            }}
-                          />
-                        )}
-                        <span>{shop === 'unknown' ? 'Other' : shop === 'all' ? 'All' : shop}</span>
-                      </div>
-                      <span
-                        className={`text-xs ${activeTab === shop ? 'text-accent-2' : 'text-foreground-subtle'}`}
-                      >
-                        ({shopCounts[shop]})
-                      </span>
-                    </div>
+                    <ArrowUpDown className="h-4 w-4" />
                   </button>
-                )
-              })}
-            </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Sort by price ({sortOrder === 'asc' ? '安い順' : '高い順'})</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
-        </div> */}
+        </div>
       </div>
 
       <div className="mx-auto max-w-3xl p-2 md:p-4">
