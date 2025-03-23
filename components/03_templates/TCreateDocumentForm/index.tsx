@@ -105,14 +105,29 @@ const Component: FC<Props> = ({ onSubmit }) => {
 
   const handleKeywordClick = (keyword: RecommendKeywordEntity) => {
     if (keyword.children && keyword.children.length > 0) {
+      // 親キーワードをクリックした時
       setParentKeyword(keyword)
       setCurrentKeywords(keyword.children)
-    } else {
+      // 親キーワードを検索バーに入力
       form.setValue('prompt', keyword.value.en)
       const textareaElement = document.querySelector('textarea')
       if (textareaElement) {
         textareaElement.style.height = 'auto'
-        const maxHeight = lineHeight * (isMobile ? 12 : 18) // モバイルでは最大行数を減らす
+        const maxHeight = lineHeight * (isMobile ? 12 : 18)
+        const newHeight = Math.min(textareaElement.scrollHeight, maxHeight)
+        textareaElement.style.height = `${newHeight}px`
+        setTextareaHeight(`${newHeight}px`)
+      }
+    } else {
+      // 子キーワードをクリックした時
+      const fullKeyword = parentKeyword
+        ? `${parentKeyword.value.en} ${keyword.value.en}`.trim()
+        : keyword.value.en
+      form.setValue('prompt', fullKeyword)
+      const textareaElement = document.querySelector('textarea')
+      if (textareaElement) {
+        textareaElement.style.height = 'auto'
+        const maxHeight = lineHeight * (isMobile ? 12 : 18)
         const newHeight = Math.min(textareaElement.scrollHeight, maxHeight)
         textareaElement.style.height = `${newHeight}px`
         setTextareaHeight(`${newHeight}px`)

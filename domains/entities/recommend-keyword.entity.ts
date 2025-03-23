@@ -1,10 +1,20 @@
-type RecommendKeywordEntity = {
-  thumbnailUrl?: string
-  value: {
-    en: string
-    ja: string
-  }
-  children?: RecommendKeywordEntity[]
+export type MultiLangValue = {
+  en: string
+  ja: string
 }
 
-export type { RecommendKeywordEntity }
+export type KeywordChild = {
+  thumbnailUrl: string
+  value: MultiLangValue
+}
+
+export type RecommendKeywordEntity = {
+  thumbnailUrl: string
+  value: MultiLangValue
+  children?: KeywordChild[]
+}
+
+export type KeywordPath = {
+  parent?: RecommendKeywordEntity
+  current: RecommendKeywordEntity | KeywordChild
+}
