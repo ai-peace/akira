@@ -19,7 +19,8 @@ type Variables = {
 // ログインのcallbackが複数実行される
 export const usePrivyAuthentication = ({ redirectUrl }: Variables = {}) => {
   const { ready, authenticated } = usePrivy()
-  const { userPrivateMutate } = useUserPrivate()
+  const { userPrivate, userPrivateMutate } = useUserPrivate()
+
   const { chatsMutate } = useChats()
   const { userPromptUsageMutate } = useUserPromptUsage()
   const router = useRouter()
@@ -35,36 +36,50 @@ export const usePrivyAuthentication = ({ redirectUrl }: Variables = {}) => {
         return
       }
 
-      if (wasAlreadyAuthenticated) return
+      try {
+        let userPrivate = await userPrivateRepository.get(`${accessToken}`)
+        if (!userPrivate) {
+          try {
+            userPrivate = await userPrivateRepository.create(`${accessToken}`)
+          } catch (error) {
+            logout()
+            handleError(error, {
+              description:
+                'AKIRA has reached its user limit. Please register for the waitlist if you would like to join.',
+            })
+            router.push(getUsersLimitExceedUrl())
+            return
+          }
+        }
 
-      let userPrivate = await userPrivateRepository.get(`${accessToken}`)
-      if (!userPrivate) {
-        try {
-          userPrivate = await userPrivateRepository.create(`${accessToken}`)
-        } catch (error) {
-          logout()
-          handleError(error, {
-            description:
-              'AKIRA has reached its user limit. Please register for the waitlist if you would like to join.',
-          })
-          router.push(getUsersLimitExceedUrl())
+        userPrivateMutate(userPrivate)
+        if (wasAlreadyAuthenticated) return
+        chatsMutate()
+        userPromptUsageMutate()
+
+        const userPromptUsage = await userPromptUsageRepository.get(`${accessToken}`)
+        if (!userPromptUsage) {
+          router.push(errorUrl())
           return
         }
+
+        toast.success('Welcome back!', {
+          description: 'login success',
+        })
+      } catch (error: any) {
+        // トークン期限切れエラーの場合
+        if (error?.code === 'TOKEN_EXPIRED') {
+          await handleTokenExpired()
+          return
+        }
+
+        // その他のエラー
+        handleError(error, {
+          description: error?.message || 'An unexpected error occurred',
+        })
+        logout()
+        router.push(rootUrl())
       }
-
-      userPrivateMutate(userPrivate)
-      chatsMutate()
-      userPromptUsageMutate()
-
-      const userPromptUsage = await userPromptUsageRepository.get(`${accessToken}`)
-      if (!userPromptUsage) {
-        router.push(errorUrl())
-        return
-      }
-
-      toast.success('Welcome back!', {
-        description: 'login success',
-      })
     },
     onError: (error: any) => {
       console.error(error)
