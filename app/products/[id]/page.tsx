@@ -18,7 +18,7 @@ import Head from 'next/head'
 import { useTheme } from 'next-themes'
 import { STOCK_STATUS, getStockStatusDisplay } from '@/domains/types/stock-status'
 
-export default function ProductDetailPage() {
+export default function Page() {
   const router = useRouter()
   const params = useParams()
   const searchParams = useSearchParams()
@@ -38,8 +38,8 @@ export default function ProductDetailPage() {
   const [showFeatureModal, setShowFeatureModal] = useState(false)
 
   // Get information from URL parameters
-  const productUniqueKey = params.id as string
-  const promptGroupUniqueKey = searchParams.get('pgKey') || ''
+  const productUniqueKey = params?.id as string
+  const promptGroupUniqueKey = searchParams?.get('pgKey') || ''
 
   // Fetch promptGroup data
   const { promptGroup, promptGroupIsLoading } = usePromptGroup({
