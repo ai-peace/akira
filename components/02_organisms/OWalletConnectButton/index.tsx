@@ -21,7 +21,7 @@ const Component = ({ className }: Props) => {
           className,
         )}
         icon={<Loader2 className="mr-1 h-4 w-4 animate-spin" />}
-        text="Loging..."
+        text="Now Loading..."
       />
     )
   }
