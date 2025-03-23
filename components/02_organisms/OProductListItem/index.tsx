@@ -67,9 +67,9 @@ const Component: FC<Props> = ({ product, promptGroupUniqueKey }) => {
               </div>
             </div>
           </div>
-          <div className="flex flex-col p-2">
+          {/* <div className="flex flex-col p-2">
             <div className="text-xs">{product.shopName}</div>
-          </div>
+          </div> */}
         </div>
       </Card>
     </>
