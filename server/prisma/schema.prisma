@@ -1,0 +1,150 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int    @id @default(autoincrement())
+  uniqueKey String @map("unique_key") @db.VarChar(255)
+
+  privyId String @map("privy_id") @db.VarChar(255)
+
+  solanaSystemAccountAddress String? @map("solana_system_account_address") @db.VarChar(255)
+
+  name        String? @db.VarChar(255)
+  email       String? @db.VarChar(255)
+  loginMethod String  @map("login_method") @db.VarChar(255) //ログイン方法
+
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  chats            Chat[]
+  userPromptUsages UserPromptUsage[]
+
+  @@unique([uniqueKey])
+  @@unique([privyId])
+  @@index([uniqueKey], name: "users_unique_key")
+  @@index([privyId], name: "users_privyid_unique")
+  @@index([email])
+  @@map("users")
+}
+
+model UserPromptUsage {
+  id Int @id @default(autoincrement())
+
+  userId Int @map("user_id")
+
+  count Int      @default(0)
+  date  DateTime @db.Date
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@index([userId])
+  @@index([userId, date])
+  @@map("user_prompt_usage")
+}
+
+model Chat {
+  id        Int    @id @default(autoincrement()) @map("id")
+  uniqueKey String @map("unique_key")
+
+  userId Int? @map("user_id")
+
+  title      String? @map("title")
+  mdxContent String? @map("mdx_content") @db.Text
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  promptGroups PromptGroup[]
+  user         User?         @relation(fields: [userId], references: [id])
+
+  @@unique([uniqueKey])
+  @@index([uniqueKey])
+  @@map("chats")
+}
+
+model PromptGroup {
+  id        Int    @id @default(autoincrement()) @map("id")
+  uniqueKey String @map("unique_key")
+
+  chatId Int @map("chat_id")
+
+  question String @map("question") @db.Text
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  chat    Chat     @relation(fields: [chatId], references: [id])
+  prompts Prompt[]
+
+  @@unique([uniqueKey])
+  @@index([uniqueKey])
+  @@index([chatId])
+  @@map("prompt_groups")
+}
+
+model Prompt {
+  id        Int    @id @default(autoincrement()) @map("id")
+  uniqueKey String @map("unique_key")
+
+  promptGroupId Int?
+
+  order Int? @default(autoincrement()) @map("order")
+
+  result     Json?   @map("result")
+  resultType String? @map("result_type")
+
+  llmStatus         LlmStatus @default(IDLE) @map("llm_status")
+  llmStatusChangeAt DateTime? @default(now()) @map("llm_status_change_at")
+  llmError          String?   @map("llm_error") @db.Text
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  promptGroup PromptGroup? @relation(fields: [promptGroupId], references: [id])
+
+  @@unique([uniqueKey])
+  @@index([uniqueKey])
+  @@index([promptGroupId])
+  @@index([promptGroupId, order])
+  @@map("prompts")
+}
+
+model Waitlist {
+  id        Int    @id @default(autoincrement())
+  uniqueKey String @map("unique_key") @db.VarChar(255)
+
+  email  String         @db.VarChar(255)
+  status WaitListStatus @default(WAITING)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([uniqueKey])
+  @@unique([email])
+  @@index([email])
+  @@index([status])
+  @@map("waitlists")
+}
+
+enum LlmStatus {
+  IDLE
+  PROCESSING
+  SUCCESS
+  FAILED
+}
+
+enum WaitListStatus {
+  WAITING
+  INVITED
+  REGISTERED
+}

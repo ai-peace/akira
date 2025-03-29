@@ -1,0 +1,293 @@
+'use client'
+
+import {
+  PriceRange,
+  RecommendKeywordEntity,
+} from '@/common/domains/entities/recommend-keyword.entity'
+import { recommendKeywords } from '@/common/domains/mocks/recommend-keywords'
+import { ORecommendKeywordListItem } from '@/front/components/02_organisms/ORecommendKeywordListItem'
+import { Button } from '@/front/components/ui/button'
+import { Textarea } from '@/front/components/ui/textarea'
+import { PrivyAccessTokenRepository } from '@/front/repositories/privy-access-token.repository'
+import { cn } from '@/front/util/utils'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { usePrivy } from '@privy-io/react-auth'
+import { ArrowUp, Loader2 } from 'lucide-react'
+import { FC, useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+import * as z from 'zod'
+
+const topPageKeywords = [
+  'Jujutsu Kaisen', // 呪術廻戦
+  'One Piece', // ワンピース
+  'My Hero Academia', // 僕のヒーローアカデミア
+  'Chainsaw Man', // チェンソーマン
+  'Spy x Family', // スパイファミリー
+  'Demon Slayer: Kimetsu no Yaiba', // 鬼滅の刃
+  'Blue Lock', // ブルーロック（別誌だがアメリカで人気）
+  'Dr. Stone', // ドクターストーン
+  'Mashle: Magic and Muscles', // マッシュル-MASHLE-
+  'Undead Unluck', // アンデッドアンラック
+  'Kaiju No. 8', // 怪獣8号
+  'Mission: Yozakura Family', // 夜桜さんちの大作戦
+  'Sakamoto Days', // サカモトデイズ
+  'Black Clover', // ブラッククローバー
+  'Dandadan', // ダンダダン（別誌だけど超人気）
+  'The Elusive Samurai', // 逃げ上手の若君
+  'Fabricant 100', // ファブリカント100
+  'Akane-banashi', // あかね噺
+  'Kill Blue', // キルブルー
+  'Cipher Academy', // 暗号学園のいろは
+]
+
+const formSchema = z.object({
+  prompt: z.string().min(1, 'プロンプトを入力してください'),
+})
+
+type FormData = z.infer<typeof formSchema>
+
+type Props = {
+  onSubmit: (prompt: string) => Promise<void>
+}
+
+const Component: FC<Props> = ({ onSubmit }) => {
+  const [textareaHeight, setTextareaHeight] = useState('auto')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [currentKeywords, setCurrentKeywords] =
+    useState<RecommendKeywordEntity[]>(recommendKeywords)
+  const [parentKeyword, setParentKeyword] = useState<RecommendKeywordEntity | null>(null)
+  const [isMobile, setIsMobile] = useState(false)
+  const lineHeight = isMobile ? 18 : 24 // モバイルでは行の高さを小さく
+  const { login } = usePrivy()
+
+  // 画面サイズの変更を検知
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 768) // 768px未満をモバイルとみなす
+    }
+
+    // 初期チェック
+    checkIfMobile()
+
+    // リサイズイベントのリスナーを追加
+    window.addEventListener('resize', checkIfMobile)
+
+    // クリーンアップ
+    return () => {
+      window.removeEventListener('resize', checkIfMobile)
+    }
+  }, [])
+
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      prompt: '',
+    },
+  })
+
+  const handleSubmit = async (data: FormData) => {
+    try {
+      const accessToken = await PrivyAccessTokenRepository.get()
+      if (!accessToken) {
+        login()
+        return
+      }
+      setIsSubmitting(true)
+      await onSubmit(data.prompt)
+      form.reset()
+      // 高さをリセット
+      setTextareaHeight('auto')
+    } catch (error) {
+      console.error(error)
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleKeywordClick = (keyword: RecommendKeywordEntity) => {
+    if (keyword.children && keyword.children.length > 0) {
+      // 親キーワードをクリックした時
+      setParentKeyword(keyword)
+      setCurrentKeywords(keyword.children)
+      // 親キーワードを検索バーに入力
+      form.setValue('prompt', keyword.value.en)
+      const textareaElement = document.querySelector('textarea')
+      if (textareaElement) {
+        textareaElement.style.height = 'auto'
+        const maxHeight = lineHeight * (isMobile ? 12 : 18)
+        const newHeight = Math.min(textareaElement.scrollHeight, maxHeight)
+        textareaElement.style.height = `${newHeight}px`
+        setTextareaHeight(`${newHeight}px`)
+      }
+    } else {
+      // 子キーワードをクリックした時
+      const fullKeyword = parentKeyword
+        ? `${parentKeyword.value.en} ${keyword.value.en}`.trim()
+        : keyword.value.en
+      form.setValue('prompt', fullKeyword)
+      const textareaElement = document.querySelector('textarea')
+      if (textareaElement) {
+        textareaElement.style.height = 'auto'
+        const maxHeight = lineHeight * (isMobile ? 12 : 18)
+        const newHeight = Math.min(textareaElement.scrollHeight, maxHeight)
+        textareaElement.style.height = `${newHeight}px`
+        setTextareaHeight(`${newHeight}px`)
+      }
+      // 子キーワードクリック後、価格帯のみを表示
+      if (parentKeyword) {
+        setCurrentKeywords([])
+      }
+    }
+  }
+
+  const handlePriceRangeClick = (priceRange: PriceRange) => {
+    const currentPrompt = form.getValues('prompt')
+    const priceFilter = priceRange.label.en
+    const newPrompt = currentPrompt ? `${currentPrompt} ${priceFilter}` : priceFilter
+    form.setValue('prompt', newPrompt)
+    const textareaElement = document.querySelector('textarea')
+    if (textareaElement) {
+      textareaElement.style.height = 'auto'
+      const maxHeight = lineHeight * (isMobile ? 12 : 18)
+      const newHeight = Math.min(textareaElement.scrollHeight, maxHeight)
+      textareaElement.style.height = `${newHeight}px`
+      setTextareaHeight(`${newHeight}px`)
+    }
+  }
+
+  const handleBackToParent = () => {
+    setParentKeyword(null)
+    setCurrentKeywords(recommendKeywords)
+  }
+
+  return (
+    <>
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="flex h-full flex-col">
+        <div
+          className={cn(
+            'border-border-muted bg-background-muted relative w-full flex-grow rounded-lg border p-2 md:p-4',
+            isSubmitting && 'opacity-20',
+          )}
+        >
+          <Textarea
+            {...form.register('prompt')}
+            placeholder="Dragon Ball cel animation"
+            onChange={(e) => {
+              form.setValue('prompt', e.target.value)
+              e.target.style.height = 'auto'
+              const maxHeight = lineHeight * (isMobile ? 12 : 18)
+              const newHeight = Math.min(e.target.scrollHeight, maxHeight)
+              e.target.style.height = `${newHeight}px`
+              setTextareaHeight(`${newHeight}px`)
+            }}
+            className={
+              'text-foreground-strong min-h-[24px] w-full resize-none border-0 bg-transparent p-1 pb-12 text-base shadow-none focus-visible:ring-0 md:text-lg'
+            }
+            style={{
+              overflow:
+                parseInt(textareaHeight) >= lineHeight * (isMobile ? 12 : 18) ? 'auto' : 'hidden',
+              lineHeight: `${lineHeight}px`,
+              height: textareaHeight,
+              fontSize: isMobile ? '16px' : '',
+              touchAction: 'manipulation',
+              WebkitAppearance: 'none',
+            }}
+            disabled={isSubmitting}
+            data-lpignore="true"
+          />
+          {form.formState.errors.prompt && (
+            <p className="mt-1 text-xs text-red-500 md:text-sm">
+              {form.formState.errors.prompt.message}
+            </p>
+          )}
+
+          <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between md:bottom-4 md:left-4 md:right-4">
+            <div className="flex gap-2" />
+
+            <div className="flex items-center gap-2">
+              <Button
+                type="submit"
+                className="h-8 w-8 rounded-lg bg-foreground p-1 hover:bg-foreground/80 md:h-auto md:w-auto md:px-4 md:py-2"
+              >
+                {isSubmitting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <ArrowUp className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-4">
+          {parentKeyword && (
+            <>
+              {parentKeyword.priceRanges && currentKeywords.length === 0 ? (
+                <div className="flex flex-wrap justify-center gap-3">
+                  <ORecommendKeywordListItem
+                    keyword={{
+                      thumbnailUrl: '',
+                      value: { en: 'Back', ja: '戻る' },
+                      children: [],
+                    }}
+                    isSubmitting={isSubmitting}
+                    onClick={handleBackToParent}
+                  />
+                  {parentKeyword.priceRanges.map((priceRange) => (
+                    <ORecommendKeywordListItem
+                      key={priceRange.label.en}
+                      keyword={{
+                        thumbnailUrl: '',
+                        value: priceRange.label,
+                      }}
+                      isSubmitting={isSubmitting}
+                      onClick={() => handlePriceRangeClick(priceRange)}
+                    />
+                  ))}
+                </div>
+              ) : null}
+            </>
+          )}
+
+          {currentKeywords.length > 0 && (
+            <div className="flex flex-wrap justify-center gap-3">
+              {parentKeyword && (
+                <ORecommendKeywordListItem
+                  keyword={{
+                    thumbnailUrl: '',
+                    value: { en: 'Back', ja: '戻る' },
+                    children: [],
+                  }}
+                  isSubmitting={isSubmitting}
+                  onClick={handleBackToParent}
+                />
+              )}
+              {currentKeywords.map((keyword, index) => (
+                <ORecommendKeywordListItem
+                  key={keyword.value.en}
+                  keyword={keyword}
+                  index={index}
+                  isSubmitting={isSubmitting}
+                  onClick={() => handleKeywordClick(keyword)}
+                />
+              ))}
+              {currentKeywords !== recommendKeywords && (
+                <ORecommendKeywordListItem
+                  keyword={{
+                    thumbnailUrl: '',
+                    value: { en: 'Next', ja: '次へ' },
+                    children: [],
+                  }}
+                  isSubmitting={isSubmitting}
+                  onClick={() => setCurrentKeywords([])}
+                />
+              )}
+            </div>
+          )}
+        </div>
+      </form>
+    </>
+  )
+}
+
+export { Component as TCreateDocumentForm }

@@ -1,0 +1,46 @@
+import { EDotButton } from '@/front/components/01_elements/EDotButton'
+import { cn } from '@/front/util/utils'
+import { usePrivy } from '@privy-io/react-auth'
+import { Loader2, WalletIcon } from 'lucide-react'
+
+type Props = {
+  className?: string
+}
+
+const Component = ({ className }: Props) => {
+  const { login, authenticated, ready } = usePrivy()
+
+  // Privyが準備できていない場合は工事中ダイアログを表示
+  if (!ready) {
+    return (
+      <EDotButton
+        className={cn(
+          'bg-background-soft h-12 w-full rounded-full border-foreground text-foreground shadow-none transition-colors hover:text-background',
+
+          className,
+        )}
+        icon={<Loader2 className="mr-1 h-4 w-4 animate-spin" />}
+        text="Now Loading..."
+      />
+    )
+  }
+
+  // ログイン済みの場合はログイン済みボタンを表示
+  if (authenticated) return null
+
+  // ログインボタンを表示
+  return (
+    <EDotButton
+      onClick={() => login()}
+      className={cn(
+        'bg-background-soft h-12 w-full rounded-full border-foreground text-foreground shadow-none transition-colors hover:text-background',
+
+        className,
+      )}
+      icon={<WalletIcon className="mr-1 h-4 w-4" />}
+      text="Login"
+    />
+  )
+}
+
+export { Component as OWalletConnectButton }

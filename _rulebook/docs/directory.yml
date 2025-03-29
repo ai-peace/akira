@@ -1,0 +1,182 @@
+# Root level configuration files
+- .env.sample # example for .env
+- .eslintrc.json # eslint config
+- .gitignore # git ignore
+- .prettierrc # prettier config
+- components.json # components.json
+- docker-compose.yml # docker-compose config
+- next-env.d.ts # next-env type definition
+- next.config.js # next.config config
+- package.json # package.json
+- pnpm-lock.yaml # pnpm lock file
+- postcss.config.js # postcss config
+- README.md # README
+- tailwind.config.js # tailwind config
+- tsconfig.json # tsconfig config
+
+# App directory - Next.js App Router
+app:
+  # App router for nextjs app
+  - layout.tsx # layout for app
+  - page.tsx # main page
+  (app): # main route for app
+  api:
+    [...route]: # API routes using Middleware Hono
+
+# Common directory - Shared domain models
+common:
+  # Shared domain models and entities
+  domains:
+    # Domain entities shared between client and server
+    - prompt.entity.ts # Prompt entity
+    - user.entity.ts # User entity
+
+# Front directory - Client-side code
+front:
+  # Client-side code and components
+  
+  api-client:
+    # API client for nextjs api server
+    - hc.api-client.ts # Hono client for API
+
+  components:
+    # UI components: reusable UI elements
+
+    01_elements:
+      # Domain independent components. They don't have domain knowledge, so they have props.
+      E{elementName}:
+        # E{elementName} is actual component name: e.g. EButton, EInput
+        - index.tsx # main component
+        - collection.tsx # collection of components
+
+    02_organisms:
+      # Domain dependent components. They have domain knowledge, so they don't have props.
+      O{organismName}:
+        # O{organismName} is actual component name: e.g. OBottomLoginButton, OChatBubbleProduct
+        - index.tsx # main component
+        - collection.tsx # collection of components
+
+    03_templates:
+      # Reuseable parts of screen. They are not full screen, but parts of screen.
+      T{templateName}:
+        # T{templateName} is actual template name: e.g. TChatMessageContent, TCreateDocumentForm, TLeftMenu, TProductSearch
+        - index.tsx # main component
+
+    04_screens:
+      # Full screen components. They are full screen, so they don't have props.
+      # Most of the time, they get data through `resource/hooks`.
+      S{screenName}:
+        # Example: SUserShowScreen
+        - index.tsx # main component
+
+    ui:
+      # Shadcn/ui components from shadcn/ui scaffold
+      - button.tsx # Button component
+      # (and more UI components)
+
+  consts:
+    # Constants for client application
+    - application-url.front-const.ts # Application URLs for client application
+    - application-properties.front-const.ts # Application properties for client application
+
+  hooks:
+    # Hooks for client application
+    resources:
+      # Resource hooks using SWR for entity management
+      # Provides automatic data fetching and caching for components
+      - useCreateUser.ts # Hook for creating users
+      - usePrompt.ts # Hook for prompt resources
+      - useUser.ts # Hook for user resources
+
+  lib:
+    # Library for client application
+    - utils.ts # Utility functions
+
+  repositories:
+    # Repositories for client application data access
+    - prompt.repository.ts # Repository for prompt entities
+    - user.repository.ts # Repository for user entities
+
+  styles:
+    # Styles for client application
+    - globals.css # Global CSS styles
+
+# Public directory - Static assets
+public:
+  # Public files for client application
+  - icon512_maskable.png # Maskable icon for PWA
+  - icon512_rounded.png # Rounded icon for PWA
+  - manifest.json # PWA manifest
+
+# Server directory - Backend logic and API implementation
+server:
+  # Server side logic and API implementation
+  
+  prisma:
+    # Prisma ORM configuration
+    - schema.prisma # Prisma schema definition
+    migrations:
+      # Database migrations
+      - migration_lock.toml # Migration lock file
+      20250220024428_initialize:
+        - migration.sql # Initial migration
+      20250220033010_revise:
+        - migration.sql # Revision migration
+
+  router:
+    # API router implementation using Hono
+    - types.ts # Type definitions for client-side using Hono
+    
+    prompts:
+      # Prompts resource endpoints
+      - show.ts # Show prompt endpoint
+    
+    users:
+      # Users resource endpoints
+      - create.ts # Create user endpoint
+      - show.ts # Show user endpoint
+      
+      prompts:
+        # User prompts nested resource
+        - create.ts # Create user prompt endpoint
+        
+        schema:
+          # Input schema definitions
+          - create.schema.ts # Create schema
+      
+      schema:
+        # Input schema definitions
+        - create.schema.ts # Create schema
+
+  server-const:
+    # Server-side constants and configurations
+    - appilication.server-const.ts # Application constants
+
+  server-lib:
+    # Server-side utility libraries
+    - prisma-service.util.ts # Prisma service utilities
+    - safe-structured-output-parser.ts # Output parser
+    - uuid.ts # UUID utilities
+
+  server-mappers:
+    # Data transformation logic between different layers
+    prompts:
+      # Prompt mappers
+      - index.mapper.ts # Prompt mapper
+    
+    users:
+      # User mappers
+      - index.mapper.ts # User mapper
+
+  server-service:
+    # Business logic implementation layer
+    conversation-agent:
+      # Conversation agent service
+      - index.tool.ts # Conversation agent tool
+      - prompt.ts # Prompt templates
+
+  server-usecase:
+    # Application use case implementations
+    - generate-user-response.usecase.ts # Generate user response use case
+
+
