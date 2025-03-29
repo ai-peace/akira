@@ -20,7 +20,8 @@ const sourcingWorkflow = new Workflow({
 /* prettier-ignore */
 sourcingWorkflow
   .step(translateStep)
-    .then(buildQueryMandarakeStep)
+  .after(translateStep)
+    .step(buildQueryMandarakeStep)
     .then(pageCrawlerMandarakeStep)
     .then(mapProductEntityMandarakeStep)
   .after(translateStep)

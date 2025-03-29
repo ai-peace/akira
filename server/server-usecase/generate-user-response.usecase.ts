@@ -7,6 +7,7 @@ import { UserPromptUsage } from '@prisma/client'
 import { userPromptUsageService } from '../server-service/user-prompt-usage.service'
 import { mandarakeWorkflow } from '../mastra/workflows/mandarake.workflow'
 import { mastra } from '../mastra'
+import { sourcingWorkflow } from '../mastra/workflows/sourcing.workflow'
 
 type LlmStatus = 'IDLE' | 'PROCESSING' | 'SUCCESS' | 'FAILED'
 const LlmStatus = {
@@ -74,7 +75,8 @@ const processConversation = async (promptUniqueKey: string, question: string) =>
     try {
       // 新しいAPIを使用: createRun() -> start()
       console.log('searching....')
-      const run = mandarakeWorkflow.createRun()
+      const run = sourcingWorkflow.createRun()
+      // const run = mandarakeWorkflow.createRun()
       const workflowResult = await run.start({
         triggerData: {
           input: question,

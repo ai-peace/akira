@@ -41,3 +41,4 @@ public/workbox-*.js.map
 tmp/
 
 .mastra/
+debug/
