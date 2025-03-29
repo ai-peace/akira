@@ -2,22 +2,31 @@ import { openai } from '@ai-sdk/openai'
 import { Agent } from '@mastra/core/agent'
 import { Step } from '@mastra/core/workflows'
 import { z } from 'zod'
+import { translateStep } from '../common/translate.step'
 
 const buildQueryStep = new Step({
   id: 'buildQueryStep',
+  inputSchema: z.object({
+    translatedKeyword: z.string(),
+  }),
   outputSchema: z.object({
     keyword: z.string(),
     options: z.record(z.string()),
   }),
   execute: async ({ context }) => {
     console.log('buildQueryStep', context)
-    const userInput = context.triggerData?.input
-    if (!userInput) throw new Error('User input is required')
+
+    // 前のステップの結果から翻訳されたキーワードを取得
+    const translatedResult = context.getStepResult(translateStep)
+    const translatedKeyword = translatedResult?.translatedKeyword
+
+    console.log('translatedKeyword', translatedKeyword)
+    if (!translatedKeyword) throw new Error('Translated keyword is required')
 
     const response = await buildQueryAgent.stream([
       {
         role: 'user',
-        content: userInput,
+        content: translatedKeyword,
       },
     ])
 
@@ -46,18 +55,23 @@ const buildQueryAgent = new Agent({
   instructions: `あなたはMandarakeの検索クエリを構築するアシスタントです。
 ユーザーの入力から検索キーワードとオプションを抽出し、適切な形式に整形してください。
 
+# 最重要指示
+**在庫状態は指定がない限り必ず「在庫ありのみ」（soldOut=1）を出力してください。**
+**ユーザーが明示的に「在庫なし含む」などと指定した場合のみ、soldOutパラメータを省略してください。**
+
 出力形式:
 {
   "keyword": "検索キーワード",
   "options": {
-    // URLクエリパラメータの形式で出力
+    "soldOut": "1", // ★重要: 指定がなければ必ず在庫ありのみ(soldOut=1)を設定
+    // その他URLクエリパラメータ
   }
 }
 
 オプションのルール:
-1. 在庫状態:
-   - デフォルト: "soldOut=1" (在庫ありのみ)
-   - 在庫なしを含む場合: パラメータなし
+1. 在庫状態 【最優先事項】:
+   - **デフォルト: "soldOut=1" (在庫ありのみ) ← 指定がなければ必ずこれを設定**
+   - 在庫なしを含む場合のみ: パラメータなし
 
 2. 表示順:
    - デフォルト: "sort=price&sortOrder=1" (価格が高い順)
@@ -84,6 +98,7 @@ const buildQueryAgent = new Agent({
 キーワードについて:
 - オプションに関連する単語（在庫、価格、表示順、カテゴリなど）は除外し、純粋な検索キーワードのみを抽出してください。
 
-ユーザーの入力を解析し、上記の形式で結果を出力してください。`,
+ユーザーの入力を解析し、上記の形式で結果を出力してください。最後にもう一度確認してください：
+**ユーザーが明示的に在庫なしを含むよう指定していない場合は、必ずsoldOut=1を設定すること。**`,
   model: openai('gpt-4o-mini'),
 })
