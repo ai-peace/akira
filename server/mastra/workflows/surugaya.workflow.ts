@@ -1,8 +1,8 @@
 import { Workflow } from '@mastra/core/workflows'
 import { z } from 'zod'
-import { buildQueryStep } from './surugaya/build-query.surugaya.step'
-import { pageCrawlerStep } from './surugaya/page-crawler.surugaya.step'
-import { mapProductEntityStep } from './surugaya/map-product-item.surugaya.step'
+import { buildQuerySurugayaStep } from './surugaya/build-query.surugaya.step'
+import { pageCrawlerSurugayaStep } from './surugaya/page-crawler.surugaya.step'
+import { mapProductEntitySurugayaStep } from './surugaya/map-product-item.surugaya.step'
 import { translateStep } from './common/translate.step'
 
 const surugayaWorkflow = new Workflow({
@@ -14,9 +14,9 @@ const surugayaWorkflow = new Workflow({
 
 surugayaWorkflow
   .step(translateStep)
-  .then(buildQueryStep)
-  .then(pageCrawlerStep)
-  .then(mapProductEntityStep)
+  .then(buildQuerySurugayaStep)
+  .then(pageCrawlerSurugayaStep)
+  .then(mapProductEntitySurugayaStep)
   .commit()
 
 export { surugayaWorkflow }

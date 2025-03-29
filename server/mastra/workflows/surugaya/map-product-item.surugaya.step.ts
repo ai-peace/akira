@@ -1,50 +1,52 @@
 import { Step } from '@mastra/core/workflows'
 import { z } from 'zod'
 import * as cheerio from 'cheerio'
-import { pageCrawlerStep } from './page-crawler.surugaya.step'
 import * as fs from 'fs'
 import * as path from 'path'
+import { pageCrawlerSurugayaStep } from './page-crawler.surugaya.step'
+import { STOCK_STATUS, StockStatus } from '@/common/domains/types/stock-status'
+import { generateUniqueKey } from '@/server/server-lib/uuid'
+import type { ProductEntity } from '@/common/domains/entities/product.entity'
 
-const productItemSchema = z.object({
+const productSchema = z.object({
+  uniqueKey: z.string(),
   title: z.object({
-    ja: z.string(),
     en: z.string(),
+    ja: z.string(),
   }),
   price: z.number(),
-  priceWithTax: z.number(),
-  url: z.string(),
-  imageUrl: z.string(),
-  status: z.string(),
-  condition: z.string(),
+  priceWithTax: z.number().optional(),
+  currency: z.string(),
+  condition: z.string().optional(),
+  description: z.string().optional(),
+  imageUrl: z.string().optional(),
+  url: z.string().optional(),
+  status: z.custom<StockStatus>(),
   itemCode: z.string(),
   shopName: z.string(),
   shopIconUrl: z.string(),
-  isNewArrival: z.boolean().optional(),
-  shopInfo: z.string().optional(),
-})
+}) satisfies z.ZodType<ProductEntity>
 
-type ProductItemEntity = z.infer<typeof productItemSchema>
-
-export const mapProductEntityStep = new Step({
-  id: 'mapProductEntityStep',
+export const mapProductEntitySurugayaStep = new Step({
+  id: 'mapProductEntitySurugayaStep',
   inputSchema: z.object({
     pages: z.array(z.string()),
   }),
   outputSchema: z.object({
-    products: z.array(productItemSchema),
+    products: z.array(productSchema),
   }),
   execute: async ({ context }) => {
-    const pages = context.getStepResult(pageCrawlerStep)?.pages
+    const pages = context.getStepResult(pageCrawlerSurugayaStep)?.pages
     if (!pages) {
       throw new Error('Failed to get pages')
     }
 
     console.log('Processing pages:', pages.length)
-    const products: ProductItemEntity[] = []
+    const products: ProductEntity[] = []
 
     for (const [index, page] of pages.entries()) {
       const $ = cheerio.load(page)
-      console.log('Processing page...', page)
+      console.log('Processing page...')
 
       // デバッグ用にHTMLを保存
       try {
@@ -98,10 +100,20 @@ export const mapProductEntityStep = new Step({
             ? imageUrl
             : `https://www.suruga-ya.jp${imageUrl}`
 
-          // 商品状態
-          const status =
+          // 商品状態のテキスト
+          const statusText =
             $item.find('.stock_status, .status_text').text().trim() ||
             ($item.find('.price').text().includes('品切れ') ? '品切れ' : '在庫あり')
+
+          // 在庫状態をStockStatusに変換
+          let status: StockStatus = STOCK_STATUS.UNKNOWN
+          if (statusText.includes('在庫あり') || statusText.includes('在庫あります')) {
+            status = STOCK_STATUS.AVAILABLE
+          } else if (statusText.includes('品切れ') || statusText.includes('在庫なし')) {
+            status = STOCK_STATUS.OUT_OF_STOCK
+          } else if (statusText.includes('確認')) {
+            status = STOCK_STATUS.REQUIRES_USER_CONFIRMATION
+          }
 
           // 商品の状態（コンディション）
           const condition = $item.find('.condition_text, .condition').text().trim() || '状態不明'
@@ -132,21 +144,22 @@ export const mapProductEntityStep = new Step({
           }
 
           products.push({
+            uniqueKey: generateUniqueKey(),
             title: {
               ja: jaTitle,
               en: jaTitle, // 英語タイトルは現時点では日本語と同じ
             },
             price,
             priceWithTax,
+            currency: 'JPY',
+            condition: condition || '',
+            description: shopInfo || '',
             url: fullUrl,
             imageUrl: fullImageUrl,
             status,
-            condition,
             itemCode,
             shopName: 'surugaya',
             shopIconUrl: 'https://www.suruga-ya.jp/favicon.ico',
-            isNewArrival,
-            shopInfo,
           })
         } catch (itemError) {
           console.error('Error parsing item data:', itemError)
@@ -154,8 +167,8 @@ export const mapProductEntityStep = new Step({
       })
     }
 
-    console.log(products, 'surugaya')
     console.log(`Extracted ${products.length} products from ${pages.length} pages`)
+    console.log(products, 'surugaya')
     return { products }
   },
 })

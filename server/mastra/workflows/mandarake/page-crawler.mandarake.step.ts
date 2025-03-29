@@ -2,14 +2,14 @@ import { openai } from '@ai-sdk/openai'
 import { Agent } from '@mastra/core/agent'
 import { Step } from '@mastra/core/workflows'
 import axios from 'axios'
+import * as cheerio from 'cheerio'
 import fs from 'fs'
 import path from 'path'
 import { z } from 'zod'
-import { buildQueryStep } from './build-query.mandarake.step'
-import * as cheerio from 'cheerio'
+import { buildQueryMandarakeStep } from './build-query.mandarake.step'
 
-const pageCrawlerStep = new Step({
-  id: 'pageCrawlerStep',
+const pageCrawlerMandarakeStep = new Step({
+  id: 'pageCrawlerMandarakeStep',
   inputSchema: z.object({
     keyword: z.string(),
     options: z.record(z.string()),
@@ -18,8 +18,8 @@ const pageCrawlerStep = new Step({
     pages: z.array(z.string()),
   }),
   execute: async ({ context }) => {
-    const keyword = context.getStepResult(buildQueryStep)?.keyword
-    const options = context.getStepResult(buildQueryStep)?.options
+    const keyword = context.getStepResult(buildQueryMandarakeStep)?.keyword
+    const options = context.getStepResult(buildQueryMandarakeStep)?.options
     if (!keyword || !options) {
       throw new Error('Failed to get keyword or options')
     }
@@ -108,7 +108,7 @@ const pageCrawlerStep = new Step({
   },
 })
 
-export { pageCrawlerStep }
+export { pageCrawlerMandarakeStep }
 
 const pageCrawlerAgent = new Agent({
   name: 'pageCrawlerAgent',

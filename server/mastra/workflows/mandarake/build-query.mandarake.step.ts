@@ -4,8 +4,8 @@ import { Step } from '@mastra/core/workflows'
 import { z } from 'zod'
 import { translateStep } from '../common/translate.step'
 
-const buildQueryStep = new Step({
-  id: 'buildQueryStep',
+const buildQueryMandarakeStep = new Step({
+  id: 'buildQueryMandarakeStep',
   inputSchema: z.object({
     translatedKeyword: z.string(),
   }),
@@ -16,7 +16,6 @@ const buildQueryStep = new Step({
   execute: async ({ context }) => {
     console.log('buildQueryStep', context)
 
-    // 前のステップの結果から翻訳されたキーワードを取得
     const translatedResult = context.getStepResult(translateStep)
     const translatedKeyword = translatedResult?.translatedKeyword
 
@@ -48,7 +47,7 @@ const buildQueryStep = new Step({
   },
 })
 
-export { buildQueryStep }
+export { buildQueryMandarakeStep }
 
 const buildQueryAgent = new Agent({
   name: 'buildQueryAgent',

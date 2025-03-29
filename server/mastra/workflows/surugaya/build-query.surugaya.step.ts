@@ -4,8 +4,8 @@ import { Agent } from '@mastra/core/agent'
 import { openai } from '@ai-sdk/openai'
 import { translateStep } from '../common/translate.step'
 
-const buildQueryStep = new Step({
-  id: 'buildQueryStep',
+const buildQuerySurugayaStep = new Step({
+  id: 'buildQuerySurugayaStep',
   inputSchema: z.object({
     translatedKeyword: z.string(),
   }),
@@ -48,7 +48,7 @@ const buildQueryStep = new Step({
   },
 })
 
-export { buildQueryStep }
+export { buildQuerySurugayaStep }
 
 const buildQueryAgent = new Agent({
   name: 'surugaya-query-builder',

@@ -1,11 +1,11 @@
 import { Step } from '@mastra/core/workflows'
 import { z } from 'zod'
-import { buildQueryStep } from './build-query.surugaya.step'
+import { buildQuerySurugayaStep } from './build-query.surugaya.step'
 import fs from 'fs'
 import path from 'path'
 import * as cheerio from 'cheerio'
 
-const pageCrawlerStep = new Step({
+const pageCrawlerSurugayaStep = new Step({
   id: 'pageCrawlerStep',
   inputSchema: z.object({
     keyword: z.string(),
@@ -15,8 +15,8 @@ const pageCrawlerStep = new Step({
     pages: z.array(z.string()),
   }),
   execute: async ({ context }) => {
-    const keyword = context.getStepResult(buildQueryStep)?.keyword
-    const options = context.getStepResult(buildQueryStep)?.options
+    const keyword = context.getStepResult(buildQuerySurugayaStep)?.keyword
+    const options = context.getStepResult(buildQuerySurugayaStep)?.options
     if (!keyword || !options) {
       throw new Error('Failed to get keyword or options')
     }
@@ -184,4 +184,4 @@ const pageCrawlerStep = new Step({
   },
 })
 
-export { pageCrawlerStep }
+export { pageCrawlerSurugayaStep }

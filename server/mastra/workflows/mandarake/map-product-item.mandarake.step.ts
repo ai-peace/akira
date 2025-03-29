@@ -3,8 +3,7 @@ import { STOCK_STATUS, StockStatus } from '@/common/domains/types/stock-status'
 import { Step } from '@mastra/core/workflows'
 import * as cheerio from 'cheerio'
 import { z } from 'zod'
-import { pageCrawlerStep } from './page-crawler.mandarake.step'
-import { prisma } from '@/server/server-lib/prisma'
+import { pageCrawlerMandarakeStep } from './page-crawler.mandarake.step'
 import { generateUniqueKey } from '@/server/server-lib/uuid'
 
 const productSchema = z.object({
@@ -26,8 +25,8 @@ const productSchema = z.object({
   shopIconUrl: z.string(),
 }) satisfies z.ZodType<ProductEntity>
 
-const mapProductEntityStep = new Step({
-  id: 'mapProductEntityStep',
+const mapProductEntityMandarakeStep = new Step({
+  id: 'mapProductEntityMandarakeStep',
   inputSchema: z.object({
     pages: z.array(z.string()),
   }),
@@ -35,7 +34,7 @@ const mapProductEntityStep = new Step({
     products: z.array(productSchema),
   }),
   execute: async ({ context }) => {
-    const pages = context.getStepResult(pageCrawlerStep)?.pages
+    const pages = context.getStepResult(pageCrawlerMandarakeStep)?.pages
     if (!pages) {
       throw new Error('Failed to get pages')
     }
@@ -129,25 +128,13 @@ const mapProductEntityStep = new Step({
     console.log(`Extracted ${products.length} products from ${pages.length} pages`)
     console.log(products, 'mandarake')
 
-    await prisma.prompt.update({
-      where: {
-        uniqueKey: context.triggerData?.promptUniqueKey,
-      },
-      data: {
-        result: {
-          message: getResultMessage(products),
-          data: products,
-          keywords: [],
-        },
-        llmStatus: 'SUCCESS',
-        resultType: products.length > 0 ? 'FOUND_PRODUCT_ITEMS' : 'NO_PRODUCT_ITEMS',
-      },
-    })
+    // データベース保存処理を削除しました
+
     return { products }
   },
 })
 
-export { mapProductEntityStep }
+export { mapProductEntityMandarakeStep }
 
 const getResultMessage = (products: ProductEntity[], isPartial: boolean = false) => {
   if (products.length === 0) {

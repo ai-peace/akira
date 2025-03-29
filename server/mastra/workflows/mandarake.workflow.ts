@@ -1,8 +1,8 @@
 import { Workflow } from '@mastra/core/workflows'
 import { z } from 'zod'
-import { buildQueryStep } from './mandarake/build-query.mandarake.step'
-import { mapProductEntityStep } from './mandarake/map-product-item.mandarake.step'
-import { pageCrawlerStep } from './mandarake/page-crawler.mandarake.step'
+import { buildQueryMandarakeStep } from './mandarake/build-query.mandarake.step'
+import { mapProductEntityMandarakeStep } from './mandarake/map-product-item.mandarake.step'
+import { pageCrawlerMandarakeStep } from './mandarake/page-crawler.mandarake.step'
 import { translateStep } from './common/translate.step'
 
 const mandarakeWorkflow = new Workflow({
@@ -15,9 +15,9 @@ const mandarakeWorkflow = new Workflow({
 
 mandarakeWorkflow
   .step(translateStep)
-  .then(buildQueryStep)
-  .then(pageCrawlerStep)
-  .then(mapProductEntityStep)
+  .then(buildQueryMandarakeStep)
+  .then(pageCrawlerMandarakeStep)
+  .then(mapProductEntityMandarakeStep)
   .commit()
 
 export { mandarakeWorkflow }
