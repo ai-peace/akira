@@ -24,7 +24,11 @@ const extractTagsStep = new Step({
       // プロンプトのuniqueKeyを取得
       const promptUniqueKey = context.triggerData?.promptUniqueKey
       if (!promptUniqueKey) {
-        throw new Error('Prompt unique key is required')
+        console.log('プロンプトのuniqueKeyが見つかりません')
+        return {
+          products: [],
+          tagsExtracted: false,
+        }
       }
 
       // 現在のプロンプト情報を取得
@@ -37,10 +41,34 @@ const extractTagsStep = new Step({
       const result = (currentPrompt?.result as any) || {}
       const products = result.data || []
 
-      if (products.length === 0) {
+      if (!products || products.length === 0) {
         console.log('タグ付けする商品がありません')
+
+        // 検索結果がない場合、NO_PRODUCT_ITEMSステータスを設定
+        try {
+          const updatedResult = {
+            data: [],
+            message: '検索条件に一致する商品は見つかりませんでした。',
+            keywords: [],
+            sourceSites: [],
+          }
+
+          await prisma.prompt.update({
+            where: { uniqueKey: promptUniqueKey },
+            data: {
+              result: updatedResult,
+              resultType: 'NO_PRODUCT_ITEMS',
+              llmStatus: 'SUCCESS',
+              llmStatusChangeAt: new Date(),
+            },
+          })
+          console.log('プロンプトのステータスを更新しました: NO_PRODUCT_ITEMS')
+        } catch (updateError) {
+          console.error('プロンプトステータスの更新中にエラーが発生しました:', updateError)
+        }
+
         return {
-          products,
+          products: [],
           tagsExtracted: false,
         }
       }
@@ -53,7 +81,32 @@ const extractTagsStep = new Step({
       const tagExtractorAgent = mastra.getAgent('tagExtractorAgent')
 
       if (!tagExtractorAgent) {
-        throw new Error('タグ抽出エージェントが見つかりません')
+        console.error('タグ抽出エージェントが見つかりません')
+        // エージェントが見つからない場合もデフォルトタグを使用
+        const updatedProducts = products.map((product: ProductEntity) => ({
+          ...product,
+          tags: ['その他'],
+        }))
+
+        // 更新した商品データを保存
+        const updatedResult = {
+          ...result,
+          data: updatedProducts,
+        }
+
+        await prisma.prompt.update({
+          where: { uniqueKey: promptUniqueKey },
+          data: {
+            result: updatedResult,
+            llmStatus: 'SUCCESS',
+            llmStatusChangeAt: new Date(),
+          },
+        })
+
+        return {
+          products: updatedProducts,
+          tagsExtracted: true,
+        }
       }
 
       // エージェントを使ってタグを抽出
@@ -97,7 +150,10 @@ const extractTagsStep = new Step({
           }
         }
 
-        return product
+        return {
+          ...product,
+          tags: ['その他'],
+        }
       })
 
       // 更新した商品データを保存
@@ -108,7 +164,11 @@ const extractTagsStep = new Step({
 
       await prisma.prompt.update({
         where: { uniqueKey: promptUniqueKey },
-        data: { result: updatedResult },
+        data: {
+          result: updatedResult,
+          llmStatus: 'SUCCESS',
+          llmStatusChangeAt: new Date(),
+        },
       })
 
       console.log('商品にタグを適用しました')
@@ -118,6 +178,23 @@ const extractTagsStep = new Step({
       }
     } catch (error) {
       console.error('タグ抽出中にエラーが発生しました:', error)
+
+      // エラーが発生した場合でもプロンプトのステータスを更新
+      try {
+        if (context.triggerData?.promptUniqueKey) {
+          await prisma.prompt.update({
+            where: { uniqueKey: context.triggerData.promptUniqueKey },
+            data: {
+              llmStatus: 'SUCCESS', // エラーでもSUCCESSにして続行させる
+              llmStatusChangeAt: new Date(),
+              llmError: error instanceof Error ? error.message : '不明なエラー',
+            },
+          })
+        }
+      } catch (updateError) {
+        console.error('エラー時のプロンプト更新に失敗:', updateError)
+      }
+
       return {
         products: [],
         tagsExtracted: false,
