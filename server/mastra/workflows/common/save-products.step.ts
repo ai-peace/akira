@@ -2,8 +2,8 @@ import { Step } from '@mastra/core/workflows'
 import { z } from 'zod'
 import { prisma } from '@/server/server-lib/prisma'
 import type { ProductEntity } from '@/common/domains/entities/product.entity'
-import { mapProductEntityMandarakeStep } from '../mandarake/map-product-item.mandarake.step'
-import { mapProductEntitySurugayaStep } from '../surugaya/map-product-item.surugaya.step'
+import { pageCrawlerMandarakeStep } from '../mandarake/page-crawler.mandarake.step'
+import { pageCrawlerSurugayaStep } from '../surugaya/page-crawler.surugaya.step'
 
 // 商品情報保存ステップ
 const saveProductsStep = new Step({
@@ -18,12 +18,12 @@ const saveProductsStep = new Step({
     console.log('保存ステップ開始')
 
     // マンダラケの結果を取得
-    const mandarakeResults = context.getStepResult(mapProductEntityMandarakeStep)
+    const mandarakeResults = context.getStepResult(pageCrawlerMandarakeStep)
     const mandarakeProducts = mandarakeResults?.products || []
     console.log(`マンダラケの商品数: ${mandarakeProducts.length}`)
 
     // 駿河屋の結果を取得
-    const surugayaResults = context.getStepResult(mapProductEntitySurugayaStep)
+    const surugayaResults = context.getStepResult(pageCrawlerSurugayaStep)
     const surugayaProducts = surugayaResults?.products || []
     console.log(`駿河屋の商品数: ${surugayaProducts.length}`)
 

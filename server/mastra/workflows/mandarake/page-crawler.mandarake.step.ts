@@ -1,12 +1,34 @@
 import { openai } from '@ai-sdk/openai'
 import { Agent } from '@mastra/core/agent'
 import { Step } from '@mastra/core/workflows'
+import type { ProductEntity } from '@/common/domains/entities/product.entity'
+import { STOCK_STATUS, StockStatus } from '@/common/domains/types/stock-status'
+import { generateUniqueKey } from '@/server/server-lib/uuid'
 import axios from 'axios'
 import * as cheerio from 'cheerio'
 import fs from 'fs'
 import path from 'path'
 import { z } from 'zod'
 import { buildQueryMandarakeStep } from './build-query.mandarake.step'
+
+const productSchema = z.object({
+  uniqueKey: z.string(),
+  title: z.object({
+    en: z.string(),
+    ja: z.string(),
+  }),
+  price: z.number(),
+  priceWithTax: z.number().optional(),
+  currency: z.string(),
+  condition: z.string().optional(),
+  description: z.string().optional(),
+  imageUrl: z.string().optional(),
+  url: z.string().optional(),
+  status: z.custom<StockStatus>(),
+  itemCode: z.string(),
+  shopName: z.string(),
+  shopIconUrl: z.string(),
+}) satisfies z.ZodType<ProductEntity>
 
 const pageCrawlerMandarakeStep = new Step({
   id: 'pageCrawlerMandarakeStep',
@@ -15,7 +37,7 @@ const pageCrawlerMandarakeStep = new Step({
     options: z.record(z.string()),
   }),
   outputSchema: z.object({
-    pages: z.array(z.string()),
+    products: z.array(productSchema),
   }),
   execute: async ({ context }) => {
     const keyword = context.getStepResult(buildQueryMandarakeStep)?.keyword
@@ -71,8 +93,10 @@ const pageCrawlerMandarakeStep = new Step({
         initialUrl.replace(/page=\d+/, `page=${i + 1}`),
       )
 
-      // URLからHTMLを取得して保存
-      const pages = await Promise.all(
+      const products: ProductEntity[] = []
+
+      // URLからHTMLを取得してProductEntityに変換
+      await Promise.all(
         urls.map(async (url: string, index: number) => {
           try {
             console.log(`Fetching URL: ${url}`)
@@ -89,17 +113,24 @@ const pageCrawlerMandarakeStep = new Step({
             fs.writeFileSync(filePath, html, 'utf-8')
             console.log(`Successfully saved HTML to: ${filePath}`)
 
-            return html
+            // HTMLからProductEntityに変換
+            const pageProducts = mapHtmlToProducts(html)
+            products.push(...pageProducts)
+
+            console.log(`Extracted ${pageProducts.length} products from page ${index + 1}`)
+            return pageProducts
           } catch (error) {
             console.error(`Failed to fetch ${url}:`, error)
-            return null
+            return []
           }
         }),
       )
 
-      console.log(`Total pages saved: ${pages.filter((p) => p !== null).length}`)
+      console.log(`Total products extracted: ${products.length}`)
+      console.log(products, 'mandarake')
+
       return {
-        pages: pages.filter((page): page is string => page !== null),
+        products,
       }
     } catch (e) {
       console.error('Error in page crawler:', e)
@@ -109,6 +140,91 @@ const pageCrawlerMandarakeStep = new Step({
 })
 
 export { pageCrawlerMandarakeStep }
+
+// HTMLをProductEntityに変換する関数
+const mapHtmlToProducts = (html: string): ProductEntity[] => {
+  const $ = cheerio.load(html)
+  const products: ProductEntity[] = []
+
+  $('.block').each((_, element) => {
+    try {
+      const $item = $(element)
+
+      // 商品情報を抽出
+      const jaTitle = $item.find('.title').text().trim()
+      const priceText = $item.find('.price').text().trim()
+
+      // 価格の解析
+      const basePrice = priceText.match(/^[\d,]+/)?.[0] || ''
+      const taxIncludedPrice = priceText.match(/\(税込\s*([\d,]+)円\)/)?.[1] || ''
+
+      const price = parseInt(basePrice.replace(/,/g, '')) || 0
+      const priceWithTax = parseInt(taxIncludedPrice.replace(/,/g, '')) || 0
+
+      if (!jaTitle || !price) {
+        console.log('Skipping item due to missing title or price:', { jaTitle, price })
+        return
+      } else {
+        console.log('Item:', { jaTitle, price })
+      }
+
+      const url = $item.find('.title a').attr('href') || ''
+      const imageUrl = $item.find('.thum img').attr('src') || ''
+      const statusText = $item.find('.stock').text().trim()
+      const shopInfo = $item.find('.shop').text().trim()
+      const itemCode = $item.find('.itemno').text().trim()
+      const priceRange = $item.find('.price_range').text().trim()
+
+      // 在庫状態の変換
+      let status: StockStatus = STOCK_STATUS.UNKNOWN
+
+      switch (statusText) {
+        case '在庫あり':
+          status = STOCK_STATUS.AVAILABLE
+          break
+        case '在庫あります':
+          status = STOCK_STATUS.AVAILABLE
+          break
+        case '在庫確認します':
+          status = STOCK_STATUS.REQUIRES_USER_CONFIRMATION
+          break
+        case '在庫なし':
+          status = STOCK_STATUS.OUT_OF_STOCK
+          break
+        case '':
+          status = STOCK_STATUS.OUT_OF_STOCK
+          break
+        default:
+          status = STOCK_STATUS.UNKNOWN
+      }
+
+      products.push({
+        uniqueKey: generateUniqueKey(),
+        title: {
+          en: jaTitle, // 英語タイトルは日本語と同じ
+          ja: jaTitle,
+        },
+        price,
+        priceWithTax,
+        currency: 'JPY',
+        condition: '',
+        description: priceRange,
+        url: url.startsWith('http') ? url : `https://order.mandarake.co.jp${url}`,
+        imageUrl: imageUrl.startsWith('http')
+          ? imageUrl
+          : `https://order.mandarake.co.jp${imageUrl}`,
+        status,
+        itemCode,
+        shopName: 'mandarake',
+        shopIconUrl: 'https://www.mandarake.co.jp/favicon.ico',
+      })
+    } catch (itemError) {
+      console.error('Error parsing item data:', itemError)
+    }
+  })
+
+  return products
+}
 
 const pageCrawlerAgent = new Agent({
   name: 'pageCrawlerAgent',
