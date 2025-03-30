@@ -2,6 +2,7 @@ import { Workflow } from '@mastra/core/workflows'
 import { z } from 'zod'
 import { saveProductsStep } from './common/save-products.step'
 import { translateStep } from './common/translate.step'
+import { extractTagsStep } from './common/extract-tags.step'
 import { buildQueryMandarakeStep } from './mandarake/build-query.mandarake.step'
 import { pageCrawlerMandarakeStep } from './mandarake/page-crawler.mandarake.step'
 import { buildQuerySurugayaStep } from './surugaya/build-query.surugaya.step'
@@ -26,6 +27,8 @@ sourcingWorkflow
     .then(pageCrawlerSurugayaStep)
   .step(saveProductsStep)
   .after([pageCrawlerMandarakeStep, pageCrawlerSurugayaStep])
+  .step(extractTagsStep)
+  .after(saveProductsStep)
   .commit()
 
 export { sourcingWorkflow }
