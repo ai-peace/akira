@@ -1,7 +1,7 @@
 import { ProductEntity } from '@/common/domains/entities/product.entity'
 import { FC, useMemo, useState, useEffect } from 'react'
 import { OProductListItemCollection } from '../../02_organisms/OProductListItem/collection'
-import { Filter, ArrowUpDown, Check, Loader2 } from 'lucide-react'
+import { Filter, ArrowUpDown, Check, Loader2, SearchX } from 'lucide-react'
 import Link from 'next/link'
 import { STOCK_STATUS, getStockStatusDisplay } from '@/common/domains/types/stock-status'
 import { Popover, PopoverContent, PopoverTrigger } from '@/front/components/ui/popover'
@@ -22,7 +22,7 @@ type Props = {
 }
 
 const Component: FC<Props> = ({
-  products,
+  products = [],
   chatUniqueKey,
   promptGroupUniqueKey,
   isTagsLoading = false,
@@ -134,6 +134,9 @@ const Component: FC<Props> = ({
     return `${selectedStatuses.length} Selected`
   }, [selectedStatuses, stockStatuses])
 
+  // 検索結果が0件かどうか
+  const hasNoResults = !isTagsLoading && (!products || products.length === 0)
+
   return (
     <>
       <div className="relative bg-background">
@@ -146,6 +149,7 @@ const Component: FC<Props> = ({
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="h-10 w-full rounded-md border border-input bg-background px-3 text-foreground"
+              disabled={hasNoResults}
             />
           </div>
           <div className="flex items-center gap-2">
@@ -155,7 +159,10 @@ const Component: FC<Props> = ({
                   <div>
                     <Popover open={open} onOpenChange={setOpen}>
                       <PopoverTrigger asChild>
-                        <button className="flex h-10 w-10 items-center justify-center rounded-md border border-input bg-background hover:bg-secondary">
+                        <button
+                          className="flex h-10 w-10 items-center justify-center rounded-md border border-input bg-background hover:bg-secondary"
+                          disabled={hasNoResults}
+                        >
                           <Filter className="h-4 w-4" />
                         </button>
                       </PopoverTrigger>
@@ -198,6 +205,7 @@ const Component: FC<Props> = ({
                   <button
                     onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
                     className="flex h-10 w-10 items-center justify-center rounded-md border border-input bg-background hover:bg-secondary"
+                    disabled={hasNoResults}
                   >
                     <ArrowUpDown className="h-4 w-4" />
                   </button>
@@ -251,11 +259,29 @@ const Component: FC<Props> = ({
       </div>
 
       <div className="mx-auto max-w-3xl p-2 md:p-4">
-        <OProductListItemCollection
-          products={filteredProducts}
-          displayCount={filteredProducts.length}
-          promptGroupUniqueKey={promptGroupUniqueKey}
-        />
+        {hasNoResults ? (
+          <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 py-12 text-center">
+            <SearchX className="mb-3 h-12 w-12 text-gray-400" />
+            <h3 className="mb-1 text-lg font-medium text-gray-900">検索結果がありません</h3>
+            <p className="text-sm text-gray-500">
+              検索条件を変更するか、別のキーワードで再度お試しください。
+            </p>
+          </div>
+        ) : filteredProducts.length === 0 && searchTerm !== '' ? (
+          <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 py-12 text-center">
+            <SearchX className="mb-3 h-12 w-12 text-gray-400" />
+            <h3 className="mb-1 text-lg font-medium text-gray-900">
+              検索条件に一致する商品がありません
+            </h3>
+            <p className="text-sm text-gray-500">検索条件を変更してお試しください。</p>
+          </div>
+        ) : (
+          <OProductListItemCollection
+            products={filteredProducts}
+            displayCount={filteredProducts.length}
+            promptGroupUniqueKey={promptGroupUniqueKey}
+          />
+        )}
       </div>
     </>
   )
