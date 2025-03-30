@@ -82,7 +82,18 @@ const pageCrawlerMandarakeStep = new Step({
 
       // 最初のページを取得して総ページ数を解析
       console.log('Fetching initial page to determine total pages')
-      const initialResponse = await axios.get(initialUrl)
+
+      let initialResponse
+      try {
+        initialResponse = await axios.get(initialUrl)
+      } catch (error) {
+        console.error(`Failed to fetch initial page: ${error}`)
+        // 初期ページの取得に失敗した場合は空の結果を返す
+        return {
+          products: [],
+        }
+      }
+
       const initialHtml = initialResponse.data
       const $ = cheerio.load(initialHtml)
 
@@ -92,7 +103,7 @@ const pageCrawlerMandarakeStep = new Step({
       console.log('Total search results:', totalCount)
 
       // 1ページあたり48件で計算（最大5ページまで）
-      const maxPage = Math.min(Math.ceil(totalCount / 48), 2)
+      const maxPage = Math.min(Math.ceil(totalCount / 48), 5)
       console.log(`Total pages to fetch: ${maxPage}`)
 
       // 全ページのURLを生成
@@ -107,7 +118,15 @@ const pageCrawlerMandarakeStep = new Step({
         urls.map(async (url: string, index: number) => {
           try {
             console.log(`Fetching URL: ${url}`)
-            const response = await axios.get(url)
+
+            let response
+            try {
+              response = await axios.get(url)
+            } catch (error) {
+              console.error(`Failed to fetch ${url}: ${error}`)
+              return []
+            }
+
             const html = response.data
             console.log(`Received HTML content length: ${html.length}`)
 
@@ -201,7 +220,10 @@ const pageCrawlerMandarakeStep = new Step({
       }
     } catch (e) {
       console.error('Error in page crawler:', e)
-      throw new Error('Failed to parse agent response or fetch pages')
+      // エラーをスローする代わりに空の結果を返す
+      return {
+        products: [],
+      }
     }
   },
 })

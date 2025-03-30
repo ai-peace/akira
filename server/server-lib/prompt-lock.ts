@@ -35,6 +35,41 @@ export const promptProductSaver = {
     isPartial: boolean = false,
   ): Promise<void> {
     try {
+      // 空の製品リストの場合は早期リターン（ただしソースサイトは追加する）
+      if (products.length === 0) {
+        console.log(`プロンプト(${promptUniqueKey})に${shopName}からの商品はありません`)
+
+        // 現在のプロンプト情報を取得
+        const currentPrompt = await prisma.prompt.findUnique({
+          where: { uniqueKey: promptUniqueKey },
+          select: { result: true },
+        })
+
+        // 既存の結果データを取得
+        const existingResult = (currentPrompt?.result as any) || {}
+        const existingSourceSites = existingResult.sourceSites || []
+
+        // 新しいソースサイトを追加（商品がなくてもソースは記録）
+        let sourceSites = [...existingSourceSites]
+        if (!sourceSites.includes(shopName)) {
+          sourceSites.push(shopName)
+
+          // ソースサイトのみ更新
+          await prisma.prompt.update({
+            where: { uniqueKey: promptUniqueKey },
+            data: {
+              result: {
+                ...existingResult,
+                sourceSites,
+              },
+              llmStatus: 'PROCESSING', // 処理中
+            },
+          })
+        }
+
+        return
+      }
+
       // 現在のプロンプト情報を取得
       const currentPrompt = await prisma.prompt.findUnique({
         where: { uniqueKey: promptUniqueKey },

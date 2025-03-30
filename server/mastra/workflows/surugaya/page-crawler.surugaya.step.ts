@@ -75,29 +75,43 @@ const pageCrawlerSurugayaStep = new Step({
 
       // 最初のページを取得して総ページ数を解析
       console.log('Fetching initial page to determine total pages')
-      const initialResponse = await fetch(initialUrl, {
-        headers: {
-          'User-Agent':
-            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-          Accept:
-            'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
-          'Accept-Language': 'ja,en-US;q=0.9,en;q=0.8',
-          'Cache-Control': 'no-cache',
-          Pragma: 'no-cache',
-          'Sec-Ch-Ua': '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
-          'Sec-Ch-Ua-Mobile': '?0',
-          'Sec-Ch-Ua-Platform': '"macOS"',
-          'Sec-Fetch-Dest': 'document',
-          'Sec-Fetch-Mode': 'navigate',
-          'Sec-Fetch-Site': 'none',
-          'Sec-Fetch-User': '?1',
-          'Upgrade-Insecure-Requests': '1',
-        },
-        redirect: 'follow',
-      })
+
+      let initialResponse
+      try {
+        initialResponse = await fetch(initialUrl, {
+          headers: {
+            'User-Agent':
+              'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+            Accept:
+              'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+            'Accept-Language': 'ja,en-US;q=0.9,en;q=0.8',
+            'Cache-Control': 'no-cache',
+            Pragma: 'no-cache',
+            'Sec-Ch-Ua': '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
+            'Sec-Ch-Ua-Mobile': '?0',
+            'Sec-Ch-Ua-Platform': '"macOS"',
+            'Sec-Fetch-Dest': 'document',
+            'Sec-Fetch-Mode': 'navigate',
+            'Sec-Fetch-Site': 'none',
+            'Sec-Fetch-User': '?1',
+            'Upgrade-Insecure-Requests': '1',
+          },
+          redirect: 'follow',
+        })
+      } catch (error) {
+        console.error(`Failed to fetch initial page: ${error}`)
+        // 初期ページの取得に失敗した場合は空の結果を返す
+        return {
+          products: [],
+        }
+      }
 
       if (!initialResponse.ok) {
-        throw new Error(`HTTP error! status: ${initialResponse.status}`)
+        console.error(`HTTP error for initial page! status: ${initialResponse.status}`)
+        // 404などのエラーの場合は空の結果を返す
+        return {
+          products: [],
+        }
       }
 
       // リダイレクト後のURLを取得
@@ -137,32 +151,40 @@ const pageCrawlerSurugayaStep = new Step({
             const controller = new AbortController()
             const timeout = setTimeout(() => controller.abort(), 8000)
 
-            const response = await fetch(url, {
-              headers: {
-                'User-Agent':
-                  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-                Accept:
-                  'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
-                'Accept-Language': 'ja,en-US;q=0.9,en;q=0.8',
-                'Cache-Control': 'no-cache',
-                Pragma: 'no-cache',
-                'Sec-Ch-Ua': '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
-                'Sec-Ch-Ua-Mobile': '?0',
-                'Sec-Ch-Ua-Platform': '"macOS"',
-                'Sec-Fetch-Dest': 'document',
-                'Sec-Fetch-Mode': 'navigate',
-                'Sec-Fetch-Site': 'none',
-                'Sec-Fetch-User': '?1',
-                'Upgrade-Insecure-Requests': '1',
-                Referer: initialUrl,
-              },
-              signal: controller.signal,
-              redirect: 'follow',
-            })
-            clearTimeout(timeout)
+            let response
+            try {
+              response = await fetch(url, {
+                headers: {
+                  'User-Agent':
+                    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+                  Accept:
+                    'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8',
+                  'Accept-Language': 'ja,en-US;q=0.9,en;q=0.8',
+                  'Cache-Control': 'no-cache',
+                  Pragma: 'no-cache',
+                  'Sec-Ch-Ua': '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
+                  'Sec-Ch-Ua-Mobile': '?0',
+                  'Sec-Ch-Ua-Platform': '"macOS"',
+                  'Sec-Fetch-Dest': 'document',
+                  'Sec-Fetch-Mode': 'navigate',
+                  'Sec-Fetch-Site': 'none',
+                  'Sec-Fetch-User': '?1',
+                  'Upgrade-Insecure-Requests': '1',
+                  Referer: initialUrl,
+                },
+                signal: controller.signal,
+                redirect: 'follow',
+              })
+              clearTimeout(timeout)
+            } catch (error) {
+              clearTimeout(timeout)
+              console.error(`Failed to fetch ${url}: ${error}`)
+              return []
+            }
 
             if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`)
+              console.error(`HTTP error! status: ${response.status} for URL: ${url}`)
+              return []
             }
 
             // リダイレクト後のURLを取得
@@ -288,7 +310,10 @@ const pageCrawlerSurugayaStep = new Step({
       }
     } catch (e) {
       console.error('Error in page crawler:', e)
-      throw new Error('Failed to fetch pages')
+      // エラーをスローする代わりに空の結果を返す
+      return {
+        products: [],
+      }
     }
   },
 })
