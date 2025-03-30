@@ -6,12 +6,6 @@ import { generateUniqueKey } from '../server-lib/uuid'
 import { promptGroupMapper } from '../server-mappers/prompt-group/index.mapper'
 import { userPromptUsageService } from '../server-service/user-prompt-usage.service'
 
-type LlmStatus = 'IDLE' | 'PROCESSING' | 'SUCCESS' | 'FAILED'
-const LlmStatus = {
-  PROCESSING: 'PROCESSING' as const,
-  SUCCESS: 'SUCCESS' as const,
-} as const
-
 const execute = async (
   chatUniqueKey: string,
   question: string,
@@ -20,8 +14,8 @@ const execute = async (
   try {
     const promptGroup = await initializePromptGroup(chatUniqueKey, question)
 
-    // 非同期で会話エージェントを実行
-    processConversation(promptGroup.prompts[0].uniqueKey, question).then(() => {
+    // 非同期で実行
+    processSourcing(promptGroup.prompts[0].uniqueKey, question).then(() => {
       // 会話エージェントが成功したら、ユーザーのプロンプト使用回数をインクリメント
       userPromptUsageService.increment(userPromptUsage)
     })
@@ -34,7 +28,7 @@ const execute = async (
   }
 }
 
-export const generateUserResponseUsecase = { execute }
+export const sourcingUsecase = { execute }
 
 // private
 const initializePromptGroup = async (chatUniqueKey: string, question: string) => {
@@ -50,7 +44,7 @@ const initializePromptGroup = async (chatUniqueKey: string, question: string) =>
       prompts: {
         create: {
           uniqueKey: generateUniqueKey(),
-          llmStatus: LlmStatus.PROCESSING,
+          llmStatus: 'PROCESSING',
           resultType: 'AGENT_RESPONSE',
           order: 1,
         },
@@ -63,38 +57,19 @@ const initializePromptGroup = async (chatUniqueKey: string, question: string) =>
   })
 }
 
-const processConversation = async (promptUniqueKey: string, question: string) => {
+const processSourcing = async (promptUniqueKey: string, question: string) => {
   try {
-    // 既存のconversationAgent.processInputを残しつつ、テスト目的でmandarakeWorkflowも実行
-    // await conversationAgent.processInput(promptUniqueKey, question)
-
-    // マンダラケワークフローをテスト実行（結果は別途保存）
-    try {
-      // 新しいAPIを使用: createRun() -> start()
-      console.log('searching....')
-      const run = sourcingWorkflow.createRun()
-      // const run = mandarakeWorkflow.createRun()
-      const workflowResult = await run.start({
-        triggerData: {
-          input: question,
-          promptUniqueKey,
-        },
-      })
-
-      console.log('Mandarake Workflow results:', workflowResult)
-    } catch (workflowError) {
-      console.error('Mandarake workflow error:', workflowError)
-    }
-  } catch (error) {
-    console.error('Error processing conversation:', error)
-    await prisma.prompt.update({
-      where: {
-        uniqueKey: promptUniqueKey,
-      },
-      data: {
-        result: { message: 'エラーが発生しました。もう一度お試しください。' },
-        llmStatus: 'FAILED',
+    console.log('searching....')
+    const run = sourcingWorkflow.createRun()
+    const workflowResult = await run.start({
+      triggerData: {
+        input: question,
+        promptUniqueKey,
       },
     })
+
+    console.log('Mandarake Workflow results:', workflowResult)
+  } catch (workflowError) {
+    console.error('Mandarake workflow error:', workflowError)
   }
 }
