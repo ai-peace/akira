@@ -1,7 +1,7 @@
 import { ProductEntity } from '@/common/domains/entities/product.entity'
 import { FC, useMemo, useState, useEffect } from 'react'
 import { OProductListItemCollection } from '../../02_organisms/OProductListItem/collection'
-import { Filter, ArrowUpDown, Check } from 'lucide-react'
+import { Filter, ArrowUpDown, Check, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { STOCK_STATUS, getStockStatusDisplay } from '@/common/domains/types/stock-status'
 import { Popover, PopoverContent, PopoverTrigger } from '@/front/components/ui/popover'
@@ -18,9 +18,15 @@ type Props = {
   products: ProductEntity[]
   chatUniqueKey: string
   promptGroupUniqueKey?: string
+  isTagsLoading?: boolean
 }
 
-const Component: FC<Props> = ({ products, chatUniqueKey, promptGroupUniqueKey }) => {
+const Component: FC<Props> = ({
+  products,
+  chatUniqueKey,
+  promptGroupUniqueKey,
+  isTagsLoading = false,
+}) => {
   const [searchTerm, setSearchTerm] = useState('')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
   const [activeTab, setActiveTab] = useState<string>('all')
@@ -206,10 +212,15 @@ const Component: FC<Props> = ({ products, chatUniqueKey, promptGroupUniqueKey })
       </div>
 
       {/* カテゴリタブ */}
-      {uniqueTags.length > 1 && (
-        <div className="border-b border-gray-200 bg-white">
-          <div className="mx-auto max-w-3xl px-2 md:px-4">
-            <div className="overflow-x-auto scrollbar-hide">
+      <div className="border-b border-gray-200 bg-white">
+        <div className="mx-auto max-w-3xl px-2 md:px-4">
+          <div className="overflow-x-auto scrollbar-hide">
+            {isTagsLoading ? (
+              <div className="flex items-center justify-center py-2 text-gray-500">
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <span className="text-sm font-medium">カテゴリ解析中...</span>
+              </div>
+            ) : uniqueTags.length > 1 ? (
               <div className="flex w-full">
                 {uniqueTags.map((tag) => (
                   <button
@@ -222,14 +233,22 @@ const Component: FC<Props> = ({ products, chatUniqueKey, promptGroupUniqueKey })
                     }`}
                   >
                     {tag === 'all' ? 'すべて' : tag}
-                    <span className="ml-1 text-xs text-gray-500">({tagCounts[tag] || 0})</span>
+                    <span
+                      className={`ml-1 text-xs ${
+                        activeTagFilter === tag ? 'text-blue-600' : 'text-gray-500'
+                      }`}
+                    >
+                      ({tagCounts[tag] || 0})
+                    </span>
                   </button>
                 ))}
               </div>
-            </div>
+            ) : (
+              <div className="py-2"></div>
+            )}
           </div>
         </div>
-      )}
+      </div>
 
       <div className="mx-auto max-w-3xl p-2 md:p-4">
         <OProductListItemCollection
