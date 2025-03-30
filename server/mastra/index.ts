@@ -1,15 +1,17 @@
-import { Mastra } from '@mastra/core/mastra'
 import { createLogger } from '@mastra/core/logger'
-import { weatherWorkflow } from './workflows'
-import { weatherAgent } from './agents'
-import { mandarakeWorkflow } from './workflows/mandarake.workflow'
-import { surugayaWorkflow } from './workflows/surugaya.workflow'
+import { Mastra } from '@mastra/core/mastra'
+import { PostgresStore } from '@mastra/pg'
+import { weatherAgent, tagExtractorAgent } from './agents'
+import { sourcingWorkflow } from './workflows/sourcing.workflow'
 
 export const mastra = new Mastra({
-  workflows: { weatherWorkflow, mandarakeWorkflow, surugayaWorkflow },
-  agents: { weatherAgent },
+  workflows: { sourcingWorkflow },
+  agents: { weatherAgent, tagExtractorAgent },
   logger: createLogger({
     name: 'Mastra',
     level: 'info',
+  }),
+  storage: new PostgresStore({
+    connectionString: process.env.DATABASE_URL ?? '',
   }),
 })

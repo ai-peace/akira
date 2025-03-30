@@ -1,12 +1,10 @@
 import { PromptGroupEntity } from '@/common/domains/entities/prompt-group.entity'
+import { UserPromptUsage } from '@prisma/client'
+import { sourcingWorkflow } from '../mastra/workflows/sourcing.workflow'
 import { prisma } from '../server-lib/prisma'
 import { generateUniqueKey } from '../server-lib/uuid'
 import { promptGroupMapper } from '../server-mappers/prompt-group/index.mapper'
-import { conversationAgent } from '../server-service/tools/conversation-agent/index.tool'
-import { UserPromptUsage } from '@prisma/client'
 import { userPromptUsageService } from '../server-service/user-prompt-usage.service'
-import { mandarakeWorkflow } from '../mastra/workflows/mandarake.workflow'
-import { mastra } from '../mastra'
 
 type LlmStatus = 'IDLE' | 'PROCESSING' | 'SUCCESS' | 'FAILED'
 const LlmStatus = {
@@ -74,7 +72,8 @@ const processConversation = async (promptUniqueKey: string, question: string) =>
     try {
       // 新しいAPIを使用: createRun() -> start()
       console.log('searching....')
-      const run = mandarakeWorkflow.createRun()
+      const run = sourcingWorkflow.createRun()
+      // const run = mandarakeWorkflow.createRun()
       const workflowResult = await run.start({
         triggerData: {
           input: question,

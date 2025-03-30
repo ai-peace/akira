@@ -1,11 +1,8 @@
 {
   "mcpServers": {
     "mastra": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "@mastra/mcp-docs-server@latest"
-      ]
+      "command": "pnpm",
+      "args": ["dlx", "@mastra/mcp-docs-server@latest"]
     }
   }
 }

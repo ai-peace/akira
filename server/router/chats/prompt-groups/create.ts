@@ -4,7 +4,7 @@ import { prisma } from '@/server/server-lib/prisma'
 import { privyAuthMiddleware } from '@/server/server-middleware/privy-auth.middleware'
 import { requireUserPromptUsage } from '@/server/server-middleware/require-user-prompt-usage.middleware'
 import { requireUserMiddleware } from '@/server/server-middleware/require-user.middleware'
-import { generateUserResponseUsecase } from '@/server/server-usecase/generate-user-response.usecase'
+import { sourcingUsecase } from '@/server/server-usecase/sourcing.usecase'
 import { zValidator } from '@hono/zod-validator'
 import { Hono } from 'hono'
 import { createChatPromptGroupSchema } from './schema/create.schema'
@@ -19,6 +19,7 @@ const route = createChatPromptGroup.post(
   zValidator('json', createChatPromptGroupSchema),
   async (c) => {
     try {
+      // プロンプトのためのデータ準備
       const uniqueKey = c.req.param('uniqueKey')
       const { question } = c.req.valid('json')
       const userPromptUsage = c.get('userPromptUsage')
@@ -50,11 +51,7 @@ const route = createChatPromptGroup.post(
         )
       }
 
-      const promptGroupEntity = await generateUserResponseUsecase.execute(
-        uniqueKey,
-        question,
-        userPromptUsage,
-      )
+      const promptGroupEntity = await sourcingUsecase.execute(uniqueKey, question, userPromptUsage)
 
       return c.json<HcApiResponseType<PromptGroupEntity>>(
         {

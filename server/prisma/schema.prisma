@@ -148,3 +148,16 @@ enum WaitListStatus {
   INVITED
   REGISTERED
 }
+
+// Mastra
+
+model MastraWorkflowSnapshot {
+  workflowName String   @map("workflow_name")
+  runId        String   @map("run_id")
+  snapshot     String   @map("snapshot") @db.Text
+  createdAt    DateTime @default(now()) @map("createdAt")
+  updatedAt    DateTime @updatedAt @map("updatedAt")
+
+  @@id([workflowName, runId])
+  @@map("mastra_workflow_snapshot")
+}

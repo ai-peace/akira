@@ -2,22 +2,31 @@ import { Step } from '@mastra/core/workflows'
 import { z } from 'zod'
 import { Agent } from '@mastra/core/agent'
 import { openai } from '@ai-sdk/openai'
+import { translateStep } from '../common/translate.step'
 
-const buildQueryStep = new Step({
-  id: 'buildQueryStep',
+const buildQuerySurugayaStep = new Step({
+  id: 'buildQuerySurugayaStep',
+  inputSchema: z.object({
+    translatedKeyword: z.string(),
+  }),
   outputSchema: z.object({
     keyword: z.string(),
     options: z.record(z.string()),
   }),
   execute: async ({ context }) => {
     console.log('buildQueryStep', context)
-    const userInput = context.triggerData?.input
-    if (!userInput) throw new Error('User input is required')
+
+    // 前のステップの結果から翻訳されたキーワードを取得
+    const translatedResult = context.getStepResult(translateStep)
+    const translatedKeyword = translatedResult?.translatedKeyword
+
+    console.log('translatedKeyword', translatedKeyword)
+    if (!translatedKeyword) throw new Error('Translated keyword is required')
 
     const response = await buildQueryAgent.stream([
       {
         role: 'user',
-        content: userInput,
+        content: translatedKeyword,
       },
     ])
 
@@ -39,7 +48,7 @@ const buildQueryStep = new Step({
   },
 })
 
-export { buildQueryStep }
+export { buildQuerySurugayaStep }
 
 const buildQueryAgent = new Agent({
   name: 'surugaya-query-builder',

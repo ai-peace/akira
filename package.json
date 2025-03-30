@@ -25,6 +25,7 @@
     "@langchain/core": "^0.3.37",
     "@langchain/openai": "^0.4.2",
     "@mastra/core": "^0.7.0",
+    "@mastra/pg": "^0.2.6",
     "@prisma/client": "^6.1.0",
     "@privy-io/react-auth": "^2.4.5",
     "@privy-io/server-auth": "^1.19.0",

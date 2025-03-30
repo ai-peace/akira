@@ -6,7 +6,7 @@ import { chatMapper } from '@/server/server-mappers/chat/index.mapper'
 import { privyAuthMiddleware } from '@/server/server-middleware/privy-auth.middleware'
 import { requireUserPromptUsage } from '@/server/server-middleware/require-user-prompt-usage.middleware'
 import { requireUserMiddleware } from '@/server/server-middleware/require-user.middleware'
-import { generateUserResponseUsecase } from '@/server/server-usecase/generate-user-response.usecase'
+import { sourcingUsecase } from '@/server/server-usecase/sourcing.usecase'
 import { zValidator } from '@hono/zod-validator'
 import { Hono } from 'hono'
 import { createChatSchema } from './schema/create.schema'
@@ -49,7 +49,7 @@ const route = createChat.post(
         },
       })
 
-      await generateUserResponseUsecase.execute(chat.uniqueKey, data.mainPrompt, userPromptUsage)
+      await sourcingUsecase.execute(chat.uniqueKey, data.mainPrompt, userPromptUsage)
 
       const chatEntity = chatMapper.toDomain(chat)
 

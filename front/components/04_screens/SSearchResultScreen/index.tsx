@@ -6,7 +6,8 @@ import { TProductSearch } from '@/front/components/03_templates/TProductSearch'
 import { usePromptGroup } from '@/front/hooks/resources/prompt-groups/usePromptGroup'
 import { ArrowLeftIcon } from 'lucide-react'
 import Link from 'next/link'
-import { FC } from 'react'
+import { FC, useMemo } from 'react'
+import { ProductEntity } from '@/common/domains/entities/product.entity'
 
 type Props = {
   promptGroupUniqueKey: string
@@ -14,6 +15,28 @@ type Props = {
 
 const Component: FC<Props> = ({ promptGroupUniqueKey }) => {
   const { promptGroup } = usePromptGroup({ uniqueKey: promptGroupUniqueKey })
+
+  // タグの解析中かどうかを判断
+  const isTagsAnalyzing = useMemo(() => {
+    if (!promptGroup?.prompts) return false
+
+    // 1. プロンプトのいずれかが処理中の状態かチェック
+    const hasProcessingPrompt = promptGroup.prompts.some(
+      (prompt) => prompt.llmStatus === 'PROCESSING',
+    )
+
+    // 2. 商品データがあるがタグが付いていないものがあるか確認
+    const hasProductsWithoutTags = promptGroup.prompts.some((prompt) => {
+      if (prompt.resultType === 'FOUND_PRODUCT_ITEMS' && prompt.result?.data) {
+        return prompt.result.data.some(
+          (product: ProductEntity) => !product.tags || product.tags.length === 0,
+        )
+      }
+      return false
+    })
+
+    return hasProcessingPrompt || hasProductsWithoutTags
+  }, [promptGroup])
 
   return (
     <div className="block w-full">
@@ -28,7 +51,7 @@ const Component: FC<Props> = ({ promptGroupUniqueKey }) => {
           ) : (
             <div className="h-6" />
           )}
-          <h2 className="text-md text-foreground-strong absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-bold">
+          <h2 className="text-md absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-bold text-foreground-strong">
             All products
           </h2>
           <div className="flex items-center gap-2">
@@ -47,6 +70,7 @@ const Component: FC<Props> = ({ promptGroupUniqueKey }) => {
                 products={prompt.result?.data}
                 chatUniqueKey={promptGroup?.chatUniqueKey}
                 promptGroupUniqueKey={promptGroupUniqueKey}
+                isTagsLoading={isTagsAnalyzing}
               />
             )}
           </div>

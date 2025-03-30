@@ -124,14 +124,14 @@ const Component: FC<Props> = ({ promptGroups, createChatPromptGroup, onIntersect
                                   message={prompt.result?.message || ''}
                                   promptGroupUniqueKey={promptGroup.uniqueKey}
                                 />
-                                {prompt.result?.keywords && (
+                                {/* {prompt.result?.keywords && (
                                   <ORelativeKeywords
                                     keywords={prompt.result.keywords as unknown as KeywordPair[]}
                                     handleCreateChatPromptGroupByKeyword={
                                       handleCreateChatPromptGroupByKeyword
                                     }
                                   />
-                                )}
+                                )} */}
                               </>
                             )}
                             {prompt.resultType === 'FIRST_RESPONSE' && (
