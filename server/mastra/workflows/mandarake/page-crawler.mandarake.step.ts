@@ -63,7 +63,7 @@ const pageCrawlerMandarakeStep = new Step({
       console.log('Total search results:', totalCount)
 
       // 1ページあたり48件で計算（最大5ページまで）
-      const maxPage = Math.min(Math.ceil(totalCount / 48), 1)
+      const maxPage = Math.min(Math.ceil(totalCount / 48), 2)
       console.log(`Total pages to fetch: ${maxPage}`)
 
       // 全ページのURLを生成

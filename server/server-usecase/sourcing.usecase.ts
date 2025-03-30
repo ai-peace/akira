@@ -1,10 +1,11 @@
 import { PromptGroupEntity } from '@/common/domains/entities/prompt-group.entity'
 import { UserPromptUsage } from '@prisma/client'
-import { sourcingWorkflow } from '../mastra/workflows/sourcing.workflow'
 import { prisma } from '../server-lib/prisma'
 import { generateUniqueKey } from '../server-lib/uuid'
 import { promptGroupMapper } from '../server-mappers/prompt-group/index.mapper'
 import { userPromptUsageService } from '../server-service/user-prompt-usage.service'
+import { mastra } from '../mastra'
+// import { sourcingWorkflow } from '../mastra/workflows/sourcing.workflow'
 
 const execute = async (
   chatUniqueKey: string,
@@ -60,6 +61,8 @@ const initializePromptGroup = async (chatUniqueKey: string, question: string) =>
 const processSourcing = async (promptUniqueKey: string, question: string) => {
   try {
     console.log('searching....')
+
+    const sourcingWorkflow = mastra.getWorkflow('sourcingWorkflow')
     const run = sourcingWorkflow.createRun()
     const workflowResult = await run.start({
       triggerData: {

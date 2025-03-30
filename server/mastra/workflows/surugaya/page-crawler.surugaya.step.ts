@@ -88,7 +88,7 @@ const pageCrawlerSurugayaStep = new Step({
       console.log('Total search results:', totalItems)
 
       // 1ページあたり24件で計算（テスト用に1ページのみに制限）
-      const maxPage = Math.min(Math.ceil(totalItems / 24), 1)
+      const maxPage = Math.min(Math.ceil(totalItems / 24), 2)
       console.log(`Total pages to fetch: ${maxPage}`)
 
       // 全ページのURLを生成
