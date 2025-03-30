@@ -4,6 +4,7 @@ import { Step } from '@mastra/core/workflows'
 import type { ProductEntity } from '@/common/domains/entities/product.entity'
 import { STOCK_STATUS, StockStatus } from '@/common/domains/types/stock-status'
 import { generateUniqueKey } from '@/server/server-lib/uuid'
+import { promptProductSaver } from '@/server/server-lib/prompt-lock'
 import axios from 'axios'
 import * as cheerio from 'cheerio'
 import fs from 'fs'
@@ -42,8 +43,14 @@ const pageCrawlerMandarakeStep = new Step({
   execute: async ({ context }) => {
     const keyword = context.getStepResult(buildQueryMandarakeStep)?.keyword
     const options = context.getStepResult(buildQueryMandarakeStep)?.options
+    const promptUniqueKey = context.triggerData?.promptUniqueKey as string
+
     if (!keyword || !options) {
       throw new Error('Failed to get keyword or options')
+    }
+
+    if (!promptUniqueKey) {
+      throw new Error('Failed to get promptUniqueKey')
     }
 
     const response = await pageCrawlerAgent.stream([
@@ -93,9 +100,9 @@ const pageCrawlerMandarakeStep = new Step({
         initialUrl.replace(/page=\d+/, `page=${i + 1}`),
       )
 
-      const products: ProductEntity[] = []
+      const allProducts: ProductEntity[] = []
 
-      // URLからHTMLを取得してProductEntityに変換
+      // URLからHTMLを取得して処理
       await Promise.all(
         urls.map(async (url: string, index: number) => {
           try {
@@ -115,9 +122,54 @@ const pageCrawlerMandarakeStep = new Step({
 
             // HTMLからProductEntityに変換
             const pageProducts = mapHtmlToProducts(html)
-            products.push(...pageProducts)
-
             console.log(`Extracted ${pageProducts.length} products from page ${index + 1}`)
+
+            // プロンプトに直接結果を追加（ロックを使用）
+            let lockAcquired = false
+            try {
+              lockAcquired = promptProductSaver.acquireLock(promptUniqueKey)
+              if (lockAcquired) {
+                // Mandarakeのページはまだ残っているかもしれないので、部分的な結果としてマーク
+                const isPartial = index < urls.length - 1
+                await promptProductSaver.saveProducts(
+                  promptUniqueKey,
+                  pageProducts,
+                  'mandarake',
+                  isPartial,
+                )
+              } else {
+                console.log(`ロックが取得できなかったため待機中... (Mandarake, Page ${index + 1})`)
+                // ロック取得を試みるシンプルな再試行ロジック
+                let retries = 0
+                while (!lockAcquired && retries < 5) {
+                  await new Promise((resolve) => setTimeout(resolve, 500))
+                  lockAcquired = promptProductSaver.acquireLock(promptUniqueKey)
+                  retries++
+                }
+
+                if (lockAcquired) {
+                  const isPartial = index < urls.length - 1
+                  await promptProductSaver.saveProducts(
+                    promptUniqueKey,
+                    pageProducts,
+                    'mandarake',
+                    isPartial,
+                  )
+                } else {
+                  console.error(
+                    `ロックが取得できませんでした。データは保存されません (Mandarake, Page ${index + 1})`,
+                  )
+                }
+              }
+            } finally {
+              if (lockAcquired) {
+                promptProductSaver.releaseLock(promptUniqueKey)
+              }
+            }
+
+            // 結果を返すためのリストにも追加
+            allProducts.push(...pageProducts)
+
             return pageProducts
           } catch (error) {
             console.error(`Failed to fetch ${url}:`, error)
@@ -126,11 +178,26 @@ const pageCrawlerMandarakeStep = new Step({
         }),
       )
 
-      console.log(`Total products extracted: ${products.length}`)
-      console.log(products, 'mandarake')
+      console.log(`Total products extracted: ${allProducts.length}`)
+
+      // すべてのページの処理が終わったら、最終的な結果として保存
+      let finalLockAcquired = false
+      try {
+        finalLockAcquired = promptProductSaver.acquireLock(promptUniqueKey)
+        if (finalLockAcquired) {
+          // 最終的な結果を保存して完了としてマーク
+          await promptProductSaver.markComplete(promptUniqueKey)
+        } else {
+          console.error('最終結果の保存ためにロックが取得できませんでした')
+        }
+      } finally {
+        if (finalLockAcquired) {
+          promptProductSaver.releaseLock(promptUniqueKey)
+        }
+      }
 
       return {
-        products,
+        products: allProducts,
       }
     } catch (e) {
       console.error('Error in page crawler:', e)
@@ -164,8 +231,6 @@ const mapHtmlToProducts = (html: string): ProductEntity[] => {
       if (!jaTitle || !price) {
         console.log('Skipping item due to missing title or price:', { jaTitle, price })
         return
-      } else {
-        console.log('Item:', { jaTitle, price })
       }
 
       const url = $item.find('.title a').attr('href') || ''
