@@ -2,9 +2,9 @@ import { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'AKIRA - AI Shopping Assistant',
+    name: 'AKIRA - AI Buyer for Rare RWA NFTs',
     short_name: 'AKIRA',
-    description: 'Your AI-powered shopping companion',
+    description: 'AKIRA is an AI-powered buyer for rare RWA NFTs',
     start_url: '/',
     display: 'standalone',
     background_color: '#ffffff',

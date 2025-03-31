@@ -33,7 +33,7 @@ const Component: FC = () => {
   }
 
   return (
-    <div className="prose prose-invert prose-headings:text-foreground-strong prose-p:text-foreground prose-a:text-accent-1 prose-strong:text-foreground-strong prose-code:text-accent-1 prose-pre:bg-background-muted mx-auto h-full w-full max-w-[708px] px-4 pb-[80px]">
+    <div className="prose prose-invert mx-auto h-full w-full max-w-[708px] px-4 pb-[80px] prose-headings:text-foreground-strong prose-p:text-foreground prose-a:text-accent-1 prose-strong:text-foreground-strong prose-code:text-accent-1 prose-pre:bg-background-muted">
       <div className="flex h-full w-full flex-col items-center justify-center">
         <div className="flex w-full flex-col items-center justify-center">
           <div className="relative mb-6 h-20 w-20">
@@ -68,8 +68,8 @@ const Component: FC = () => {
 
       <div className="absolute bottom-4 left-0 right-0 flex items-center justify-center">
         <EDotFont
-          text="AKIRA - Japanese Rare Item Search Agent "
-          className="text-foreground-strong font-[400]"
+          text="AKIRA - AI Buyer for Rare RWA NFTs"
+          className="font-[400] text-foreground-strong"
           animate={true}
           delay={200}
         />

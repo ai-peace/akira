@@ -6,11 +6,10 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: {
-    default: 'AKIRA - SEARCH AI AGENT',
+    default: 'AKIRA - AI Buyer for Rare RWA NFTs',
     template: '%s | AKIRA',
   },
-  description:
-    'Find your perfect items through natural conversations with AI. AKIRA makes your shopping experience smarter and more intuitive.',
+  description: 'AKIRA is an AI-powered buyer for rare RWA NFTs',
   icons: {
     icon: '/icon512_rounded.png',
     apple: '/icon512_rounded.png',
@@ -23,9 +22,8 @@ export const metadata: Metadata = {
     title: 'AKIRA',
   },
   openGraph: {
-    title: 'AKIRA - SEARCH AI AGENT',
-    description:
-      'Find your perfect items through natural conversations with AI. AKIRA makes your shopping experience smarter and more intuitive.',
+    title: 'AKIRA - AI Buyer for Rare RWA NFTs',
+    description: 'AKIRA is an AI-powered buyer for rare RWA NFTs',
     images: [
       {
         url: `${clientApplicationProperties.appUrl}/images/ogp/ogp_twitterCard_default.jpg`,
@@ -39,8 +37,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'AKIRA - SEARCH AI AGENT',
-    description: 'Find your perfect items through natural conversations with AI',
+    title: 'AKIRA - AI Buyer for Rare RWA NFTs',
+    description: 'AKIRA is an AI-powered buyer for rare RWA NFTs',
     images: [`${clientApplicationProperties.appUrl}/images/ogp/ogp_twitterCard_default.jpg`],
   },
   formatDetection: {
