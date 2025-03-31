@@ -220,11 +220,11 @@ const Component: FC<Props> = ({
       </div>
 
       {/* カテゴリタブ */}
-      <div className="border-b border-gray-200 bg-white">
+      <div className="border-b border-border-subtle bg-background">
         <div className="mx-auto max-w-3xl px-2 md:px-4">
           <div className="overflow-x-auto scrollbar-hide">
             {isTagsLoading ? (
-              <div className="flex items-center justify-center py-2 text-gray-500">
+              <div className="flex items-center justify-center pb-4 pt-2 text-gray-500">
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 <span className="text-sm font-medium">カテゴリ解析中...</span>
               </div>
@@ -237,7 +237,7 @@ const Component: FC<Props> = ({
                     className={`flex-shrink-0 px-4 py-2 text-sm font-medium ${
                       activeTagFilter === tag
                         ? 'border-b-2 border-blue-600 text-blue-600'
-                        : 'border-b-2 border-transparent text-gray-500 hover:text-gray-700'
+                        : 'border-b-2 border-transparent text-foreground-muted hover:text-foreground'
                     }`}
                   >
                     {tag === 'all' ? 'すべて' : tag}
