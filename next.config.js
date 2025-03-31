@@ -11,6 +11,8 @@ const withPWA = nextPWA({
 const nextConfig = withPWA({
   reactStrictMode: true,
   webpack: (config, { isServer }) => {
+    // webpackのキャッシュを無効化
+    config.cache = false
     // READMEファイルを無視する設定を追加
     config.module.rules.push({
       test: /\.md$/,
