@@ -1,9 +1,10 @@
 import { OProductListItem } from '@/front/components/02_organisms/OProductListItem'
 import { ProductEntity } from '@/common/domains/entities/product.entity'
 import { getPromptGroupUrl } from '@/front/util/url.helper'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRight, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import { FC, useEffect, useRef, useState } from 'react'
+import { Button } from '@/front/components/ui/button'
 
 type Props = {
   products: ProductEntity[]
@@ -88,12 +89,12 @@ const Component: FC<Props> = ({ products, displayCount, promptGroupUniqueKey }) 
       </div>
 
       {promptGroupUniqueKey && (
-        <div className="flex justify-end">
-          <Link
-            href={getPromptGroupUrl(promptGroupUniqueKey)}
-            className="rounded-md px-4 py-2 text-sm text-blue-500 transition-all hover:underline"
-          >
-            View all
+        <div className="flex justify-end pt-4">
+          <Link href={getPromptGroupUrl(promptGroupUniqueKey)}>
+            <Button variant="outline" size="sm" className="gap-2">
+              View all
+              <ArrowRight className="h-4 w-4" />
+            </Button>
           </Link>
         </div>
       )}
