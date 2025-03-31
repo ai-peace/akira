@@ -3,14 +3,22 @@ import { FC } from 'react'
 import { OProductListItem } from './index'
 import { getPromptGroupUrl } from '@/front/util/url.helper'
 import Link from 'next/link'
+import { Button } from '@/front/components/ui/button'
+import { ArrowRight } from 'lucide-react'
 
 type Props = {
   products: ProductEntity[]
   displayCount: number
   promptGroupUniqueKey?: string
+  showViewAll?: boolean
 }
 
-const Component: FC<Props> = ({ products, displayCount, promptGroupUniqueKey }) => {
+const Component: FC<Props> = ({
+  products,
+  displayCount,
+  promptGroupUniqueKey,
+  showViewAll = true,
+}) => {
   return (
     <>
       <div className="grid w-full grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4">
@@ -22,13 +30,13 @@ const Component: FC<Props> = ({ products, displayCount, promptGroupUniqueKey }) 
           />
         ))}
       </div>
-      {promptGroupUniqueKey && (
-        <div className="flex justify-end">
-          <Link
-            href={getPromptGroupUrl(promptGroupUniqueKey)}
-            className="rounded-md px-4 py-2 text-sm text-blue-500 transition-all hover:underline"
-          >
-            View all
+      {promptGroupUniqueKey && showViewAll && (
+        <div className="flex justify-end pt-4">
+          <Link href={getPromptGroupUrl(promptGroupUniqueKey)}>
+            <Button variant="outline" size="sm" className="gap-2">
+              View all
+              <ArrowRight className="h-4 w-4" />
+            </Button>
           </Link>
         </div>
       )}

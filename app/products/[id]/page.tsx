@@ -112,7 +112,7 @@ export default function Page() {
           <meta name="description" content="Loading product details..." />
         </Head>
         <div className="flex h-screen items-center justify-center">
-          <div className="border-border-strong h-8 w-8 animate-spin rounded-full border-b-2 border-t-2"></div>
+          <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-border-strong"></div>
         </div>
       </>
     )
@@ -175,7 +175,7 @@ export default function Page() {
 
           <div className="container mx-auto px-4">
             <Card className="p-8 text-center">
-              <h1 className="text-foreground-strong mb-4 text-2xl font-bold">Product Not Found</h1>
+              <h1 className="mb-4 text-2xl font-bold text-foreground-strong">Product Not Found</h1>
               <p className="text-foreground">
                 Sorry, we couldn&apos;t find the product you&apos;re looking for.
               </p>
@@ -257,7 +257,7 @@ export default function Page() {
             {/* Main Product Layout - Desktop: Image | Title+Info, Mobile: Stacked */}
             <div className="flex flex-col gap-4 md:flex-row md:gap-4">
               {/* Product Image with RPG Style Border - Left side on desktop, full width on mobile */}
-              <div className="bg-background-muted relative flex items-center justify-center overflow-hidden rounded-lg p-2 md:w-1/2">
+              <div className="relative flex items-center justify-center overflow-hidden rounded-lg bg-background-muted p-2 md:w-1/2">
                 {product.imageUrl && (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -275,7 +275,7 @@ export default function Page() {
                   <div className="mb-2">
                     <EDotFont
                       text={product.title.en}
-                      className="text-foreground-strong text-xl font-bold md:text-2xl"
+                      className="text-xl font-bold text-foreground-strong md:text-2xl"
                       animate={true}
                       speed={1}
                       delay={0}
@@ -284,7 +284,7 @@ export default function Page() {
                   <div>
                     <EDotFont
                       text={product.title.ja}
-                      className="text-foreground-muted text-sm"
+                      className="text-sm text-foreground-muted"
                       isJapanese={true}
                       animate={true}
                       speed={1}
@@ -316,19 +316,19 @@ export default function Page() {
                 <div className={'flex flex-1 flex-col rounded-lg bg-background p-1 md:px-4'}>
                   {/* Price */}
                   <div className="mb-6">
-                    <div className="text-accent-1 text-3xl font-bold">
+                    <div className="text-3xl font-bold text-accent-1">
                       <EDotFont
                         text={`$${Math.round(product.price / 150).toLocaleString()}`}
-                        className="text-accent-1 text-3xl font-bold"
+                        className="text-3xl font-bold text-accent-1"
                         animate={true}
                         speed={1}
                         delay={30}
                       />
                     </div>
-                    <div className="text-foreground-muted text-sm">
+                    <div className="text-sm text-foreground-muted">
                       <EDotFont
                         text={`${product.currency} ${product.price.toLocaleString()}`}
-                        className="text-foreground-muted text-sm"
+                        className="text-sm text-foreground-muted"
                         animate={true}
                         speed={1}
                         delay={40}
@@ -359,7 +359,7 @@ export default function Page() {
                   {/* Product Description */}
                   {product.description && (
                     <div className="mb-6">
-                      <h2 className="text-foreground-strong mb-2 text-lg font-semibold">
+                      <h2 className="mb-2 text-lg font-semibold text-foreground-strong">
                         <EDotFont text="Description" animate={true} speed={1} delay={60} />
                       </h2>
                       <EDotFont
@@ -375,7 +375,7 @@ export default function Page() {
                   {/* Condition */}
                   {product.condition && (
                     <div className="mb-6">
-                      <h2 className="text-foreground-strong mb-2 text-lg font-semibold">
+                      <h2 className="mb-2 text-lg font-semibold text-foreground-strong">
                         <EDotFont text="Condition" animate={true} speed={1} delay={80} />
                       </h2>
                       <EDotFont
@@ -390,7 +390,7 @@ export default function Page() {
 
                   {/* RPG Style Action Buttons */}
                   <div className="mt-auto">
-                    <div className="text-foreground-strong mb-2 text-lg font-semibold">
+                    <div className="mb-2 text-lg font-semibold text-foreground-strong">
                       <EDotFont text="Actions" animate={true} speed={1} delay={100} />
                     </div>
 
@@ -468,7 +468,7 @@ export default function Page() {
           {/* Related Products Section */}
           {allProducts.length > 1 && (
             <div className="mt-8 border-t border-border pt-8">
-              <h3 className="text-foreground-strong mb-6 text-center text-base font-medium">
+              <h3 className="mb-6 text-center text-base font-medium text-foreground-strong">
                 <EDotFont text="Others" className="text-lg" />
               </h3>
               {promptGroup && (
@@ -476,6 +476,7 @@ export default function Page() {
                   products={allProducts.filter((p) => p.uniqueKey !== productUniqueKey)}
                   chatUniqueKey={promptGroup.chatUniqueKey}
                   promptGroupUniqueKey={promptGroupUniqueKey}
+                  showViewAll={false}
                 />
               )}
             </div>
@@ -491,7 +492,7 @@ export default function Page() {
           >
             <button
               onClick={() => setShowModal(false)}
-              className="hover:text-foreground-muted absolute right-4 top-4 text-foreground"
+              className="absolute right-4 top-4 text-foreground hover:text-foreground-muted"
             >
               <X className="h-5 w-5" />
             </button>
@@ -499,7 +500,7 @@ export default function Page() {
             <div className="mb-4 text-center">
               <EDotFont
                 text={modalType === 'favorite' ? 'Feature Coming Soon' : 'RWA NFT Coming Soon'}
-                className="text-foreground-strong text-xl font-bold"
+                className="text-xl font-bold text-foreground-strong"
                 animate={true}
                 speed={1}
                 delay={0}
@@ -535,7 +536,7 @@ export default function Page() {
                   setShowModal(false)
                   router.push('/waitlists')
                 }}
-                className="border-accent-1 bg-accent-1 hover:bg-accent-1/90 w-full rounded-lg border-2 px-4 py-2 text-white"
+                className="w-full rounded-lg border-2 border-accent-1 bg-accent-1 px-4 py-2 text-white hover:bg-accent-1/90"
               >
                 <EDotFont text="Join Waitlist" animate={true} speed={1} delay={100} />
               </button>
@@ -552,7 +553,7 @@ export default function Page() {
           >
             <button
               onClick={() => setShowFeatureModal(false)}
-              className="hover:text-foreground-muted absolute right-4 top-4 text-foreground"
+              className="absolute right-4 top-4 text-foreground hover:text-foreground-muted"
             >
               <X className="h-5 w-5" />
             </button>
@@ -560,7 +561,7 @@ export default function Page() {
             <div className="mb-4 text-center">
               <EDotFont
                 text="Feature Under Construction"
-                className="text-foreground-strong text-xl font-bold"
+                className="text-xl font-bold text-foreground-strong"
                 animate={true}
                 speed={1}
                 delay={0}
@@ -592,7 +593,7 @@ export default function Page() {
                   setShowFeatureModal(false)
                   router.push('/waitlists')
                 }}
-                className="border-accent-1 bg-accent-1 hover:bg-accent-1/90 w-full rounded-lg border-2 px-4 py-2 text-white"
+                className="w-full rounded-lg border-2 border-accent-1 bg-accent-1 px-4 py-2 text-white hover:bg-accent-1/90"
               >
                 <EDotFont text="Join Waitlist" animate={true} speed={1} delay={100} />
               </button>

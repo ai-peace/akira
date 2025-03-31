@@ -19,6 +19,7 @@ type Props = {
   chatUniqueKey: string
   promptGroupUniqueKey?: string
   isTagsLoading?: boolean
+  showViewAll?: boolean
 }
 
 const Component: FC<Props> = ({
@@ -26,6 +27,7 @@ const Component: FC<Props> = ({
   chatUniqueKey,
   promptGroupUniqueKey,
   isTagsLoading = false,
+  showViewAll = true,
 }) => {
   const [searchTerm, setSearchTerm] = useState('')
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc')
@@ -280,6 +282,7 @@ const Component: FC<Props> = ({
             products={filteredProducts}
             displayCount={filteredProducts.length}
             promptGroupUniqueKey={promptGroupUniqueKey}
+            showViewAll={showViewAll}
           />
         )}
       </div>

@@ -79,6 +79,7 @@ const Component: FC<Props> = ({ promptGroupUniqueKey }) => {
                 chatUniqueKey={promptGroup?.chatUniqueKey}
                 promptGroupUniqueKey={promptGroupUniqueKey}
                 isTagsLoading={isTagsAnalyzing}
+                showViewAll={false}
               />
             )}
           </div>
