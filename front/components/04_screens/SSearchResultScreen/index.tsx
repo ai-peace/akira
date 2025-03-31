@@ -4,7 +4,7 @@ import EShareButton from '@/front/components/01_elements/EShareButton'
 import { OThemeChangeButton } from '@/front/components/02_organisms/OThemeChangeButton'
 import { TProductSearch } from '@/front/components/03_templates/TProductSearch'
 import { usePromptGroup } from '@/front/hooks/resources/prompt-groups/usePromptGroup'
-import { ArrowLeftIcon } from 'lucide-react'
+import { ArrowLeftIcon, Loader2 } from 'lucide-react'
 import Link from 'next/link'
 import { FC, useMemo } from 'react'
 import { ProductEntity } from '@/common/domains/entities/product.entity'
@@ -14,7 +14,7 @@ type Props = {
 }
 
 const Component: FC<Props> = ({ promptGroupUniqueKey }) => {
-  const { promptGroup } = usePromptGroup({ uniqueKey: promptGroupUniqueKey })
+  const { promptGroup, promptGroupIsLoading } = usePromptGroup({ uniqueKey: promptGroupUniqueKey })
 
   // タグの解析中かどうかを判断
   const isTagsAnalyzing = useMemo(() => {
@@ -38,6 +38,14 @@ const Component: FC<Props> = ({ promptGroupUniqueKey }) => {
     return hasProcessingPrompt || hasProductsWithoutTags
   }, [promptGroup])
 
+  if (promptGroupIsLoading) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    )
+  }
+
   return (
     <div className="block w-full">
       <div className="relative bg-background">
@@ -52,7 +60,7 @@ const Component: FC<Props> = ({ promptGroupUniqueKey }) => {
             <div className="h-6" />
           )}
           <h2 className="text-md absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 font-bold text-foreground-strong">
-            All products
+            {promptGroup?.question || 'Search Results'}
           </h2>
           <div className="flex items-center gap-2">
             <EShareButton className="static bottom-auto right-auto z-auto" />
