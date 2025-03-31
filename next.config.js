@@ -27,7 +27,7 @@ const nextConfig = withPWA({
 
     // @libsqlをexternalsに追加
     if (isServer) {
-      config.externals = [...(config.externals || []), '@libsql/client']
+      config.externals = [...(config.externals || []), '@libsql/client', '@mastra/core']
     }
 
     // punycode警告を抑制
@@ -37,7 +37,7 @@ const nextConfig = withPWA({
   },
   // Node.js環境の設定
   experimental: {
-    serverComponentsExternalPackages: ['punycode'],
+    serverComponentsExternalPackages: ['punycode', '@mastra/core'],
   },
 })
 
