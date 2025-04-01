@@ -10,13 +10,14 @@ import { TProductSearch } from '@/front/components/03_templates/TProductSearch'
 import { Button } from '@/front/components/ui/button'
 import { Card } from '@/front/components/ui/card'
 import { usePromptGroup } from '@/front/hooks/resources/prompt-groups/usePromptGroup'
-import { ArrowLeft, Heart, Orbit, ShoppingCart, X } from 'lucide-react'
+import { ArrowLeft, Heart, Loader2, Orbit, ShoppingCart, X } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Head from 'next/head'
 import { useParams, useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 export default function Page() {
+  const [isClient, setIsClient] = useState(false)
   const router = useRouter()
   const params = useParams()
   const searchParams = useSearchParams()
@@ -53,6 +54,10 @@ export default function Page() {
       setCursorVisible((prev) => !prev)
     }, 500)
     return () => clearInterval(interval)
+  }, [])
+
+  useEffect(() => {
+    setIsClient(true)
   }, [])
 
   useEffect(() => {
@@ -102,6 +107,14 @@ export default function Page() {
   const handleRwaClick = () => {
     setModalType('rwa')
     setShowModal(true)
+  }
+
+  if (!isClient) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    )
   }
 
   if (loading || promptGroupIsLoading) {
