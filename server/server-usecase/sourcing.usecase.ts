@@ -16,10 +16,7 @@ const execute = async (
     const promptGroup = await initializePromptGroup(chatUniqueKey, question)
 
     // 非同期で実行
-    processSourcing(promptGroup.prompts[0].uniqueKey, question).then(() => {
-      // 会話エージェントが成功したら、ユーザーのプロンプト使用回数をインクリメント
-      userPromptUsageService.increment(userPromptUsage)
-    })
+    processSourcing(promptGroup.prompts[0].uniqueKey, question, userPromptUsage)
 
     const promptGroupEntity = promptGroupMapper.toDomain(promptGroup)
     return promptGroupEntity
@@ -58,10 +55,15 @@ const initializePromptGroup = async (chatUniqueKey: string, question: string) =>
   })
 }
 
-const processSourcing = async (promptUniqueKey: string, question: string) => {
+const processSourcing = async (
+  promptUniqueKey: string,
+  question: string,
+  userPromptUsage: UserPromptUsage,
+) => {
   try {
     console.log('searching....')
 
+    userPromptUsageService.increment(userPromptUsage)
     const sourcingWorkflow = mastra.getWorkflow('sourcingWorkflow')
     const run = sourcingWorkflow.createRun()
     const workflowResult = await run.start({
