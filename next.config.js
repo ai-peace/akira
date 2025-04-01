@@ -1,14 +1,5 @@
-// next.config.js (ESM構文)
-import nextPWA from 'next-pwa'
-
-const withPWA = nextPWA({
-  dest: 'public',
-  register: true,
-  skipWaiting: true,
-})
-
 /** @type {import('next').NextConfig} */
-const nextConfig = withPWA({
+const nextConfig = {
   reactStrictMode: true,
   webpack: (config, { isServer }) => {
     // webpackのキャッシュを無効化
@@ -39,6 +30,6 @@ const nextConfig = withPWA({
   experimental: {
     serverComponentsExternalPackages: ['punycode', '@mastra/core'],
   },
-})
+}
 
 export default nextConfig
