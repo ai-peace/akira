@@ -48,7 +48,7 @@ const extractTagsStep = new Step({
         try {
           const updatedResult = {
             data: [],
-            message: '検索条件に一致する商品は見つかりませんでした。',
+            message: 'No products found matching your search criteria.',
             keywords: [],
             sourceSites: [],
           }
