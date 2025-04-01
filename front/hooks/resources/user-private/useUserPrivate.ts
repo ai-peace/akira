@@ -15,6 +15,12 @@ const useUserPrivate = () => {
       if (!accessToken) return null
       return await userPrivateRepository.get(accessToken)
     },
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      dedupingInterval: 5000, // 5秒間は重複リクエストを防ぐ
+      refreshInterval: 30000, // 30秒ごとに自動更新
+    },
   )
 
   // localStorage内のトークンの変更を検知してリロードする
