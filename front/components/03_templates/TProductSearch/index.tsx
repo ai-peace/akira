@@ -228,7 +228,7 @@ const Component: FC<Props> = ({
             {isTagsLoading ? (
               <div className="flex items-center justify-center pb-4 pt-2 text-gray-500">
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                <span className="text-sm font-medium">カテゴリ解析中...</span>
+                <span className="text-sm font-medium">Analyzing categories...</span>
               </div>
             ) : uniqueTags.length > 1 ? (
               <div className="flex w-full">
@@ -264,18 +264,18 @@ const Component: FC<Props> = ({
         {hasNoResults ? (
           <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 py-12 text-center">
             <SearchX className="mb-3 h-12 w-12 text-gray-400" />
-            <h3 className="mb-1 text-lg font-medium text-gray-900">検索結果がありません</h3>
+            <h3 className="mb-1 text-lg font-medium text-gray-900">No Results Found</h3>
             <p className="text-sm text-gray-500">
-              検索条件を変更するか、別のキーワードで再度お試しください。
+              Please try again by changing your search criteria or using different keywords.
             </p>
           </div>
         ) : filteredProducts.length === 0 && searchTerm !== '' ? (
           <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 bg-gray-50 py-12 text-center">
             <SearchX className="mb-3 h-12 w-12 text-gray-400" />
             <h3 className="mb-1 text-lg font-medium text-gray-900">
-              検索条件に一致する商品がありません
+              No Products Match Your Search Criteria
             </h3>
-            <p className="text-sm text-gray-500">検索条件を変更してお試しください。</p>
+            <p className="text-sm text-gray-500">Please try modifying your search criteria.</p>
           </div>
         ) : (
           <OProductListItemCollection

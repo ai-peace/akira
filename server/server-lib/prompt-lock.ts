@@ -134,7 +134,7 @@ export const promptProductSaver = {
 // 結果メッセージを生成する関数
 const getResultMessage = (products: any[], isPartial: boolean = false) => {
   if (products.length === 0) {
-    return '検索条件に一致する商品は見つかりませんでした。'
+    return 'No products found matching your search criteria.'
   }
-  return `検索条件に一致する商品が${products.length}件${isPartial ? '（途中経過）' : ''}見つかりました。`
+  return `Found ${products.length} product${products.length > 1 ? 's' : ''} matching your search criteria${isPartial ? ' (interim results)' : ''}.`
 }
