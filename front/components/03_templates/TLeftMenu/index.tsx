@@ -7,11 +7,13 @@ import { OWalletConnectButton } from '@/front/components/02_organisms/OWalletCon
 import { useChats } from '@/front/hooks/resources/chats/useChats'
 import { useUserPrivate } from '@/front/hooks/resources/user-private/useUserPrivate'
 import { leftMenuVisibleAtom } from '@/front/store/atoms/menuAtoms'
+import { usePrivy } from '@privy-io/react-auth'
 import { useAtom } from 'jotai'
 import { useEffect, useRef, useState } from 'react'
 
 const Component = () => {
   const { userPrivate } = useUserPrivate()
+  const { ready, authenticated } = usePrivy()
   const [isVisible, setIsVisible] = useAtom(leftMenuVisibleAtom)
   const [isMobile, setIsMobile] = useState(false)
   const [isDragging, setIsDragging] = useState(false)
@@ -120,11 +122,11 @@ const Component = () => {
       >
         <div
           ref={drawerRef}
-          className="animate-slide-in-bottom bg-background-soft absolute bottom-0 left-0 right-0 h-[80vh] rounded-t-xl"
+          className="absolute bottom-0 left-0 right-0 h-[80vh] animate-slide-in-bottom rounded-t-xl bg-background-soft"
           onClick={(e) => e.stopPropagation()}
         >
           <div
-            className="bg-background-soft sticky left-0 top-0 z-10 flex h-12 w-full flex-col items-center justify-center px-4"
+            className="sticky left-0 top-0 z-10 flex h-12 w-full flex-col items-center justify-center bg-background-soft px-4"
             onMouseDown={handleDragStart}
             onTouchStart={handleDragStart}
           >
@@ -141,13 +143,13 @@ const Component = () => {
             {!userPrivate && (
               <div className="flex h-full flex-col items-center justify-center p-4">
                 <p className="mb-4 text-center text-sm text-muted-foreground">
-                  ログインするとチャット履歴が保存されます
+                  Chat history will be saved when you log in
                 </p>
                 <OWalletConnectButton className="w-full" />
               </div>
             )}
             {userPrivate && (
-              <div className="bg-background-soft sticky bottom-0 left-0 right-0 mt-auto px-4 py-4">
+              <div className="sticky bottom-0 left-0 right-0 mt-auto bg-background-soft px-4 py-4">
                 <div className="flex flex-col gap-4">
                   <OUserPromptUsage />
                   <OUserProfile />
@@ -162,7 +164,7 @@ const Component = () => {
 
   // デスクトップ表示
   return (
-    <div className="border-border-subtle bg-background-soft relative flex h-full w-[320px] flex-col overflow-y-scroll">
+    <div className="relative flex h-full w-[320px] flex-col overflow-y-scroll border-border-subtle bg-background-soft">
       {userPrivate && (
         <>
           <div className="relative mt-0 h-full w-full flex-grow overflow-x-hidden">
@@ -172,7 +174,7 @@ const Component = () => {
               </div>
             )}
           </div>
-          <div className="bg-background-soft sticky bottom-0 left-0 right-0 mt-auto px-4 py-4">
+          <div className="sticky bottom-0 left-0 right-0 mt-auto bg-background-soft px-4 py-4">
             <div className="flex flex-col gap-4">
               <OUserPromptUsage />
               <OUserProfile />
@@ -180,10 +182,10 @@ const Component = () => {
           </div>
         </>
       )}
-      {!userPrivate && (
+      {ready && !authenticated && (
         <div className="flex h-full flex-col items-center justify-center p-4">
           <p className="mb-4 text-center text-sm text-muted-foreground">
-            ログインするとチャット履歴が保存されます
+            Chat history will be saved when you log in
           </p>
           <OWalletConnectButton className="w-full" />
         </div>
