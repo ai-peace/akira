@@ -16,7 +16,7 @@ const sourcingWorkflow: Workflow = new Workflow({
   }),
 })
 
-/* prettier-ignore */
+/* prettier-ignore */ http://localhost:4111/tools
 sourcingWorkflow
   .step(translateStep)
   .after(translateStep)
@@ -25,10 +25,8 @@ sourcingWorkflow
   .after(translateStep)
     .step(buildQuerySurugayaStep)
     .then(pageCrawlerSurugayaStep)
-  .step(saveProductsStep)
   .after([pageCrawlerMandarakeStep, pageCrawlerSurugayaStep])
   .step(extractTagsStep)
-  .after(saveProductsStep)
   .commit()
 
 export { sourcingWorkflow }
