@@ -1,69 +1,69 @@
 # ECサイト解析とステップ実装のためのLLM指示ガイド
 
-あなたは新しいECサイトの商品検索機能を実装するアシスタントです。
+あなたはECサイトを解析し、mastraのAIエージェントの一部のステップを構築する、プログラマです。
 
 ## 目的
 
 指定されたECサイトから商品情報を収集するための2つのステップを作成します：
 
-1. クエリビルダーステップ（build-query.{サイト名}.step.ts）
-2. ページクローラーステップ（page-crawler.{サイト名}.step.ts）
+1. クエリビルダーステップ（server/mastra/workflows/{サイト名}/build-query.{サイト名}.step.ts）
+2. ページクローラーステップ（server/mastra/workflows/{サイト名}/page-crawler.{サイト名}.step.ts）
 
-## 前提条件
+これはmastraフレームワークを元に作る、workflowのstepの一部となります。
+server/mastra/workflows/index.ts
+がワークフローのもとで、サイトごとにステップを用意しています。
 
-1. サイトのURLが特定できていること
-2. 検索機能が利用可能であること
-3. 基本的なアクセス制限がないこと
+そのステップが下記です。
 
-## 実装概要
-
-- 01_overview.md
-- 02_build-query-step.md
-- 03_page-crawler-step.md
+- Mandarake実装: server/mastra/workflows/mandarake/
+- Surugaya実装: server/mastra/workflows/surugaya/
 
 ## 解析手順
 
-### 1. サイトの基本解析
+### 1. URLがなければ検索エンジンで検索して発見する。
 
-1. メインページにアクセスし、以下を確認：
+LLMの記憶や、検索エンジンで特定のURLを取得
 
-   - 検索フォームの有無と形式
-   - 基本的なナビゲーション構造
-   - エラーページやCAPTCHAの有無
+### 2. URLにアクセスし、下記を実施
 
-2. 検索機能の動作確認：
-   - 基本的な検索（例：「ワンピース」）
-   - 詳細検索オプションの確認
-   - 検索結果ページの構造
+- キーワード検索のフォームを見つけて「ワンピース」と入力して検索できるかをためす
+  - 検索できない場合、他のフォームにアクセスし、検索結果を試す
+  - 検索ができない場合（ワンピースに対応するものがない場合）、これは対策されているサイトと判断し、ユーザーに報告して中断する
 
-### 2. 検索URLの解析
+### 3. キーワード検索ができた場合
 
-1. 検索時のURLパターンを確認：
+- 検索オプションを解析したいので、絞り込みやカテゴリなどの各種ボタンとキーワードを解析する
+  - その際、URLにオプションが足される形なのか、切り替わってしまう形なのかは要確認。
+    - URLオプションにクエリ型されるものは、絞り込みの性質であると判断し取り入れられる
+    - そうではなく切り替わる場合は別ページの可能性が高いので、要検討する
+- 様々な検索クエリを何回も試してリストアップする。
 
-   - ベースURL
-   - クエリパラメータの形式
-   - 必須パラメータと任意パラメータ
+### 4. 商品情報の構造解析
 
-2. 特殊なパラメータの確認：
-   - カテゴリー指定
-   - 価格範囲
-   - 商品状態
-   - ソート順
+最終的に下記の方式にするように解析をかける。
 
-### 3. 商品情報の構造解析
-
-1. 商品リストの構造：
-
-   - リストのコンテナ要素
-   - 個別商品要素
-   - ページネーション要素
-
-2. 商品詳細情報：
-   - タイトル
-   - 価格
-   - 在庫状態
-   - 画像URL
-   - 商品URL
+```typescript
+{
+  products: Array<{
+    uniqueKey: string
+    title: {
+      en: string
+      ja: string
+    }
+    price: number
+    priceWithTax?: number
+    currency: string
+    condition?: string
+    description?: string
+    imageUrl?: string
+    url?: string
+    status: StockStatus
+    itemCode: string
+    shopName: string
+    shopIconUrl: string
+  }>
+}
+```
 
 ## 実装要件
 
@@ -173,6 +173,12 @@
    - 複合条件での検索
    - 特殊文字の処理
    - 境界値テスト
+
+## 参考：モジュール概要
+
+- 01_overview.md
+- 02_build-query-step.md
+- 03_page-crawler-step.md
 
 ## 参考実装
 
