@@ -1,6 +1,7 @@
 export const STOCK_STATUS = {
   AVAILABLE: 'available',
   REQUIRES_USER_CONFIRMATION: 'requires user confirmation',
+  PRE_ORDER: 'pre-order',
   OUT_OF_STOCK: 'out-of-stock',
   UNKNOWN: 'unknown',
 } as const
@@ -15,6 +16,10 @@ export const STOCK_STATUS_DISPLAY = {
   [STOCK_STATUS.REQUIRES_USER_CONFIRMATION]: {
     en: 'Check Stock',
     ja: '在庫確認要',
+  },
+  [STOCK_STATUS.PRE_ORDER]: {
+    en: 'Preorder',
+    ja: '予約受付中',
   },
   [STOCK_STATUS.OUT_OF_STOCK]: {
     en: 'Out of Stock',
@@ -32,6 +37,7 @@ const LEGACY_STATUS_MAPPING: Record<string, StockStatus> = {
   在庫あります: STOCK_STATUS.AVAILABLE,
   在庫確認します: STOCK_STATUS.REQUIRES_USER_CONFIRMATION,
   在庫なし: STOCK_STATUS.OUT_OF_STOCK,
+  予約受付中: STOCK_STATUS.PRE_ORDER,
   '': STOCK_STATUS.OUT_OF_STOCK,
 }
 

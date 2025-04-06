@@ -6,6 +6,14 @@ import { buildQueryMandarakeStep } from './mandarake/build-query.mandarake.step'
 import { pageCrawlerMandarakeStep } from './mandarake/page-crawler.mandarake.step'
 import { buildQuerySurugayaStep } from './surugaya/build-query.surugaya.step'
 import { pageCrawlerSurugayaStep } from './surugaya/page-crawler.surugaya.step'
+import { buildQueryTreasureFStep } from './treasure-f/build-query.treasure-f.step'
+import { pageCrawlerTreasureFStep } from './treasure-f/page-crawler.treasure-f.step'
+import { buildQueryToysrusStep } from './toysrus/build-query.toysrus.step'
+import { pageCrawlerToysrusStep } from './toysrus/page-crawler.toysrus.step'
+import { pageCrawlerCardrushPokemonStep } from './cardrush-pokemon/page-crawler.cardrush-pokemon.step'
+import { buildQueryCardrushPokemonStep } from './cardrush-pokemon/build-query.cardrush-pokemon.step'
+import { buildQueryAmiAmiStep } from './amiami/build-query.amiami.step'
+import { pageCrawlerAmiAmiStep } from './amiami/page-crawler.amiami.step'
 
 const sourcingWorkflow: Workflow = new Workflow({
   name: 'sourcing-workflow',
@@ -24,7 +32,16 @@ sourcingWorkflow
   .after(translateStep)
     .step(buildQuerySurugayaStep)
     .then(pageCrawlerSurugayaStep)
-  .after([pageCrawlerMandarakeStep, pageCrawlerSurugayaStep])
+  .after(translateStep)
+    .step(buildQueryTreasureFStep)
+    .then(pageCrawlerTreasureFStep)
+  .after(translateStep)
+    .step(buildQueryToysrusStep)
+    .then(pageCrawlerToysrusStep)
+  .after(translateStep)
+    .step(buildQueryCardrushPokemonStep)
+    .then(pageCrawlerCardrushPokemonStep)
+  .after([pageCrawlerMandarakeStep, pageCrawlerSurugayaStep, pageCrawlerTreasureFStep, pageCrawlerToysrusStep, pageCrawlerCardrushPokemonStep])
   .step(extractTagsStep)
   .commit()
 
