@@ -2,6 +2,7 @@ import { openai } from '@ai-sdk/openai'
 import { Agent } from '@mastra/core/agent'
 import { Step } from '@mastra/core/workflows'
 import { z } from 'zod'
+import { selectSourcesStep } from '../common/select-sources.step'
 import { translateStep } from '../common/translate.step'
 
 const buildQueryAmiAmiStep = new Step({
@@ -14,10 +15,13 @@ const buildQueryAmiAmiStep = new Step({
     options: z.record(z.string()),
   }),
   execute: async ({ context }) => {
-    console.log('buildQueryStep', context)
+    console.log('buildQueryAmiAmiStep', context)
 
-    const translatedResult = context.getStepResult(translateStep)
-    const translatedKeyword = translatedResult?.translatedKeyword
+    // selectSourcesStepから取得を試み、なければtranslateStepから取得
+    let translatedKeyword = context.getStepResult(selectSourcesStep)?.translatedKeyword
+    if (!translatedKeyword) {
+      translatedKeyword = context.getStepResult(translateStep)?.translatedKeyword
+    }
 
     console.log('translatedKeyword', translatedKeyword)
     if (!translatedKeyword) throw new Error('Translated keyword is required')
@@ -39,7 +43,7 @@ const buildQueryAmiAmiStep = new Step({
       const parsedResult = JSON.parse(result)
       return {
         keyword: parsedResult.keyword,
-        options: parsedResult.options,
+        options: parsedResult.options || {},
       }
     } catch (e) {
       throw new Error('Failed to parse agent response')
