@@ -35,9 +35,9 @@ sourcingWorkflow
   .after(translateStep)
     .step(buildQueryToysrusStep)
     .then(pageCrawlerToysrusStep)
-  .after([pageCrawlerToysrusStep])
+  // .after([pageCrawlerToysrusStep])
   // .after([pageCrawlerMandarakeStep, pageCrawlerSurugayaStep, pageCrawlerTreasureFStep, pageCrawlerToysrusStep])
-  .step(extractTagsStep)
+  // .step(extractTagsStep)
   .commit()
 
 export { sourcingWorkflow }

@@ -123,9 +123,11 @@ const pageCrawlerToysrusStep = new Step({
       const $ = cheerio.load(initialHtml)
 
       // 検索結果の総数を取得
-      const totalItemsText = $('.product-count').text().trim()
-      const totalItemsMatch = totalItemsText.match(/表示\s+(\d+)\s+\/\s+(\d+)\s+件/)
-      const totalItems = totalItemsMatch ? parseInt(totalItemsMatch[2]) : 0
+      const totalItemsText = $('.result-count').text().trim() || $('.product-count').text().trim()
+      const totalItemsMatch =
+        totalItemsText.match(/(\d+)件/) || totalItemsText.match(/表示\s+(\d+)\s+\/\s+(\d+)\s+件/)
+      const totalItems = totalItemsMatch ? parseInt(totalItemsMatch[totalItemsMatch.length - 1]) : 0
+      console.log('Total search results text:', totalItemsText)
       console.log('Total search results:', totalItems)
 
       // 1ページあたり48件で計算（テスト用に2ページのみに制限）
@@ -326,67 +328,91 @@ const mapHtmlToProducts = (html: string): ProductEntity[] => {
   const $ = cheerio.load(html)
   const products: ProductEntity[] = []
 
-  // 商品リストの要素を取得
+  // 商品リストの要素を取得 - .product-tileセレクタに特化
   $('.product-tile').each((_, element) => {
     try {
       const $item = $(element)
 
-      // 商品名とURL
-      const $titleLink = $item.find('.product-name a')
-      const jaTitle = $titleLink.text().trim()
+      // data-metadata属性から商品情報を取得
+      interface ProductMetadata {
+        id?: string
+        sku?: string
+        name?: string
+        name_local?: string
+        price?: string
+        location_id?: string
+        category5?: string
+        [key: string]: any
+      }
+
+      let metadata: ProductMetadata = {}
+      try {
+        const metadataStr = $item.attr('data-metadata')
+        if (metadataStr) {
+          metadata = JSON.parse(metadataStr) as ProductMetadata
+          console.log('Successfully parsed metadata for product')
+        }
+      } catch (error) {
+        console.error('Error parsing metadata JSON:', error)
+      }
+
+      // メタデータから情報を取得
+      const jaTitle = metadata.name_local || metadata.name || ''
+      const price = parseInt(metadata.price || '0') || 0
+
+      // URLを取得（相対パスを絶対URLに変換）
+      const $titleLink = $item.find('a').first()
       const url = $titleLink.attr('href') || ''
       const fullUrl = url.startsWith('http') ? url : `https://www.toysrus.co.jp${url}`
 
-      // 価格情報の取得
-      const priceText = $item.find('.product-sales-price').text().trim()
-      let price = 0
-      let priceWithTax = 0
-
-      // 価格のパース (¥5,999 などの形式)
-      const priceMatch = priceText.match(/[￥¥]([\d,]+)/)
-      if (priceMatch) {
-        price = parseInt(priceMatch[1].replace(/[^\d]/g, ''))
-        priceWithTax = price // 日本は税込み表示が一般的
-      }
-
-      // 商品画像URL
-      const imageUrl = $item.find('.product-image img').attr('src') || ''
+      // 画像URL（data-src属性を使用）
+      const $img = $item.find('img')
+      const imageUrl = $img.attr('data-src') || $img.attr('src') || ''
       const fullImageUrl = imageUrl.startsWith('http')
         ? imageUrl
         : `https://www.toysrus.co.jp${imageUrl}`
 
-      // 在庫状態を確認
-      const isOutOfStock = $item.find('.out-of-stock').length > 0
-      const statusText = $item.find('.availability').text().trim()
-
-      // 在庫状態をStockStatusに変換
+      // 在庫情報（メタデータまたはHTMLから）
       let status: StockStatus = STOCK_STATUS.UNKNOWN
+      const locationId = metadata.location_id || ''
+      const isOutOfStock =
+        $item.find('.out-of-stock, .sold-out, .unavailable').length > 0 ||
+        locationId === 'out_of_stock'
+      const statusText = $item.find('.availability, .stock-status, .product-status').text().trim()
+
       if (isOutOfStock || statusText.includes('在庫なし') || statusText.includes('品切れ')) {
         status = STOCK_STATUS.OUT_OF_STOCK
-      } else if (statusText.includes('予約受付中')) {
+      } else if (
+        jaTitle.includes('予約受付') ||
+        jaTitle.includes('予約商品') ||
+        statusText.includes('予約受付中') ||
+        statusText.includes('予約')
+      ) {
         status = STOCK_STATUS.PRE_ORDER
       } else {
         status = STOCK_STATUS.AVAILABLE
       }
 
-      // 商品の説明（あれば）
-      const description = $item.find('.product-description').text().trim() || ''
-
-      // 商品コード (商品URLから抽出)
-      let itemCode = ''
-      const itemCodeMatch = url.match(/\/(\d+-\d+)\.html/)
-      if (itemCodeMatch) {
-        itemCode = itemCodeMatch[1]
-      } else {
-        // バックアップとして一意な識別子を生成
-        itemCode = url.split('/').pop()?.split('.')[0] || generateUniqueKey().substring(0, 10)
+      // 商品コード
+      let itemCode = metadata.id || metadata.sku || ''
+      if (!itemCode) {
+        const itemCodeMatch = url.match(/\/([^\/]+)\.html/) || url.match(/\/(\d+-\d+)/)
+        if (itemCodeMatch) {
+          itemCode = itemCodeMatch[1]
+        } else {
+          itemCode = generateUniqueKey().substring(0, 10)
+        }
       }
 
-      // 新着タグがあるか確認
-      const isNewArrival = $item.find('.badge-new').length > 0
-
-      // カテゴリ情報
-      const category = $item.find('.product-category').text().trim() || ''
+      // デバッグログ
+      console.log('Parsed product:', {
+        title: jaTitle,
+        price,
+        url: fullUrl,
+        imageUrl: fullImageUrl,
+        status,
+        metadata: !!Object.keys(metadata).length,
+      })
 
       if (!jaTitle || !price) {
         console.log('Skipping item due to missing required fields:', { jaTitle, price })
@@ -400,10 +426,10 @@ const mapHtmlToProducts = (html: string): ProductEntity[] => {
           en: jaTitle, // 英語タイトルは現時点では日本語と同じ
         },
         price,
-        priceWithTax,
+        priceWithTax: price, // 日本は税込み表示
         currency: 'JPY',
-        condition: isNewArrival ? '新品' : '通常商品',
-        description: description || category,
+        condition: '',
+        description: metadata.category5 || '', // 年齢情報を説明に
         url: fullUrl,
         imageUrl: fullImageUrl,
         status,
@@ -415,6 +441,15 @@ const mapHtmlToProducts = (html: string): ProductEntity[] => {
       console.error('Error parsing item data:', itemError)
     }
   })
+
+  // 商品が見つからなかった場合のデバッグ情報
+  if (products.length === 0) {
+    console.log('No products found. Checking HTML structure...')
+    console.log('Page title:', $('title').text())
+    console.log('Found product containers:', $('.product-tile').length)
+    // ページの一部をログに出力してデバッグ
+    console.log('HTML snippet:', html.substring(0, 500))
+  }
 
   return products
 }
