@@ -10,6 +10,7 @@ buildQueryでのキーワードとOptionデータ取得を接続し、
 ## ファイルの置き場所
 
 `server/mastra/workflows/{サイト名}/page-crawler.{サイト名}.step.ts`
+必ずファイルを作成し、コードを作ること。エージェントとしての自律的な振る舞いを期待します。
 
 ## 具体的にやること
 
