@@ -364,41 +364,47 @@ const mapHtmlToProducts = (html: string): ProductEntity[] => {
   const heading = $('h2').text().trim()
   console.log('Page heading:', heading)
 
-  // 主要な商品リストを特定
-  // 検索結果の各商品を含むlist要素を処理
-  $('list').each((index, element) => {
-    // 商品リストの特徴を確認
-    const hasListItems = $(element).find('listitem').length > 0
-    const hasImage = $(element).find('img').length > 0
-    const hasPriceText = $(element).text().includes('円買取')
-
-    // 商品の詳細リンクを確認
-    const $titleLink = $(element).find('link[href*="/moetaku/detail/"]')
-    const hasDetailLink = $titleLink.length > 0
-
-    // 商品のヘッディングレベル3（タイトル）を確認
-    const hasHeadingLevel3 = $(element).find('heading[level="3"]').length > 0
-
-    // 商品リストの特定条件（もえたくの商品リストの特徴）
-    const isProductList =
-      hasListItems && hasImage && hasPriceText && (hasDetailLink || hasHeadingLevel3)
-
-    // 商品リストでない場合はスキップ
-    if (!isProductList) {
-      return
-    }
-
+  // 商品リストを特定 - 現在のDOM構造に合わせて修正
+  $('body list').each((index, element) => {
     try {
-      // 商品タイトルと詳細ページURL
-      const $heading = $(element).find('heading[level="3"]').first()
-      const productTitle = $heading.text().trim()
-      const productLinkHref = $titleLink.attr('href') || ''
-
-      // 商品詳細URLがない場合はスキップ
-      if (!productLinkHref.includes('/moetaku/detail/')) {
-        return
+      // 商品詳細ページへのリンクを確認
+      const $titleLink = $(element).find('listitem link[href*="/moetaku/detail/"]')
+      if ($titleLink.length === 0) {
+        return // 詳細ページへのリンクがない場合はスキップ
       }
 
+      // 価格情報が含まれているか確認
+      const hasPrice = $(element).text().includes('円買取')
+      if (!hasPrice) {
+        return // 価格情報がない場合はスキップ
+      }
+
+      // 画像の有無を確認
+      const hasImage = $(element).find('img').length > 0
+      if (!hasImage) {
+        return // 画像がない場合はスキップ
+      }
+
+      // 商品タイトル
+      const $heading = $(element).find('heading[level="3"]').first()
+      let productTitle = $heading.text().trim()
+
+      if (!productTitle) {
+        // ヘッディングが見つからない場合、リンクのテキストを使用
+        productTitle = $titleLink.text().trim()
+      }
+
+      if (!productTitle) {
+        return // タイトルが取得できない場合はスキップ
+      }
+
+      // 商品詳細URL
+      const productLinkHref = $titleLink.attr('href') || ''
+      if (!productLinkHref.includes('/moetaku/detail/')) {
+        return // 詳細URLが適切でない場合はスキップ
+      }
+
+      // 完全なURLを構築
       const fullUrl = productLinkHref.startsWith('http')
         ? productLinkHref
         : `https://www.netoff.co.jp${productLinkHref}`
@@ -417,13 +423,11 @@ const mapHtmlToProducts = (html: string): ProductEntity[] => {
       let priceText = ''
       let price = 0
 
-      // 値段テキストを検索（+10%UP!!がある場合とない場合）
+      // 値段テキストを検索 - "円買取" を含む要素を探す
       $(element)
         .find('listitem')
         .each((_, item) => {
           const itemText = $(item).text().trim()
-
-          // 円買取を含むテキスト（価格情報）
           if (itemText.includes('円買取')) {
             priceText = itemText
             return false // ループを抜ける
@@ -454,51 +458,31 @@ const mapHtmlToProducts = (html: string): ProductEntity[] => {
       let manufacturer = ''
       let series = ''
 
+      // メーカー情報を取得しようとする
       $(element)
-        .find('link')
-        .each((_, link) => {
-          const linkText = $(link).text().trim()
-          const href = $(link).attr('href') || ''
+        .find('listitem')
+        .each((_, item) => {
+          const $links = $(item).find('link')
+          $links.each((_, link) => {
+            const linkText = $(link).text().trim()
+            const href = $(link).attr('href') || ''
 
-          if (!linkText) return
+            if (!linkText) return
 
-          // メーカー情報
-          if (href.includes('/figure/purchase/?mk=')) {
-            manufacturer = linkText
-          }
-          // シリーズ情報
-          else if (href.includes('/figure/purchase/?sr=')) {
-            series = linkText
-          }
-          // キーワード検索から推測
-          else if (href.includes('/figure/purchase/?ky=')) {
-            // メーカーの特徴的な名称
-            if (
-              !manufacturer &&
-              (linkText.includes('カンパニー') ||
-                linkText.includes('コーポレーション') ||
-                linkText.includes('トイ') ||
-                linkText.includes('バンダイ') ||
-                linkText.includes('メディコム') ||
-                linkText.includes('タイトー') ||
-                linkText.includes('セガ'))
-            ) {
-              manufacturer = linkText
+            // メーカー情報の可能性がある場合
+            if (href.includes('/figure/purchase/?mk=') || href.includes('/figure/purchase/?ky=')) {
+              if (!manufacturer && isManufacturer(linkText)) {
+                manufacturer = linkText
+              }
             }
-            // シリーズの特徴的な名称
-            else if (
-              !series &&
-              (linkText.includes('シリーズ') ||
-                linkText.includes('figma') ||
-                linkText.includes('ねんどろいど') ||
-                linkText.includes('一番くじ') ||
-                linkText.includes('UDF') ||
-                linkText.includes('VCD') ||
-                linkText.includes('ROBOT魂'))
-            ) {
-              series = linkText
+
+            // シリーズ情報の可能性がある場合
+            if (href.includes('/figure/purchase/?sr=') || href.includes('/figure/purchase/?ky=')) {
+              if (!series && isSeries(linkText)) {
+                series = linkText
+              }
             }
-          }
+          })
         })
 
       // 未開封品かどうか
@@ -542,3 +526,52 @@ const mapHtmlToProducts = (html: string): ProductEntity[] => {
   console.log(`抽出した商品の総数: ${products.length}`)
   return products
 }
+
+// メーカーかどうかを判断するヘルパー関数
+function isManufacturer(text: string): boolean {
+  const manufacturers = [
+    'バンプレスト',
+    'バンダイ',
+    'メガハウス',
+    'ボークス',
+    'ホットトイズ',
+    'フリュー',
+    'メディコム・トイ',
+    'プレックス',
+    'BANDAI SPIRITS',
+    'タイトー',
+    'セガ',
+    'アニプレックス',
+    'ブロッコリー',
+    'コトブキヤ',
+    'グッドスマイルカンパニー',
+  ]
+  return (
+    manufacturers.some((m) => text.includes(m)) ||
+    text.includes('カンパニー') ||
+    text.includes('コーポレーション') ||
+    text.includes('トイ')
+  )
+}
+
+// シリーズかどうかを判断するヘルパー関数
+function isSeries(text: string): boolean {
+  const seriesKeywords = [
+    'シリーズ',
+    'figma',
+    'ねんどろいど',
+    '一番くじ',
+    'UDF',
+    'VCD',
+    'ROBOT魂',
+    'Portrait.Of.Pirates',
+    'KING OF ARTIST',
+    'Grandista',
+    'ワールドコレクタブル',
+    'フィギュアーツZERO',
+  ]
+  return seriesKeywords.some((s) => text.includes(s))
+}
+
+// 他のファイルからインポートできるようにエクスポート
+export { mapHtmlToProducts }
