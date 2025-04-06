@@ -107,6 +107,9 @@ importers:
       next-themes:
         specifier: ^0.4.6
         version: 0.4.6(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
+      playwright:
+        specifier: ^1.51.1
+        version: 1.51.1
       postcss:
         specifier: ^8.4.49
         version: 8.5.3
@@ -13250,15 +13253,13 @@ snapshots:
 
   pirates@4.0.7: {}
 
-  playwright-core@1.51.1:
-    optional: true
+  playwright-core@1.51.1: {}
 
   playwright@1.51.1:
     dependencies:
       playwright-core: 1.51.1
     optionalDependencies:
       fsevents: 2.3.2
-    optional: true
 
   pngjs@5.0.0: {}
 
