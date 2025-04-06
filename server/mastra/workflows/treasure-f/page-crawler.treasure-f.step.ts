@@ -150,18 +150,30 @@ const pageCrawlerTreasureFStep = new Step({
       const totalItemsText =
         $('p[ref^="s1e"]')
           .text()
-          .match(/検索結果\（(\d+)件\）/)?.[1] || '0'
+          .match(/検索結果\（(\d+)件\）/)?.[1] ||
+        $('li.is-current.cm-typo_body_d')
+          .text()
+          .match(/検索結果（(\d+)件）/)?.[1] ||
+        '0'
       const totalItems = parseInt(totalItemsText)
       console.log('Total search results:', totalItems)
 
       // 合計ページ数を取得
-      const paginationItems = $('ul[ref^="s1e"] li[ref^="s1e"]').filter((_, el) => {
-        const text = $(el).text().trim()
-        return /^\d+$/.test(text)
-      })
+      let maxPage = 1
+      const paginationItems = $('ul[ref^="s1e"] li[ref^="s1e"], .page-pagination li').filter(
+        (_, el) => {
+          const text = $(el).text().trim()
+          return /^\d+$/.test(text)
+        },
+      )
 
-      const lastPageText = paginationItems.last().text().trim()
-      const maxPage = lastPageText ? parseInt(lastPageText) : 1
+      if (paginationItems.length > 0) {
+        const lastPageText = paginationItems.last().text().trim()
+        maxPage = lastPageText ? parseInt(lastPageText) : 1
+      } else {
+        // ページネーションが見つからない場合、アイテム数から推定
+        maxPage = Math.ceil(totalItems / parseInt(searchParams.get('number') || '60'))
+      }
       console.log(`Total pages detected: ${maxPage}`)
 
       // 実際に取得するページ数（テスト用に制限をかける場合）
@@ -368,6 +380,9 @@ const mapHtmlToProducts = (html: string): ProductEntity[] => {
     'ul[ref="s1e191"] > li',
     'ul[ref^="s1e"] > li[ref^="s1e"]',
     '.items > .item', // 通常のHTML形式
+    '.cm-itemlist.cm-itemlist_a > .pj-search_item', // トレファクONLINEの実際の商品リスト構造
+    'ul.cm-itemlist > li.pj-search_item', // バリエーション
+    '.pj-search_items .cm-itemlist li', // より広範囲なセレクタ
   ]
 
   for (const selector of productSelectors) {
@@ -383,39 +398,77 @@ const mapHtmlToProducts = (html: string): ProductEntity[] => {
 
   console.log(`合計 ${$items.length} 個の商品要素が見つかりました`)
 
+  // さらに詳細なデバッグ情報
+  if ($items.length === 0) {
+    console.log('商品リストが見つかりませんでした。代替手段を試みます:')
+
+    // 最も単純なセレクタで試す
+    const allItems = $('.pj-search_items li')
+    console.log(`単純なセレクタ .pj-search_items li で ${allItems.length} 個の要素が見つかりました`)
+
+    if (allItems.length > 0) {
+      // 改めて商品リストを取得し直す
+      allItems.each((_, element) => {
+        $items.push($(element))
+      })
+    }
+  }
+
   for (const $item of $items) {
     try {
       // 商品ページへのリンク
       // スナップショット形式と通常のHTMLフォーマットの両方をサポート
-      const itemLink = $item.find('a[href*="/ec/detail/"]').first()
+      const itemLink = $item
+        .find('a[href*="/item/"], a[href*="/ec/detail/"], a.cm-itemlist_itemcode_link')
+        .first()
       const itemHref = itemLink.attr('href')
 
-      if (!itemHref || !itemHref.includes('/ec/detail/')) {
+      if (!itemHref) {
         console.log('商品リンクが見つかりませんでした')
         continue
       }
 
       // 商品ページのURL
-      const url = `https://ec.treasure-f.com${itemHref}`
+      let url
+      if (itemHref.startsWith('http')) {
+        url = itemHref
+      } else if (itemHref.startsWith('/item/')) {
+        url = `https://ec.treasure-f.com${itemHref}`
+      } else if (itemHref.includes('/ec/detail/')) {
+        url = `https://ec.treasure-f.com${itemHref}`
+      } else {
+        url = `https://ec.treasure-f.com${itemHref}`
+      }
 
       // 商品タイトル
       let title = ''
-      // スナップショット形式
-      const titleElement = $item
-        .find('text')
-        .filter(function (this: any) {
-          return (
-            $(this).text().trim().length > 0 &&
-            !$(this).text().includes('￥') &&
-            !$(this).text().includes('¥')
-          )
-        })
-        .first()
+      // 商品タイトルの取得（複数の方法でトライ）
+      const titleElements = [
+        $item.find('.cm-itemlist_text').last(), // 最後のテキスト要素（通常商品名）
+        $item.find('.cm-typo_body_a.cm-itemlist_text').last(), // クラス指定でより詳細に
+        $item.find('p.cm-itemlist_text').last(), // pタグで指定
+        $item
+          .find('text')
+          .filter(function (this: any) {
+            return (
+              $(this).text().trim().length > 0 &&
+              !$(this).text().includes('￥') &&
+              !$(this).text().includes('¥')
+            )
+          })
+          .first(),
+      ]
 
-      if (titleElement.length > 0) {
-        title = titleElement.text().trim()
-      } else {
-        // 通常のHTML形式
+      // 最初に見つかった有効なタイトル要素を使用
+      for (const elem of titleElements) {
+        if (elem.length > 0 && elem.text().trim()) {
+          title = elem.text().trim()
+          break
+        }
+      }
+
+      // 通常のHTML形式のバックアップ
+      if (!title) {
         title = $item.find('.item_name, .name, .title').first().text().trim()
       }
 
@@ -425,20 +478,27 @@ const mapHtmlToProducts = (html: string): ProductEntity[] => {
       }
 
       // 価格
-      // スナップショット形式: "￥"マークを含むparagraphタグ
-      const priceElement = $item.find('paragraph[ref^="s1e"]').filter(function (this: any) {
-        const text = $(this).text()
-        return text.includes('￥') || text.includes('¥')
-      })
-
-      // 通常のHTML形式: 価格を含む要素
-      const normalPriceElement = $item.find('.item_price, .price, .selling_price')
+      // スナップショット形式と通常のHTML形式の両方の要素を試す
+      const priceSelectors = [
+        'p.cm-typo_head4.cm-itemlist_price', // 実際のサイトの価格表示要素
+        '.cm-itemlist_price',
+        'paragraph[ref^="s1e"]',
+        '.item_price',
+        '.price',
+        '.selling_price',
+      ]
 
       let priceText = ''
-      if (priceElement.length > 0) {
-        priceText = priceElement.text().trim()
-      } else if (normalPriceElement.length > 0) {
-        priceText = normalPriceElement.text().trim()
+      for (const selector of priceSelectors) {
+        const elem = $item.find(selector).filter(function (this: any) {
+          const text = $(this).text()
+          return text.includes('￥') || text.includes('¥')
+        })
+
+        if (elem.length > 0 && elem.text().trim()) {
+          priceText = elem.text().trim()
+          break
+        }
       }
 
       if (!priceText) {
@@ -457,55 +517,77 @@ const mapHtmlToProducts = (html: string): ProductEntity[] => {
 
       // 商品画像
       let imageUrl = ''
-      // スナップショット形式
-      const imageElement = $item.find('image[ref^="s1e"]').first()
-      if (imageElement.length > 0) {
-        imageUrl = imageElement.attr('src') || ''
-      } else {
-        // 通常のHTML形式
-        const normalImageElement = $item
-          .find('img.item_image, img.image, img.product_image')
-          .first()
-        imageUrl = normalImageElement.attr('src') || normalImageElement.attr('data-src') || ''
+      // 画像要素を探す（複数の方法でトライ）
+      const imageSelectors = [
+        '.cm-itemlist_image img', // 実際のサイトの画像要素
+        'image[ref^="s1e"]',
+        'img.item_image',
+        'img.image',
+        'img.product_image',
+        'img', // 最後の手段として任意のimg要素
+      ]
+
+      for (const selector of imageSelectors) {
+        const elem = $item.find(selector).first()
+        if (elem.length > 0) {
+          imageUrl = elem.attr('src') || elem.attr('data-src') || ''
+          if (imageUrl) break
+        }
+      }
+
+      // 相対パスの場合はベースURLを追加
+      if (imageUrl && imageUrl.startsWith('/')) {
+        imageUrl = `https://ec.treasure-f.com${imageUrl}`
       }
 
       // 商品の状態
-      // スナップショット形式
-      let conditionText = $item
-        .find('text')
-        .filter(function (this: any) {
-          const text = $(this).text().trim()
-          return text === '未使用' || text.includes('SALE') || text.includes('NEW')
-        })
-        .first()
-        .text()
-        .trim()
+      // 様々な状態表示要素を試す
+      const conditionSelectors = [
+        '.cm-tag_unused',
+        '.cm-tag_new',
+        'text',
+        '.item_condition',
+        '.condition',
+        '.status',
+      ]
 
-      // 通常のHTML形式
-      if (!conditionText) {
-        conditionText = $item.find('.item_condition, .condition, .status').first().text().trim()
+      let conditionText = ''
+      for (const selector of conditionSelectors) {
+        let elem
+        if (selector === 'text') {
+          elem = $item
+            .find(selector)
+            .filter(function (this: any) {
+              const text = $(this).text().trim()
+              return text === '未使用' || text.includes('SALE') || text.includes('NEW')
+            })
+            .first()
+        } else {
+          elem = $item.find(selector).first()
+        }
+
+        if (elem.length > 0 && elem.text().trim()) {
+          conditionText = elem.text().trim()
+          break
+        }
       }
 
-      // デフォルト値
+      // 未使用タグがない場合
       if (!conditionText) {
         conditionText = '状態不明'
       }
 
       // ショップ情報
-      // スナップショット形式
+      // ショップリンクを探す
+      const shopSelectors = ['a[href*="/shop/"]', 'a[href*="/search?step=1&shop="]']
+
       let shopName = ''
-      const shopLink = $item.find('a[ref^="s1e"]').filter(function (this: any) {
-        const href = $(this).attr('href')
-        return href && (href.includes('/shop/') || href.includes('/search?step=1&shop='))
-      })
-
-      // 通常のHTML形式
-      const normalShopLink = $item.find('a[href*="/shop/"], a[href*="/search?step=1&shop="]')
-
-      if (shopLink.length > 0) {
-        shopName = shopLink.text().trim()
-      } else if (normalShopLink.length > 0) {
-        shopName = normalShopLink.text().trim()
+      for (const selector of shopSelectors) {
+        const elem = $item.find(selector)
+        if (elem.length > 0 && elem.text().trim()) {
+          shopName = elem.text().trim()
+          break
+        }
       }
 
       if (!shopName) {
@@ -516,7 +598,17 @@ const mapHtmlToProducts = (html: string): ProductEntity[] => {
       const status = STOCK_STATUS.AVAILABLE
 
       const uniqueKey = uuidv4()
-      const itemCode = itemHref.split('/').pop() || ''
+      let itemCode = ''
+
+      // 商品コードの抽出方法
+      // URLからパターンを抽出
+      const itemCodeMatch = url.match(/\/item\/([^\/\?]+)/) || url.match(/\/ec\/detail\/([^\/\?]+)/)
+      if (itemCodeMatch && itemCodeMatch[1]) {
+        itemCode = itemCodeMatch[1]
+      } else {
+        // URLからのパターン抽出に失敗した場合、ランダムな文字列を生成
+        itemCode = `tf-${Math.random().toString(36).substring(2, 10)}`
+      }
 
       const product: ProductEntity = {
         uniqueKey,
