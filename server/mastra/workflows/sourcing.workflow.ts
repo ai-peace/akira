@@ -1,6 +1,7 @@
 import { Workflow } from '@mastra/core/workflows'
 import { z } from 'zod'
 import { extractTagsStep } from './common/extract-tags.step'
+import { selectSourcesStep } from './common/select-sources.step'
 import { translateStep } from './common/translate.step'
 import { buildQueryMandarakeStep } from './mandarake/build-query.mandarake.step'
 import { pageCrawlerMandarakeStep } from './mandarake/page-crawler.mandarake.step'
@@ -12,8 +13,6 @@ import { buildQueryToysrusStep } from './toysrus/build-query.toysrus.step'
 import { pageCrawlerToysrusStep } from './toysrus/page-crawler.toysrus.step'
 import { pageCrawlerCardrushPokemonStep } from './cardrush-pokemon/page-crawler.cardrush-pokemon.step'
 import { buildQueryCardrushPokemonStep } from './cardrush-pokemon/build-query.cardrush-pokemon.step'
-import { buildQueryAmiAmiStep } from './amiami/build-query.amiami.step'
-import { pageCrawlerAmiAmiStep } from './amiami/page-crawler.amiami.step'
 
 const sourcingWorkflow: Workflow = new Workflow({
   name: 'sourcing-workflow',
@@ -26,21 +25,48 @@ const sourcingWorkflow: Workflow = new Workflow({
 /* prettier-ignore */ http://localhost:4111/tools
 sourcingWorkflow
   .step(translateStep)
-  .after(translateStep)
-    .step(buildQueryMandarakeStep)
+  .then(selectSourcesStep)
+  .after(selectSourcesStep)
+    .step(buildQueryMandarakeStep, {
+      when: async ({ context }) => {
+        const selectedSources = context.getStepResult(selectSourcesStep)?.selectedSources || []
+        return selectedSources.includes('mandarake')
+      }
+    })
     .then(pageCrawlerMandarakeStep)
-  .after(translateStep)
-    .step(buildQuerySurugayaStep)
+  .after(selectSourcesStep)
+    .step(buildQuerySurugayaStep, {
+      when: async ({ context }) => {
+        const selectedSources = context.getStepResult(selectSourcesStep)?.selectedSources || []
+        return selectedSources.includes('surugaya')
+      }
+    })
     .then(pageCrawlerSurugayaStep)
-  .after(translateStep)
-    .step(buildQueryTreasureFStep)
+  .after(selectSourcesStep)
+    .step(buildQueryTreasureFStep, {
+      when: async ({ context }) => {
+        const selectedSources = context.getStepResult(selectSourcesStep)?.selectedSources || []
+        return selectedSources.includes('treasureF')
+      }
+    })
     .then(pageCrawlerTreasureFStep)
-  .after(translateStep)
-    .step(buildQueryToysrusStep)
+  .after(selectSourcesStep)
+    .step(buildQueryToysrusStep, {
+      when: async ({ context }) => {
+        const selectedSources = context.getStepResult(selectSourcesStep)?.selectedSources || []
+        return selectedSources.includes('toysrus')
+      }
+    })
     .then(pageCrawlerToysrusStep)
-  .after(translateStep)
-    .step(buildQueryCardrushPokemonStep)
+  .after(selectSourcesStep)
+    .step(buildQueryCardrushPokemonStep, {
+      when: async ({ context }) => {
+        const selectedSources = context.getStepResult(selectSourcesStep)?.selectedSources || []
+        return selectedSources.includes('cardrushPokemon')
+      }
+    })
     .then(pageCrawlerCardrushPokemonStep)
+
   .after([pageCrawlerMandarakeStep, pageCrawlerSurugayaStep, pageCrawlerTreasureFStep, pageCrawlerToysrusStep, pageCrawlerCardrushPokemonStep])
   .step(extractTagsStep)
   .commit()

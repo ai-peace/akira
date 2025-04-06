@@ -2,6 +2,7 @@ import { Step } from '@mastra/core/workflows'
 import { z } from 'zod'
 import { Agent } from '@mastra/core/agent'
 import { openai } from '@ai-sdk/openai'
+import { selectSourcesStep } from '../common/select-sources.step'
 import { translateStep } from '../common/translate.step'
 
 const buildQuerySurugayaStep = new Step({
@@ -16,9 +17,11 @@ const buildQuerySurugayaStep = new Step({
   execute: async ({ context }) => {
     console.log('buildQueryStep', context)
 
-    // 前のステップの結果から翻訳されたキーワードを取得
-    const translatedResult = context.getStepResult(translateStep)
-    const translatedKeyword = translatedResult?.translatedKeyword
+    // selectSourcesStepから取得を試み、なければtranslateStepから取得
+    let translatedKeyword = context.getStepResult(selectSourcesStep)?.translatedKeyword
+    if (!translatedKeyword) {
+      translatedKeyword = context.getStepResult(translateStep)?.translatedKeyword
+    }
 
     console.log('translatedKeyword', translatedKeyword)
     if (!translatedKeyword) throw new Error('Translated keyword is required')
