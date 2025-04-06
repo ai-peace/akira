@@ -66,7 +66,7 @@ const pageCrawlerMoetakuStep = new Step({
       console.log('Initial URL:', initialUrl)
 
       // 一時ディレクトリを作成
-      const tmpDir = path.join(process.cwd(), 'tmp', 'moetaku-pages')
+      const tmpDir = path.join(process.cwd(), '.mastra', 'output', 'tmp', 'moetaku-pages')
       console.log('Temporary directory path:', tmpDir)
 
       if (!fs.existsSync(tmpDir)) {
@@ -364,140 +364,53 @@ const mapHtmlToProducts = (html: string): ProductEntity[] => {
   const heading = $('h2').text().trim()
   console.log('Page heading:', heading)
 
-  // 商品リストを特定 - 現在のDOM構造に合わせて修正
-  $('body list').each((index, element) => {
+  // 商品リストを特定 - 実際のDOM構造を反映
+  $('ul[id^="item_"]').each((index, element) => {
     try {
-      // 商品詳細ページへのリンクを確認
-      const $titleLink = $(element).find('listitem link[href*="/moetaku/detail/"]')
-      if ($titleLink.length === 0) {
-        return // 詳細ページへのリンクがない場合はスキップ
+      // data-item属性からJSONデータを抽出
+      const dataItemAttr = $(element).attr('data-item')
+      if (!dataItemAttr) {
+        return // data-item属性がない場合はスキップ
       }
 
-      // 価格情報が含まれているか確認
-      const hasPrice = $(element).text().includes('円買取')
-      if (!hasPrice) {
-        return // 価格情報がない場合はスキップ
+      let dataItem: any
+      try {
+        dataItem = JSON.parse(dataItemAttr)
+      } catch (jsonError) {
+        console.error('JSON parse error:', jsonError)
+        return // JSON解析エラーの場合はスキップ
       }
 
-      // 画像の有無を確認
-      const hasImage = $(element).find('img').length > 0
-      if (!hasImage) {
-        return // 画像がない場合はスキップ
+      if (!dataItem || !dataItem.code || !dataItem.name || !dataItem.price) {
+        return // 必要なデータがない場合はスキップ
       }
 
       // 商品タイトル
-      const $heading = $(element).find('heading[level="3"]').first()
-      let productTitle = $heading.text().trim()
+      const productTitle = dataItem.name.trim()
 
       if (!productTitle) {
-        // ヘッディングが見つからない場合、リンクのテキストを使用
-        productTitle = $titleLink.text().trim()
+        return // タイトルがない場合はスキップ
       }
 
-      if (!productTitle) {
-        return // タイトルが取得できない場合はスキップ
-      }
+      // 商品コード
+      const itemCode = dataItem.code.toString()
 
       // 商品詳細URL
-      const productLinkHref = $titleLink.attr('href') || ''
-      if (!productLinkHref.includes('/moetaku/detail/')) {
-        return // 詳細URLが適切でない場合はスキップ
-      }
-
-      // 完全なURLを構築
-      const fullUrl = productLinkHref.startsWith('http')
-        ? productLinkHref
-        : `https://www.netoff.co.jp${productLinkHref}`
-
-      // 商品コード（URLから抽出）
-      const itemCode = productLinkHref.split('/').pop() || generateUniqueKey().substring(0, 8)
+      const fullUrl = `https://www.netoff.co.jp/moetaku/detail/${itemCode}`
 
       // 画像URL
-      const $img = $(element).find('img').first()
-      const imageUrl = $img.attr('src') || ''
+      const imageUrl = dataItem.imgurl || ''
       const fullImageUrl = imageUrl.startsWith('http')
         ? imageUrl
         : `https://www.netoff.co.jp${imageUrl}`
 
-      // 価格テキストを検索
-      let priceText = ''
-      let price = 0
+      // 価格
+      const price = parseInt(dataItem.price.toString())
 
-      // 値段テキストを検索 - "円買取" を含む要素を探す
-      $(element)
-        .find('listitem')
-        .each((_, item) => {
-          const itemText = $(item).text().trim()
-          if (itemText.includes('円買取')) {
-            priceText = itemText
-            return false // ループを抜ける
-          }
-        })
+      // メーカー
+      const manufacturer = dataItem.maker || ''
 
-      if (!priceText) {
-        // まだ見つからない場合は全テキストを探索
-        const allText = $(element).text()
-        const priceMatch = allText.match(/(\d[\d,]+)\s*円買取/)
-        if (priceMatch) {
-          priceText = priceMatch[0]
-        }
-      }
-
-      // 価格を抽出
-      const priceMatch = priceText.match(/(\d[\d,]+)\s*円買取/)
-      price = priceMatch ? parseInt(priceMatch[1].replace(/,/g, '')) : 0
-
-      // 有効な商品データでない場合はスキップ
-      if (!productTitle || !price) {
-        return
-      }
-
-      console.log(`商品を検出: "${productTitle}" 価格: ${price}円`)
-
-      // メーカーとシリーズ情報を取得
-      let manufacturer = ''
-      let series = ''
-
-      // メーカー情報を取得しようとする
-      $(element)
-        .find('listitem')
-        .each((_, item) => {
-          const $links = $(item).find('link')
-          $links.each((_, link) => {
-            const linkText = $(link).text().trim()
-            const href = $(link).attr('href') || ''
-
-            if (!linkText) return
-
-            // メーカー情報の可能性がある場合
-            if (href.includes('/figure/purchase/?mk=') || href.includes('/figure/purchase/?ky=')) {
-              if (!manufacturer && isManufacturer(linkText)) {
-                manufacturer = linkText
-              }
-            }
-
-            // シリーズ情報の可能性がある場合
-            if (href.includes('/figure/purchase/?sr=') || href.includes('/figure/purchase/?ky=')) {
-              if (!series && isSeries(linkText)) {
-                series = linkText
-              }
-            }
-          })
-        })
-
-      // 未開封品かどうか
-      const isUnopened = $(element).text().includes('未開封品')
-      const condition = isUnopened ? '未開封品' : ''
-
-      // 説明文を構築
-      let description = ''
-      if (manufacturer && series) {
-        description = `${manufacturer} / ${series}`
-      } else if (manufacturer) {
-        description = manufacturer
-      } else if (series) {
-        description = series
-      }
+      console.log(`商品を検出: "${productTitle}" 価格: ${price}円 メーカー: ${manufacturer}`)
 
       // 商品データを追加
       products.push({
@@ -509,8 +422,8 @@ const mapHtmlToProducts = (html: string): ProductEntity[] => {
         price,
         priceWithTax: price, // もえたく！では表示価格が税込価格
         currency: 'JPY',
-        condition,
-        description,
+        condition: '',
+        description: manufacturer,
         url: fullUrl,
         imageUrl: fullImageUrl,
         status: STOCK_STATUS.AVAILABLE, // もえたく！は基本的に全て買取可能
