@@ -2,8 +2,8 @@ import { createLogger } from '@mastra/core/logger'
 import { Mastra } from '@mastra/core/mastra'
 import { PostgresStore } from '@mastra/pg'
 import { weatherAgent, tagExtractorAgent } from './agents'
-import { sourcingWorkflow } from './workflows/sourcing.workflow'
-import { moetakuWorkflow } from './workflows/moetaku/moetaku.workflow'
+import { sourcingWorkflow } from './workflows/sourcings/sourcing.workflow'
+import { moetakuWorkflow } from './workflows/sourcings/moetaku/moetaku.workflow'
 export const mastra = new Mastra({
   workflows: { sourcingWorkflow, moetakuWorkflow },
   agents: { weatherAgent, tagExtractorAgent },

@@ -1,5 +1,5 @@
 // scripts/analyze-cardrush.ts
-import { analyzeArchivedHtml } from '../server/mastra/workflows/cardrush-pokemon/page-crawler.cardrush-pokemon.step'
+import { analyzeArchivedHtml } from '../server/mastra/workflows/sourcings/cardrush-pokemon/page-crawler.cardrush-pokemon.step'
 
 async function main() {
   // デバッグコマンドで指定されたpromptUniqueKeyを使用
