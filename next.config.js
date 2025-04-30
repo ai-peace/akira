@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  swcMinify: true,
   webpack: (config, { isServer }) => {
     // webpackのキャッシュを無効化
     config.cache = false
@@ -23,6 +24,12 @@ const nextConfig = {
 
     // punycode警告を抑制
     config.ignoreWarnings = [{ module: /node_modules\/punycode/ }]
+
+    // Cloudflareのスキームを処理
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      'cloudflare:sockets': false,
+    }
 
     return config
   },

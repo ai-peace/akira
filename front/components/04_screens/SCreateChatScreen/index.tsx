@@ -78,4 +78,4 @@ const Component: FC = () => {
   )
 }
 
-export { Component as SCreateDocumentScreen }
+export { Component as SCreateChatScreen }

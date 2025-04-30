@@ -43,7 +43,7 @@ const Component: FC<Props> = ({ products, displayCount, promptGroupUniqueKey }) 
       <div className="relative -ml-4 -mr-4 h-full w-[100vw] overflow-hidden md:w-full">
         <div
           ref={carouselRef}
-          className="no-scrollbar flex h-full w-full snap-x snap-mandatory items-stretch gap-2 overflow-x-auto pb-2 pt-1"
+          className="no-scrollbar flex h-full w-full snap-x snap-mandatory items-stretch gap-2 overflow-x-auto pb-0 pt-1"
           style={{
             scrollbarWidth: 'none',
             msOverflowStyle: 'none',
@@ -89,9 +89,9 @@ const Component: FC<Props> = ({ products, displayCount, promptGroupUniqueKey }) 
       </div>
 
       {promptGroupUniqueKey && (
-        <div className="flex justify-end pt-4">
-          <Link href={getPromptGroupUrl(promptGroupUniqueKey)}>
-            <Button variant="outline" size="sm" className="gap-2">
+        <div className="flex w-full justify-end pt-0">
+          <Link href={getPromptGroupUrl(promptGroupUniqueKey)} className="w-full">
+            <Button variant="outline" size="sm" className="w-full gap-2">
               View all
               <ArrowRight className="h-4 w-4" />
             </Button>

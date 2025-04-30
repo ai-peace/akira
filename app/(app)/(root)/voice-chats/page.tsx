@@ -1,10 +1,10 @@
 'use client'
 
-import { SCreateChatScreen } from '@/front/components/04_screens/SCreateChatScreen'
+import { SCreateVoiceChatScreen } from '@/front/components/04_screens/SCreateVoiceChatScreen'
 import { Suspense } from 'react'
 
 const DocumentContent = () => {
-  return <SCreateChatScreen />
+  return <SCreateVoiceChatScreen />
 }
 
 const Component = () => {

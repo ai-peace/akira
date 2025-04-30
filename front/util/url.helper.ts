@@ -17,3 +17,7 @@ export const rootUrl = () => {
 export const errorUrl = () => {
   return '/error'
 }
+
+export const voiceChatUrl = (uniqueKey: string) => {
+  return `/voice-chats/${uniqueKey}`
+}
