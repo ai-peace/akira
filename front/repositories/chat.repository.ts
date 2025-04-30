@@ -99,6 +99,55 @@ const create = async (input: CreateChatInput, token: string): Promise<ChatEntity
   }
 }
 
+const createVoiceChat = async (token: string): Promise<ChatEntity> => {
+  try {
+    // Honoクライアントではなく直接fetchを使用
+    const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || ''
+    const res = await fetch(`${baseUrl}/api/voice-chats`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+
+    const json = await res.json()
+
+    if (res.ok && 'data' in json) {
+      const data = json.data as ChatEntity
+
+      return {
+        ...data,
+        updatedAt: new Date(data.updatedAt),
+        createdAt: new Date(data.createdAt),
+        promptGroups: data.promptGroups?.map((promptGroup: any) => ({
+          ...promptGroup,
+          updatedAt: new Date(promptGroup.updatedAt),
+          createdAt: new Date(promptGroup.createdAt),
+          prompts: promptGroup.prompts?.map((prompt: any) => ({
+            ...prompt,
+            llmStatusChangeAt: prompt.llmStatusChangeAt
+              ? new Date(prompt.llmStatusChangeAt)
+              : undefined,
+            updatedAt: new Date(prompt.updatedAt),
+            createdAt: new Date(prompt.createdAt),
+          })),
+        })),
+      }
+    } else if (!res.ok && 'error' in json) {
+      throw new HcApiError(
+        json.error?.code ?? 'UNKNOWN_ERROR',
+        json.error?.message ?? '',
+        json.error,
+      )
+    } else {
+      throw new HcApiError('UNKNOWN_ERROR', 'Unknown error', {})
+    }
+  } catch (error) {
+    console.error('Error creating voice chat:', error)
+    throw error
+  }
+}
+
 const getLoginedUsersCollection = async (token: string): Promise<ChatEntity[]> => {
   try {
     const client = hcClient({
@@ -144,4 +193,5 @@ export const chatRepository = {
   getLoginedUsersCollection,
   get,
   create,
+  createVoiceChat,
 }

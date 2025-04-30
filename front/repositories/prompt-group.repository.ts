@@ -53,7 +53,34 @@ const create = async (input: CreateChatPromptGroupInput, token: string) => {
   throw new HcApiError('UNKNOWN_ERROR', 'Unknown error', {})
 }
 
+// NOTE 検証中のため本来honoで作成するtypeやschemaを使用していない
+const createVoiceChatPromptGroup = async (
+  audioBlob: Blob,
+  chatUniqueKey: string,
+  token: string,
+) => {
+  const formData = new FormData()
+  formData.append('audio', audioBlob)
+
+  // Honoクライアントではなく直接fetchを使用
+  const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || ''
+  const res = await fetch(`${baseUrl}/api/voice-chats/${chatUniqueKey}/prompt-groups`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  })
+
+  const json = await res.json()
+
+  if (res.ok && 'data' in json) {
+    return json.data as PromptGroupEntity
+  }
+}
+
 export const promptGroupRepository = {
   get,
   create,
+  createVoiceChatPromptGroup,
 }
