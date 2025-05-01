@@ -34,7 +34,7 @@ const route = createVoiceChatPromptGroup.post(
       console.log('5')
 
       if (!audioFile) {
-        // if (!audioFile || !(audioFile instanceof File)) {
+        console.log('6')
         return c.json<HcApiResponseType<never>>(
           {
             error: createHcApiError(hcApiErrorCodes.UNKNOWN_ERROR, {
@@ -45,7 +45,6 @@ const route = createVoiceChatPromptGroup.post(
         )
       }
 
-      console.log('6')
       const chat = await prisma.chat.findUnique({
         where: { uniqueKey },
         include: { user: true },
@@ -73,9 +72,42 @@ const route = createVoiceChatPromptGroup.post(
         )
       }
       console.log('9')
+
       // 音声ファイルをバッファに変換
-      const arrayBuffer = await audioFile.arrayBuffer()
-      const buffer = Buffer.from(arrayBuffer)
+      let buffer: Buffer
+
+      // Node.js環境で安全に処理する
+      if (typeof audioFile === 'string') {
+        // 文字列の場合（Base64エンコードされたデータなど）
+        buffer = Buffer.from(audioFile)
+      } else if (Buffer.isBuffer(audioFile)) {
+        // すでにBufferの場合
+        buffer = audioFile
+      } else if (audioFile instanceof Uint8Array) {
+        // Uint8Arrayの場合
+        buffer = Buffer.from(audioFile)
+      } else if (audioFile instanceof Blob || 'arrayBuffer' in audioFile) {
+        // BlobまたはarrayBufferメソッドを持つオブジェクト
+        // @ts-ignore - サーバー環境でもarrayBufferメソッドを持つオブジェクトを処理
+        const arrayBuffer = await audioFile.arrayBuffer()
+        buffer = Buffer.from(arrayBuffer)
+      } else {
+        // その他の場合、何らかの方法で処理を試みる
+        try {
+          // @ts-ignore - 一般的なオブジェクトとして処理を試みる
+          buffer = Buffer.from(audioFile)
+        } catch (e) {
+          return c.json<HcApiResponseType<never>>(
+            {
+              error: createHcApiError(hcApiErrorCodes.UNKNOWN_ERROR, {
+                message: 'Invalid audio file format',
+              }),
+            },
+            400,
+          )
+        }
+      }
+
       const readable = Readable.from(buffer)
 
       // Mastraを使用して音声をテキストに変換
