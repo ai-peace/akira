@@ -10,7 +10,7 @@ import {
 } from '@/front/components/ui/chat/chat-bubble'
 import { ChatMessageList } from '@/front/components/ui/chat/chat-message-list'
 import { useErrorHandler } from '@/front/hooks/uis/use-error-hander'
-import { FC, Fragment, useEffect, useRef, useState } from 'react'
+import { FC, Fragment, useEffect, useRef, useState, useMemo } from 'react'
 import MessageLoading from '../../ui/chat/message-loading'
 
 type Props = {
@@ -78,6 +78,18 @@ const PromptGroupComponent = ({
   return (
     <Fragment key={promptGroup.uniqueKey}>
       {promptGroup.prompts?.map((prompt) => {
+        // 商品データを価格の高い順にソート
+        const sortedProducts = useMemo(() => {
+          if (!prompt.result?.data) return []
+
+          return [...prompt.result.data].sort((a, b) => {
+            // 価格でソート（高い順）
+            const priceA = a.price || 0
+            const priceB = b.price || 0
+            return priceB - priceA
+          })
+        }, [prompt.result?.data])
+
         return (
           <Fragment key={prompt.uniqueKey}>
             {prompt.llmStatus === 'SUCCESS' ? (
@@ -85,7 +97,7 @@ const PromptGroupComponent = ({
                 {prompt.resultType === 'FOUND_PRODUCT_ITEMS' && (
                   <>
                     <OChatBubbleProduct
-                      products={prompt.result?.data}
+                      products={sortedProducts} // ソート済みの商品データを使用
                       message={prompt.result?.message || ''}
                       promptGroupUniqueKey={promptGroup.uniqueKey}
                       messageDisplayable={false} // NOTE voice改造
