@@ -33,8 +33,8 @@ const route = createVoiceChatPromptGroup.post(
       const audioFile = formData.get('audio')
       console.log('5')
 
-      if (!audioFile || !(audioFile instanceof File)) {
-        console.log('6')
+      if (!audioFile) {
+        // if (!audioFile || !(audioFile instanceof File)) {
         return c.json<HcApiResponseType<never>>(
           {
             error: createHcApiError(hcApiErrorCodes.UNKNOWN_ERROR, {
@@ -45,6 +45,7 @@ const route = createVoiceChatPromptGroup.post(
         )
       }
 
+      console.log('6')
       const chat = await prisma.chat.findUnique({
         where: { uniqueKey },
         include: { user: true },

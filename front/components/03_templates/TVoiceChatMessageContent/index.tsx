@@ -1,18 +1,15 @@
-import { EOptimisticPromptGroup } from '@/front/components/01_elements/EOptimisticPromptGroup'
+import { PromptGroupEntity } from '@/common/domains/entities/prompt-group.entity'
 import { EMdxRenderer } from '@/front/components/01_elements/EMdxRenderer'
+import { EOptimisticPromptGroup } from '@/front/components/01_elements/EOptimisticPromptGroup'
 import ETypewriterText from '@/front/components/01_elements/ETypewriterText'
 import { OChatBubbleProduct } from '@/front/components/02_organisms/OChatBubbleProduct'
-import { OChatInput } from '@/front/components/02_organisms/OChatInput'
-import { ORelativeKeywords } from '@/front/components/02_organisms/ORelativeKeywords'
 import {
   ChatBubble,
   ChatBubbleAvatar,
   ChatBubbleMessage,
 } from '@/front/components/ui/chat/chat-bubble'
 import { ChatMessageList } from '@/front/components/ui/chat/chat-message-list'
-import { PromptGroupEntity } from '@/common/domains/entities/prompt-group.entity'
 import { useErrorHandler } from '@/front/hooks/uis/use-error-hander'
-import { KeywordPair } from '@/server/domains/entities/prompt.entity'
 import { FC, Fragment, useEffect, useRef, useState } from 'react'
 import MessageLoading from '../../ui/chat/message-loading'
 
@@ -29,48 +26,12 @@ const Component: FC<Props> = ({ promptGroups, createChatPromptGroup, onIntersect
   } | null>(null)
   const { handleError } = useErrorHandler()
 
+  const latestPromptGroup = promptGroups?.[promptGroups.length - 1]
+
   // チャットが更新されたらoptimisticPromptGroupをリセット
   useEffect(() => {
     setOptimisticPromptGroup(null)
   }, [promptGroups])
-
-  // スクロール位置の監視
-  // useEffect(() => {
-  //   if (!messageListRef.current || !onIntersect) return
-
-  //   const observer = new IntersectionObserver(
-  //     (entries) => {
-  //       entries.forEach((entry) => {
-  //         if (entry.isIntersecting && entry.target.id) {
-  //           onIntersect(entry.target.id)
-  //         }
-  //       })
-  //     },
-  //     {
-  //       root: messageListRef.current,
-  //       threshold: 0.5,
-  //     },
-  //   )
-
-  //   const elements = document.querySelectorAll('[data-prompt-group]')
-  //   elements.forEach((element) => observer.observe(element))
-
-  //   return () => {
-  //     elements.forEach((element) => observer.unobserve(element))
-  //   }
-  // }, [promptGroups, onIntersect])
-
-  // 新しいメッセージが追加されたときに自動スクロール
-  // useEffect(() => {
-  //   if (messageListRef.current) {
-  //     setTimeout(() => {
-  //       messageListRef.current?.scrollTo({
-  //         top: messageListRef.current.scrollHeight,
-  //         behavior: 'smooth',
-  //       })
-  //     }, 100)
-  //   }
-  // }, [promptGroups?.length, promptGroups, optimisticPromptGroup])
 
   const handleCreateChatPromptGroup = async (question: string) => {
     setOptimisticPromptGroup({ question: question })
@@ -81,18 +42,6 @@ const Component: FC<Props> = ({ promptGroups, createChatPromptGroup, onIntersect
       handleError(error)
     }
   }
-
-  const handleCreateChatPromptGroupByKeyword = async (keyword: KeywordPair) => {
-    setOptimisticPromptGroup({ question: keyword.en })
-    try {
-      await createChatPromptGroup(keyword.ja)
-    } catch (error) {
-      setOptimisticPromptGroup(null)
-      handleError(error)
-    }
-  }
-
-  const latestPromptGroup = promptGroups?.[promptGroups.length - 1]
 
   return (
     <div className="relative mt-40 flex-1">
@@ -140,11 +89,6 @@ const PromptGroupComponent = ({
 }) => {
   return (
     <Fragment key={promptGroup.uniqueKey}>
-      {/* <div className="absolute bottom-0 left-0 right-0 flex justify-end">
-        {promptGroup.question}
-      </div> */}
-
-      {/* 回答 */}
       {promptGroup.prompts?.map((prompt) => {
         return (
           <Fragment key={prompt.uniqueKey}>
@@ -158,14 +102,6 @@ const PromptGroupComponent = ({
                       promptGroupUniqueKey={promptGroup.uniqueKey}
                       messageDisplayable={false} // NOTE voice改造
                     />
-                    {/* {prompt.result?.keywords && (
-                      <ORelativeKeywords
-                        keywords={prompt.result.keywords as unknown as KeywordPair[]}
-                        handleCreateChatPromptGroupByKeyword={
-                          handleCreateChatPromptGroupByKeyword
-                        }
-                      />
-                    )} */}
                   </>
                 )}
 
@@ -201,7 +137,6 @@ const PromptGroupQuestion = ({ promptGroup }: { promptGroup: PromptGroupEntity }
   return (
     <div className="absolute bottom-24 left-0 right-0 flex justify-center text-primary/50">
       <ETypewriterText text={promptGroup.question} delay={200} />
-      {/* {promptGroup.question} */}
     </div>
   )
 }
