@@ -57,10 +57,6 @@ const Component: FC<Props> = ({ promptGroups, createChatPromptGroup, onIntersect
                 handleCreateChatPromptGroup={handleCreateChatPromptGroup}
               />
             )}
-
-            {optimisticPromptGroup && (
-              <EOptimisticPromptGroup question={optimisticPromptGroup.question} />
-            )}
           </ChatMessageList>
         </div>
       </div>
@@ -105,6 +101,7 @@ const PromptGroupComponent = ({
                     </ChatBubbleMessage>
                   </ChatBubble>
                 )}
+
                 {prompt.resultType === 'AGENT_RESPONSE' && (
                   <EMdxRenderer
                     content={prompt.result?.message || ''}
@@ -114,7 +111,7 @@ const PromptGroupComponent = ({
                 )}
               </>
             ) : (
-              <div className="flex w-full justify-center">
+              <div className="mt-[32px] flex w-full justify-center md:mt-[100px]">
                 <MessageLoading />
               </div>
             )}
@@ -128,7 +125,7 @@ const PromptGroupComponent = ({
 const PromptGroupQuestion = ({ promptGroup }: { promptGroup: PromptGroupEntity }) => {
   return (
     <div className="absolute bottom-16 left-0 right-0 flex justify-center bg-background py-6 text-primary/50">
-      <ETypewriterText text={promptGroup.question} delay={200} />
+      <ETypewriterText text={promptGroup.question} delay={1000} />
     </div>
   )
 }
