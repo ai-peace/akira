@@ -58,14 +58,6 @@ const Component: FC<Props> = ({ promptGroups, createChatPromptGroup, onIntersect
               />
             )}
 
-            {/* {promptGroups?.map((promptGroup) => {
-              return (
-                <PromptGroupComponent
-                  promptGroup={promptGroup}
-                  handleCreateChatPromptGroup={handleCreateChatPromptGroup}
-                />
-              )
-            })} */}
             {optimisticPromptGroup && (
               <EOptimisticPromptGroup question={optimisticPromptGroup.question} />
             )}
