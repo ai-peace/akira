@@ -50,7 +50,7 @@ const Component: FC<Props> = ({ promptGroups, createChatPromptGroup, onIntersect
         className="scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent relative h-full overflow-y-scroll overscroll-y-contain scroll-smooth pb-64 [-webkit-overflow-scrolling:touch]"
       >
         <div className="mx-auto block md:max-w-3xl md:gap-5 lg:max-w-[40rem] lg:gap-6 xl:max-w-[48rem] 2xl:mx-auto">
-          <ChatMessageList>
+          <ChatMessageList className="-mt-[48px]">
             {latestPromptGroup && (
               <PromptGroupComponent
                 promptGroup={latestPromptGroup}
@@ -127,7 +127,7 @@ const PromptGroupComponent = ({
 
 const PromptGroupQuestion = ({ promptGroup }: { promptGroup: PromptGroupEntity }) => {
   return (
-    <div className="absolute bottom-24 left-0 right-0 flex justify-center text-primary/50">
+    <div className="absolute bottom-16 left-0 right-0 flex justify-center bg-background py-6 text-primary/50">
       <ETypewriterText text={promptGroup.question} delay={200} />
     </div>
   )
