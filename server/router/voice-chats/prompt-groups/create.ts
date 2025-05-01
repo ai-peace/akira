@@ -22,14 +22,19 @@ const route = createVoiceChatPromptGroup.post(
   requireUserPromptUsage,
   async (c) => {
     try {
+      console.log('1')
       // プロンプトのためのデータ準備
       const uniqueKey = c.req.param('uniqueKey')
+      console.log('2')
       const userPromptUsage = c.get('userPromptUsage')
-
+      console.log('3')
       const formData = await c.req.formData()
+      console.log('4')
       const audioFile = formData.get('audio')
+      console.log('5')
 
       if (!audioFile || !(audioFile instanceof File)) {
+        console.log('6')
         return c.json<HcApiResponseType<never>>(
           {
             error: createHcApiError(hcApiErrorCodes.UNKNOWN_ERROR, {
@@ -44,7 +49,7 @@ const route = createVoiceChatPromptGroup.post(
         where: { uniqueKey },
         include: { user: true },
       })
-
+      console.log('7')
       if (!chat) {
         return c.json<HcApiResponseType<never>>(
           {
@@ -55,7 +60,7 @@ const route = createVoiceChatPromptGroup.post(
           404,
         )
       }
-
+      console.log('8')
       if (chat.userId !== c.var.user.id) {
         return c.json<HcApiResponseType<never>>(
           {
@@ -66,7 +71,7 @@ const route = createVoiceChatPromptGroup.post(
           403,
         )
       }
-
+      console.log('9')
       // 音声ファイルをバッファに変換
       const arrayBuffer = await audioFile.arrayBuffer()
       const buffer = Buffer.from(arrayBuffer)
@@ -75,7 +80,7 @@ const route = createVoiceChatPromptGroup.post(
       // Mastraを使用して音声をテキストに変換
       const voiceAgent = mastra.getAgent('voiceAgent')
       const mainPrompt = (await voiceAgent.voice?.listen(readable)) as string
-
+      console.log('10')
       if (!mainPrompt) {
         return c.json<HcApiResponseType<never>>(
           {
