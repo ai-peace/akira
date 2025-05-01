@@ -5,9 +5,9 @@ import { OChatHistorySection } from '@/front/components/02_organisms/OChatHistor
 import { useChat } from '@/front/hooks/resources/chats/useChat'
 import { useRecording } from '@/front/hooks/useRecording'
 import { handleError } from '@/front/util/error-handler.helper'
-import { Mic } from 'lucide-react'
+import { Mic, Clock } from 'lucide-react'
 import Image from 'next/image'
-import { FC, useState } from 'react'
+import { FC, useState, useEffect, useRef } from 'react'
 import { TVoiceChatMessageContent } from '../../03_templates/TVoiceChatMessageContent'
 
 type Props = {
@@ -19,6 +19,8 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
     uniqueKey: chatUniqueKey,
   })
   const [currentPromptId, setCurrentPromptId] = useState<string | null>(null)
+  const [isWaitingForResponse, setIsWaitingForResponse] = useState(false)
+  const timerRef = useRef<NodeJS.Timeout | null>(null)
 
   const handleIntersect = (promptGroupId: string) => {
     setCurrentPromptId(promptGroupId)
@@ -26,15 +28,47 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
 
   const { isRecording, startRecording, stopRecording } = useRecording(chatUniqueKey)
 
+  // レスポンスが返ってきたらwaitingステータスをリセット
+  useEffect(() => {
+    if (isWaitingForResponse && chat && chat.promptGroups && chat.promptGroups.length > 0) {
+      const latestPromptGroup = chat.promptGroups[chat.promptGroups.length - 1]
+      if (latestPromptGroup.prompts.some((prompt) => prompt.llmStatus === 'SUCCESS')) {
+        setIsWaitingForResponse(false)
+        if (timerRef.current) {
+          clearTimeout(timerRef.current)
+          timerRef.current = null
+        }
+      }
+    }
+  }, [chat, isWaitingForResponse])
+
+  // 3000ms後に自動的にwaitingステータスをリセット
+  useEffect(() => {
+    if (isWaitingForResponse) {
+      timerRef.current = setTimeout(() => {
+        setIsWaitingForResponse(false)
+      }, 3000)
+    }
+
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current)
+        timerRef.current = null
+      }
+    }
+  }, [isWaitingForResponse])
+
   const handleSubmit = async () => {
     try {
       if (isRecording) {
         await stopRecording()
+        setIsWaitingForResponse(true)
       } else {
         await startRecording()
       }
     } catch (error) {
       console.error('Error creating chat:', error)
+      setIsWaitingForResponse(false)
       handleError(error, {
         description:
           'AKIRA has reached its user limit. Please register for the waitlist if you would like to join.',
@@ -76,6 +110,15 @@ const Component: FC<Props> = ({ chatUniqueKey }) => {
             <div className="ml-2 text-lg font-bold text-primary-foreground">Akira</div>
           </div>
         </div>
+
+        {isWaitingForResponse && (
+          <div className="absolute bottom-20 left-0 right-0 flex w-full items-center justify-center px-4">
+            <div className="flex items-center gap-2 rounded-full bg-background-muted px-4 py-2 text-foreground shadow-md">
+              <Clock className="h-5 w-5 animate-pulse" />
+              <span className="animate-pulse">Waiting for response...</span>
+            </div>
+          </div>
+        )}
 
         <div className="absolute bottom-4 left-0 right-0 flex w-full items-center justify-center px-4">
           <button
