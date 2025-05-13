@@ -3,8 +3,8 @@
 import { ProductEntity } from '@/common/domains/entities/product.entity'
 import { STOCK_STATUS, getStockStatusDisplay } from '@/common/domains/types/stock-status'
 import EDotFont from '@/front/components/01_elements/EDotFont'
-import ELogoAkira from '@/front/components/01_elements/ELogoAkira'
 import EShareButton from '@/front/components/01_elements/EShareButton'
+import { OAppHeader } from '@/front/components/02_organisms/OAppHeader'
 import { OThemeChangeButton } from '@/front/components/02_organisms/OThemeChangeButton'
 import { TProductSearch } from '@/front/components/03_templates/TProductSearch'
 import { Button } from '@/front/components/ui/button'
@@ -28,7 +28,6 @@ export default function Page() {
   const [cursorVisible, setCursorVisible] = useState(true)
   const [hoverButton1, setHoverButton1] = useState(false)
   const [hoverButton2, setHoverButton2] = useState(false)
-  const [hoverButton3, setHoverButton3] = useState(false)
   const [hoverFavorite, setHoverFavorite] = useState(false)
   const { theme } = useTheme()
   const isDarkMode = theme === 'dark'
@@ -177,7 +176,7 @@ export default function Page() {
             </div>
 
             <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-              <ELogoAkira width={80} height={34} />
+              {/* <ELogoAkira width={80} height={34} /> */}
             </div>
 
             <div className="flex items-center gap-2">
@@ -218,52 +217,35 @@ export default function Page() {
         {product.imageUrl && <meta name="twitter:image" content={product.imageUrl} />}
       </Head>
       <div>
-        {/* Header */}
-        <div className="sticky top-0 z-10 flex w-full items-center justify-between bg-background p-2">
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              onClick={() => router.back()}
-              className="flex items-center justify-center p-2 text-foreground"
-              size="icon"
-            >
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
-
-            {promptGroup?.chatUniqueKey && (
-              <Button
-                variant="ghost"
-                onClick={() => router.push(`/chats/${promptGroup.chatUniqueKey}`)}
-                className="flex items-center justify-center p-2 text-foreground"
-                size="icon"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="h-5 w-5"
+        <OAppHeader
+          leftSecond={
+            <>
+              {promptGroup?.chatUniqueKey && (
+                <Button
+                  variant="ghost"
+                  onClick={() => router.push(`/chats/${promptGroup.chatUniqueKey}`)}
+                  className="flex items-center justify-center p-2 text-foreground"
+                  size="icon"
                 >
-                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                </svg>
-              </Button>
-            )}
-          </div>
-
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-            <ELogoAkira width={80} height={34} />
-          </div>
-
-          <div className="flex items-center gap-2">
-            <EShareButton className="static bottom-auto right-auto z-auto" />
-            <OThemeChangeButton />
-          </div>
-        </div>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-5 w-5"
+                  >
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                  </svg>
+                </Button>
+              )}
+            </>
+          }
+        />
 
         <div className="container mx-auto pb-16">
           <div className="px-4 py-4">
