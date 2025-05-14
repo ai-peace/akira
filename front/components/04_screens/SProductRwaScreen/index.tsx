@@ -14,49 +14,6 @@ import Head from 'next/head'
 import { useRouter } from 'next/navigation'
 import { FC, useEffect, useState } from 'react'
 
-// シンプルなアニメーション用スタイル
-const styleElement = typeof document !== 'undefined' ? document.createElement('style') : null
-if (styleElement) {
-  styleElement.textContent = `
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    
-    .fade-in-up {
-      opacity: 0;
-      animation: fadeInUp 0.5s ease-out forwards;
-    }
-    
-    .delay-100 {
-      animation-delay: 100ms;
-    }
-    
-    .delay-200 {
-      animation-delay: 200ms;
-    }
-    
-    .delay-300 {
-      animation-delay: 300ms;
-    }
-    
-    .delay-400 {
-      animation-delay: 400ms;
-    }
-    
-    .delay-500 {
-      animation-delay: 500ms;
-    }
-  `
-  document.head.appendChild(styleElement)
-}
-
 type Props = {
   productUniqueKey: string
   promptGroupUniqueKey: string
@@ -69,7 +26,6 @@ const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
   const [pageTitle, setPageTitle] = useState('Product Detail - AKIRA')
   const [pageDescription, setPageDescription] = useState('View product details on AKIRA')
   const [solRate, setSolRate] = useState<number>(0)
-  const [showAnimation, setShowAnimation] = useState(false)
 
   // Fetch promptGroup data
   const { promptGroup, promptGroupIsLoading } = usePromptGroup({
@@ -122,16 +78,6 @@ const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
       setLoading(false)
     }
   }, [promptGroup, productUniqueKey, promptGroupIsLoading, solRate])
-
-  // アニメーション表示用エフェクト
-  useEffect(() => {
-    // 少し遅延してアニメーションを開始
-    const timer = setTimeout(() => {
-      setShowAnimation(true)
-    }, 300)
-
-    return () => clearTimeout(timer)
-  }, [])
 
   if (loading || promptGroupIsLoading) {
     return (
@@ -253,20 +199,16 @@ const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
         />
 
         <div className="container mx-auto max-w-[720px] pb-16">
-          <div className={`my-6 text-center ${showAnimation ? 'fade-in-up' : 'opacity-0'}`}>
+          <div className="my-6 text-center">
             <div className="font-sans text-2xl font-bold text-accent-1">YOU've Got RWA</div>
           </div>
 
-          <div
-            className={`px-6 text-center ${showAnimation ? 'fade-in-up delay-100' : 'opacity-0'}`}
-          >
+          <div className="px-6 text-center">
             <EDotFont text={product.title.en} className="text-foreground-subtle" />
           </div>
 
           <div className="p-3">
-            <div
-              className={`relative flex w-full items-center justify-center overflow-hidden rounded-lg p-2 ${showAnimation ? 'fade-in-up delay-200' : 'opacity-0'}`}
-            >
+            <div className="relative flex w-full items-center justify-center overflow-hidden rounded-lg p-2">
               {product.imageUrl && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -278,9 +220,7 @@ const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
             </div>
           </div>
 
-          <div
-            className={`mb-12 mt-6 px-6 text-sm text-foreground-muted ${showAnimation ? 'fade-in-up delay-300' : 'opacity-0'}`}
-          >
+          <div className="mb-12 mt-6 px-6 text-sm text-foreground-muted">
             <div className="leading-relaxed">
               This NFT certifies your ownership of a real-world collectible. You can now trade it on
               supported marketplaces or redeem it for the physical item.
@@ -312,11 +252,7 @@ const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
 
           {/* RPG Style Action Buttons */}
           <div className="mt-auto">
-            <div
-              className={`fixed bottom-0 left-0 z-10 flex w-full gap-2 bg-background-soft p-4 md:relative md:mb-4 md:grid md:grid-cols-1 md:bg-transparent md:p-0 ${
-                showAnimation ? 'fade-in-up delay-400' : 'opacity-0'
-              }`}
-            >
+            <div className="fixed bottom-0 left-0 z-10 flex w-full gap-2 bg-background-soft p-4 md:relative md:mb-4 md:grid md:grid-cols-1 md:bg-transparent md:p-0">
               <button
                 className={
                   'mx-auto flex w-full items-center justify-center rounded-lg border-2 bg-background-muted px-4 py-3 text-center md:w-[320px]'

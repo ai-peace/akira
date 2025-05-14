@@ -1,6 +1,6 @@
 'use client'
 
-import { SProductMintedRwaScreen } from '@/front/components/04_screens/SProductMintedRwaScreen'
+import { SProductRwaScreen } from '@/front/components/04_screens/SProductRwaScreen'
 import { useParams, useSearchParams } from 'next/navigation'
 
 export default function Page() {
@@ -12,7 +12,7 @@ export default function Page() {
   const promptGroupUniqueKey = searchParams?.get('pgKey') || ''
 
   return (
-    <SProductMintedRwaScreen
+    <SProductRwaScreen
       productUniqueKey={productUniqueKey}
       promptGroupUniqueKey={promptGroupUniqueKey}
     />
