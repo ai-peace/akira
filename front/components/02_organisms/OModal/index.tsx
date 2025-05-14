@@ -30,7 +30,7 @@ const Component: FC<Props> = ({ isOpen, onClose, heading, main, footer, classNam
 
         <div className="mb-6 text-center">{main}</div>
 
-        <div className="flex flex-col items-center justify-center gap-4 md:flex-row">{footer}</div>
+        <div>{footer}</div>
 
         <button
           onClick={onClose}

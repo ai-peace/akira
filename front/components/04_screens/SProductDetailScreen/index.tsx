@@ -467,7 +467,7 @@ const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
         onClose={handleCloseRwaModal}
         heading={
           <EDotFont
-            text="RWA NFT Coming Soon"
+            text="Deposit & Mint RWA"
             className="text-xl font-bold text-foreground-strong"
             animate={true}
             speed={1}
@@ -475,16 +475,24 @@ const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
           />
         }
         main={
-          <EDotFont
-            text="The RWA NFT marketplace integration is under construction. We're working diligently to bring this exciting feature to you soon."
-            className="text-foreground"
-            animate={true}
-            speed={1}
-            delay={50}
-          />
+          <>
+            <div>To purchase this RWA NFT, you need to deposit 0.5 SOL.</div>
+            {product.imageUrl && (
+              <div className="mt-6 flex flex-col gap-2">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={product.imageUrl} alt={product.title.en} className="" />
+              </div>
+            )}
+          </>
         }
         footer={
           <>
+            <button
+              onClick={handleNavigateToWaitlist}
+              className="mb-2 w-full rounded-lg border-2 border-accent-1 bg-accent-1 px-4 py-2 text-white hover:bg-accent-1/90"
+            >
+              <EDotFont text="NEXT" animate={true} speed={1} delay={100} />
+            </button>
             <button
               onClick={handleCloseRwaModal}
               className={`w-full rounded-lg border-2 ${
@@ -492,12 +500,6 @@ const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
               } px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800`}
             >
               <EDotFont text="Close" animate={true} speed={1} delay={100} />
-            </button>
-            <button
-              onClick={handleNavigateToWaitlist}
-              className="w-full rounded-lg border-2 border-accent-1 bg-accent-1 px-4 py-2 text-white hover:bg-accent-1/90"
-            >
-              <EDotFont text="Join Waitlist" animate={true} speed={1} delay={100} />
             </button>
           </>
         }
