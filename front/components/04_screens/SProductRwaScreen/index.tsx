@@ -199,12 +199,9 @@ const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
         />
 
         <div className="container mx-auto max-w-[720px] pb-16">
-          <div className="my-6 text-center">
-            <div className="font-sans text-2xl font-bold text-accent-1">YOU've Got RWA</div>
-          </div>
-
-          <div className="px-6 text-center">
-            <EDotFont text={product.title.en} className="text-foreground-subtle" />
+          <div className="text-center text-sm text-accent-1">RWA</div>
+          <div className="mt-3 px-6 text-center">
+            <EDotFont text={product.title.en} className="text-foreground-strong" />
           </div>
 
           <div className="p-3">
@@ -221,21 +218,14 @@ const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
           </div>
 
           <div className="mb-12 mt-6 px-6 text-sm text-foreground-muted">
-            <div className="leading-relaxed">
-              This NFT certifies your ownership of a real-world collectible. You can now trade it on
-              supported marketplaces or redeem it for the physical item.
-            </div>
-
             <div className="mt-3 break-all leading-relaxed">
               <div className="font-bold">Storage Location</div>
               <div>Akira Warehouse</div>
-              <div className="font-bold">Purchase Price</div>
-              <div>0.980 SOL (approx. ¥26,000 at time of purchase)</div>
               <div className="font-bold">Redemption Expiry</div>
               <div>2025-12-31</div>
               <div className="font-bold">NFT Address</div>
               <div className="text-accent-1">3Yf9aXQzUvTx1JmSNoCk7pRWvED5v8EfG4oZNkXZ6aXu</div>
-              <div className="font-bold">Transaction URL</div>
+              <div className="font-bold">Latest Transaction URL</div>
               <div>
                 <a
                   href="https://explorer.solana.com/tx/5nQxLdKdu74Exz9vH7FaBWNfZYGVc9TSnCqZbrnSRFuB?cluster=mainnet"
@@ -247,27 +237,18 @@ const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
                 </a>
               </div>
             </div>
-            <div className="mt-4 text-sm text-accent-1">{`Show More >>`}</div>
           </div>
 
           {/* RPG Style Action Buttons */}
           <div className="mt-auto">
-            <div className="fixed bottom-0 left-0 z-10 flex w-full gap-2 bg-background-soft p-4 md:relative md:mb-4 md:grid md:grid-cols-1 md:bg-transparent md:p-0">
+            <div className="fixed bottom-0 left-0 z-10 w-full gap-2 bg-background-soft p-4 md:relative md:mb-4 md:grid md:grid-cols-1 md:bg-transparent md:p-0">
               <button
                 className={
-                  'mx-auto flex w-full items-center justify-center rounded-lg border-2 bg-background-muted px-4 py-3 text-center md:w-[320px]'
+                  'mx-auto flex w-full items-center justify-center rounded-lg bg-accent-1 px-4 py-3 text-center text-white md:w-[320px]'
                 }
                 onClick={() => {}}
               >
-                Magic Eden
-              </button>
-              <button
-                className={
-                  'mx-auto flex w-full items-center justify-center rounded-lg border-2 bg-background-muted px-4 py-3 text-center md:w-[320px]'
-                }
-                onClick={() => {}}
-              >
-                Solana Explorer
+                Redeem Real Item
               </button>
             </div>
           </div>
