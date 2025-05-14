@@ -32,8 +32,8 @@ const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
   const [hoverFavorite, setHoverFavorite] = useState(false)
   const { theme } = useTheme()
   const isDarkMode = theme === 'dark'
-  const [showModal, setShowModal] = useState(false)
-  const [modalType, setModalType] = useState<'favorite' | 'rwa'>('favorite')
+  const [showFavoriteModal, setShowFavoriteModal] = useState(false)
+  const [showRwaModal, setShowRwaModal] = useState(false)
 
   // Fetch promptGroup data
   const { promptGroup, promptGroupIsLoading } = usePromptGroup({
@@ -82,70 +82,29 @@ const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
 
   // Function to handle favorite button click
   const handleFavoriteClick = () => {
-    setModalType('favorite')
-    setShowModal(true)
+    setShowFavoriteModal(true)
   }
 
   // Function to handle RWA NFT button click
   const handleRwaClick = () => {
-    setModalType('rwa')
-    setShowModal(true)
+    setShowRwaModal(true)
   }
 
-  // Close modal handler
-  const handleCloseModal = () => {
-    setShowModal(false)
+  // Close modal handlers
+  const handleCloseFavoriteModal = () => {
+    setShowFavoriteModal(false)
+  }
+
+  const handleCloseRwaModal = () => {
+    setShowRwaModal(false)
   }
 
   // Navigate to waitlist handler
   const handleNavigateToWaitlist = () => {
-    setShowModal(false)
+    setShowFavoriteModal(false)
+    setShowRwaModal(false)
     router.push('/waitlists')
   }
-
-  const renderModalHeading = () => (
-    <EDotFont
-      text={modalType === 'favorite' ? 'Feature Coming Soon' : 'RWA NFT Coming Soon'}
-      className="text-xl font-bold text-foreground-strong"
-      animate={true}
-      speed={1}
-      delay={0}
-    />
-  )
-
-  const renderModalMain = () => (
-    <EDotFont
-      text={
-        modalType === 'favorite'
-          ? "We're currently building the favorites feature. Thank you for your interest and patience as we work to enhance your experience."
-          : "The RWA NFT marketplace integration is under construction. We're working diligently to bring this exciting feature to you soon."
-      }
-      className="text-foreground"
-      animate={true}
-      speed={1}
-      delay={50}
-    />
-  )
-
-  const renderModalFooter = () => (
-    <>
-      <button
-        onClick={handleCloseModal}
-        className={`w-full rounded-lg border-2 ${
-          isDarkMode ? 'border-white/60' : 'border-black/60'
-        } px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800`}
-      >
-        <EDotFont text="Close" animate={true} speed={1} delay={100} />
-      </button>
-
-      <button
-        onClick={handleNavigateToWaitlist}
-        className="w-full rounded-lg border-2 border-accent-1 bg-accent-1 px-4 py-2 text-white hover:bg-accent-1/90"
-      >
-        <EDotFont text="Join Waitlist" animate={true} speed={1} delay={100} />
-      </button>
-    </>
-  )
 
   if (loading || promptGroupIsLoading) {
     return (
@@ -460,13 +419,88 @@ const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
         </div>
       </div>
 
-      {/* Modal */}
+      {/* Favorite Modal */}
       <OModal
-        isOpen={showModal}
-        onClose={handleCloseModal}
-        heading={renderModalHeading()}
-        main={renderModalMain()}
-        footer={renderModalFooter()}
+        isOpen={showFavoriteModal}
+        onClose={handleCloseFavoriteModal}
+        heading={
+          <EDotFont
+            text="Feature Coming Soon"
+            className="text-xl font-bold text-foreground-strong"
+            animate={true}
+            speed={1}
+            delay={0}
+          />
+        }
+        main={
+          <EDotFont
+            text="We're currently building the favorites feature. Thank you for your interest and patience as we work to enhance your experience."
+            className="text-foreground"
+            animate={true}
+            speed={1}
+            delay={50}
+          />
+        }
+        footer={
+          <>
+            <button
+              onClick={handleCloseFavoriteModal}
+              className={`w-full rounded-lg border-2 ${
+                isDarkMode ? 'border-white/60' : 'border-black/60'
+              } px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800`}
+            >
+              <EDotFont text="Close" animate={true} speed={1} delay={100} />
+            </button>
+            <button
+              onClick={handleNavigateToWaitlist}
+              className="w-full rounded-lg border-2 border-accent-1 bg-accent-1 px-4 py-2 text-white hover:bg-accent-1/90"
+            >
+              <EDotFont text="Join Waitlist" animate={true} speed={1} delay={100} />
+            </button>
+          </>
+        }
+      />
+
+      {/* RWA Modal */}
+      <OModal
+        isOpen={showRwaModal}
+        onClose={handleCloseRwaModal}
+        heading={
+          <EDotFont
+            text="RWA NFT Coming Soon"
+            className="text-xl font-bold text-foreground-strong"
+            animate={true}
+            speed={1}
+            delay={0}
+          />
+        }
+        main={
+          <EDotFont
+            text="The RWA NFT marketplace integration is under construction. We're working diligently to bring this exciting feature to you soon."
+            className="text-foreground"
+            animate={true}
+            speed={1}
+            delay={50}
+          />
+        }
+        footer={
+          <>
+            <button
+              onClick={handleCloseRwaModal}
+              className={`w-full rounded-lg border-2 ${
+                isDarkMode ? 'border-white/60' : 'border-black/60'
+              } px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800`}
+            >
+              <EDotFont text="Close" animate={true} speed={1} delay={100} />
+            </button>
+            <button
+              onClick={handleNavigateToWaitlist}
+              className="w-full rounded-lg border-2 border-accent-1 bg-accent-1 px-4 py-2 text-white hover:bg-accent-1/90"
+            >
+              <EDotFont text="Join Waitlist" animate={true} speed={1} delay={100} />
+            </button>
+          </>
+        }
       />
     </>
   )
