@@ -10,33 +10,29 @@ import { TProductSearch } from '@/front/components/03_templates/TProductSearch'
 import { Button } from '@/front/components/ui/button'
 import { Card } from '@/front/components/ui/card'
 import { usePromptGroup } from '@/front/hooks/resources/prompt-groups/usePromptGroup'
-import { ArrowLeft, Heart, Loader2, Orbit, ShoppingCart, X } from 'lucide-react'
+import { ArrowLeft, Heart, Loader2, Orbit, X } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Head from 'next/head'
-import { useParams, useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { FC, useEffect, useState } from 'react'
 
-export default function Page() {
-  const [isClient, setIsClient] = useState(false)
+type Props = {
+  productUniqueKey: string
+  promptGroupUniqueKey: string
+}
+
+const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
   const router = useRouter()
-  const params = useParams()
-  const searchParams = useSearchParams()
   const [product, setProduct] = useState<ProductEntity | null>(null)
   const [loading, setLoading] = useState(true)
   const [pageTitle, setPageTitle] = useState('Product Detail - AKIRA')
   const [pageDescription, setPageDescription] = useState('View product details on AKIRA')
-  const [cursorVisible, setCursorVisible] = useState(true)
-  const [hoverButton1, setHoverButton1] = useState(false)
   const [hoverButton2, setHoverButton2] = useState(false)
   const [hoverFavorite, setHoverFavorite] = useState(false)
   const { theme } = useTheme()
   const isDarkMode = theme === 'dark'
   const [showModal, setShowModal] = useState(false)
   const [modalType, setModalType] = useState<'favorite' | 'rwa'>('favorite')
-
-  // Get information from URL parameters
-  const productUniqueKey = params?.id as string
-  const promptGroupUniqueKey = searchParams?.get('pgKey') || ''
 
   // Fetch promptGroup data
   const { promptGroup, promptGroupIsLoading } = usePromptGroup({
@@ -45,18 +41,6 @@ export default function Page() {
 
   // Store all products for related products section
   const [allProducts, setAllProducts] = useState<ProductEntity[]>([])
-
-  // Blinking cursor effect
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCursorVisible((prev) => !prev)
-    }, 500)
-    return () => clearInterval(interval)
-  }, [])
-
-  useEffect(() => {
-    setIsClient(true)
-  }, [])
 
   useEffect(() => {
     if (promptGroupIsLoading || !promptGroup) return
@@ -107,96 +91,76 @@ export default function Page() {
     setShowModal(true)
   }
 
-  if (!isClient) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    )
-  }
-
   if (loading || promptGroupIsLoading) {
     return (
-      <>
-        <Head>
-          <title>Loading Product - AKIRA</title>
-          <meta name="description" content="Loading product details..." />
-        </Head>
-        <div className="flex h-screen items-center justify-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-border-strong"></div>
-        </div>
-      </>
+      <div className="flex h-screen items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-border-strong"></div>
+      </div>
     )
   }
 
   if (!product) {
     return (
-      <>
-        <Head>
-          <title>Product Not Found - AKIRA</title>
-          <meta name="description" content="The requested product could not be found." />
-        </Head>
-        <div>
-          {/* Header */}
-          <div className="sticky top-0 z-10 flex w-full items-center justify-between bg-background p-2">
-            <div className="flex items-center gap-2">
+      <div>
+        {/* Header */}
+        <div className="sticky top-0 z-10 flex w-full items-center justify-between bg-background p-2">
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              onClick={() => router.back()}
+              className="flex items-center justify-center p-2 text-foreground"
+              size="icon"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+
+            {promptGroup?.chatUniqueKey && (
               <Button
                 variant="ghost"
-                onClick={() => router.back()}
+                onClick={() => router.push(`/chats/${promptGroup.chatUniqueKey}`)}
                 className="flex items-center justify-center p-2 text-foreground"
                 size="icon"
               >
-                <ArrowLeft className="h-5 w-5" />
-              </Button>
-
-              {promptGroup?.chatUniqueKey && (
-                <Button
-                  variant="ghost"
-                  onClick={() => router.push(`/chats/${promptGroup.chatUniqueKey}`)}
-                  className="flex items-center justify-center p-2 text-foreground"
-                  size="icon"
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="h-5 w-5"
                 >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="h-5 w-5"
-                  >
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                  </svg>
-                </Button>
-              )}
-            </div>
-
-            <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-              {/* <ELogoAkira width={80} height={34} /> */}
-            </div>
-
-            <div className="flex items-center gap-2">
-              <EShareButton className="static bottom-auto right-auto z-auto" />
-              <OThemeChangeButton />
-            </div>
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+              </Button>
+            )}
           </div>
 
-          <div className="container mx-auto px-4">
-            <Card className="p-8 text-center">
-              <h1 className="mb-4 text-2xl font-bold text-foreground-strong">Product Not Found</h1>
-              <p className="text-foreground">
-                Sorry, we couldn&apos;t find the product you&apos;re looking for.
-              </p>
-              <Button onClick={() => router.back()} className="mt-4">
-                Return to Previous Page
-              </Button>
-            </Card>
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+            {/* <ELogoAkira width={80} height={34} /> */}
+          </div>
+
+          <div className="flex items-center gap-2">
+            <EShareButton className="static bottom-auto right-auto z-auto" />
+            <OThemeChangeButton />
           </div>
         </div>
-      </>
+
+        <div className="container mx-auto px-4">
+          <Card className="p-8 text-center">
+            <h1 className="mb-4 text-2xl font-bold text-foreground-strong">Product Not Found</h1>
+            <p className="text-foreground">
+              Sorry, we couldn&apos;t find the product you&apos;re looking for.
+            </p>
+            <Button onClick={() => router.back()} className="mt-4">
+              Return to Previous Page
+            </Button>
+          </Card>
+        </div>
+      </div>
     )
   }
 
@@ -503,3 +467,5 @@ export default function Page() {
     </>
   )
 }
+
+export { Component as SProductDetailScreen }
