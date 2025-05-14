@@ -311,7 +311,15 @@ const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
             <div className="fixed bottom-0 left-0 z-10 w-full bg-background-soft p-4 md:relative md:mb-4 md:bg-transparent md:p-0">
               <button
                 className="mx-auto flex w-full items-center justify-center gap-2 rounded-lg bg-accent-1 px-4 py-3 text-center text-white transition-transform hover:scale-[1.02] md:w-[320px]"
-                onClick={() => {}}
+                onClick={() => {
+                  if (promptGroup?.uniqueKey) {
+                    router.push(
+                      `/products/${productUniqueKey}/redeem-rwa?pgKey=${promptGroup.uniqueKey}`,
+                    )
+                  } else {
+                    router.push(`/products/${productUniqueKey}/redeem-rwa`)
+                  }
+                }}
               >
                 <span>Redeem Real Item</span>
                 <svg
