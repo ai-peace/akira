@@ -5,12 +5,13 @@ import { STOCK_STATUS, getStockStatusDisplay } from '@/common/domains/types/stoc
 import EDotFont from '@/front/components/01_elements/EDotFont'
 import EShareButton from '@/front/components/01_elements/EShareButton'
 import { OAppHeader } from '@/front/components/02_organisms/OAppHeader'
+import { OModal } from '@/front/components/02_organisms/OModal'
 import { OThemeChangeButton } from '@/front/components/02_organisms/OThemeChangeButton'
 import { TProductSearch } from '@/front/components/03_templates/TProductSearch'
 import { Button } from '@/front/components/ui/button'
 import { Card } from '@/front/components/ui/card'
 import { usePromptGroup } from '@/front/hooks/resources/prompt-groups/usePromptGroup'
-import { ArrowLeft, Heart, Loader2, Orbit, X } from 'lucide-react'
+import { ArrowLeft, Heart, Loader2, Orbit } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Head from 'next/head'
 import { useRouter } from 'next/navigation'
@@ -90,6 +91,61 @@ const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
     setModalType('rwa')
     setShowModal(true)
   }
+
+  // Close modal handler
+  const handleCloseModal = () => {
+    setShowModal(false)
+  }
+
+  // Navigate to waitlist handler
+  const handleNavigateToWaitlist = () => {
+    setShowModal(false)
+    router.push('/waitlists')
+  }
+
+  const renderModalHeading = () => (
+    <EDotFont
+      text={modalType === 'favorite' ? 'Feature Coming Soon' : 'RWA NFT Coming Soon'}
+      className="text-xl font-bold text-foreground-strong"
+      animate={true}
+      speed={1}
+      delay={0}
+    />
+  )
+
+  const renderModalMain = () => (
+    <EDotFont
+      text={
+        modalType === 'favorite'
+          ? "We're currently building the favorites feature. Thank you for your interest and patience as we work to enhance your experience."
+          : "The RWA NFT marketplace integration is under construction. We're working diligently to bring this exciting feature to you soon."
+      }
+      className="text-foreground"
+      animate={true}
+      speed={1}
+      delay={50}
+    />
+  )
+
+  const renderModalFooter = () => (
+    <>
+      <button
+        onClick={handleCloseModal}
+        className={`w-full rounded-lg border-2 ${
+          isDarkMode ? 'border-white/60' : 'border-black/60'
+        } px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800`}
+      >
+        <EDotFont text="Close" animate={true} speed={1} delay={100} />
+      </button>
+
+      <button
+        onClick={handleNavigateToWaitlist}
+        className="w-full rounded-lg border-2 border-accent-1 bg-accent-1 px-4 py-2 text-white hover:bg-accent-1/90"
+      >
+        <EDotFont text="Join Waitlist" animate={true} speed={1} delay={100} />
+      </button>
+    </>
+  )
 
   if (loading || promptGroupIsLoading) {
     return (
@@ -404,66 +460,14 @@ const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
         </div>
       </div>
 
-      {/* Modal for Under Construction */}
-      {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div
-            className={`relative mx-4 max-w-md rounded-lg border-2 ${isDarkMode ? 'border-white/60' : 'border-black/60'} bg-background p-6 shadow-lg`}
-          >
-            <button
-              onClick={() => setShowModal(false)}
-              className="absolute right-4 top-4 text-foreground hover:text-foreground-muted"
-            >
-              <X className="h-5 w-5" />
-            </button>
-
-            <div className="mb-4 text-center">
-              <EDotFont
-                text={modalType === 'favorite' ? 'Feature Coming Soon' : 'RWA NFT Coming Soon'}
-                className="text-xl font-bold text-foreground-strong"
-                animate={true}
-                speed={1}
-                delay={0}
-              />
-            </div>
-
-            <div className="mb-6 text-center">
-              <EDotFont
-                text={
-                  modalType === 'favorite'
-                    ? "We're currently building the favorites feature. Thank you for your interest and patience as we work to enhance your experience."
-                    : "The RWA NFT marketplace integration is under construction. We're working diligently to bring this exciting feature to you soon."
-                }
-                className="text-foreground"
-                animate={true}
-                speed={1}
-                delay={50}
-              />
-            </div>
-
-            <div className="flex flex-col items-center justify-center gap-4 md:flex-row">
-              <button
-                onClick={() => setShowModal(false)}
-                className={`w-full rounded-lg border-2 ${
-                  isDarkMode ? 'border-white/60' : 'border-black/60'
-                } px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800`}
-              >
-                <EDotFont text="Close" animate={true} speed={1} delay={100} />
-              </button>
-
-              <button
-                onClick={() => {
-                  setShowModal(false)
-                  router.push('/waitlists')
-                }}
-                className="w-full rounded-lg border-2 border-accent-1 bg-accent-1 px-4 py-2 text-white hover:bg-accent-1/90"
-              >
-                <EDotFont text="Join Waitlist" animate={true} speed={1} delay={100} />
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Modal */}
+      <OModal
+        isOpen={showModal}
+        onClose={handleCloseModal}
+        heading={renderModalHeading()}
+        main={renderModalMain()}
+        footer={renderModalFooter()}
+      />
     </>
   )
 }
