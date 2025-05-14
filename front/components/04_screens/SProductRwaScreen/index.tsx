@@ -19,6 +19,40 @@ type Props = {
   promptGroupUniqueKey: string
 }
 
+// キーフレームアニメーションをグローバルスタイルとして追加
+const styleElement = typeof document !== 'undefined' ? document.createElement('style') : null
+if (styleElement) {
+  styleElement.textContent = `
+    @keyframes rotateY {
+      0% { transform: rotateY(0deg); }
+      100% { transform: rotateY(360deg); }
+    }
+    
+    @keyframes floatText {
+      0% { transform: translateZ(40px) translateY(0); }
+      50% { transform: translateZ(70px) translateY(-5px); }
+      100% { transform: translateZ(40px) translateY(0); }
+    }
+    
+    .rotate-y-3d {
+      animation: rotateY 8s linear infinite;
+      transform-style: preserve-3d;
+    }
+    
+    .float-text-3d {
+      animation: floatText 4s ease-in-out infinite;
+      transform-style: preserve-3d;
+    }
+    
+    .image-container-3d {
+      perspective: 1200px;
+      transform-style: preserve-3d;
+      perspective-origin: center center;
+    }
+  `
+  document.head.appendChild(styleElement)
+}
+
 const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
   const router = useRouter()
   const [product, setProduct] = useState<ProductEntity | null>(null)
@@ -205,50 +239,95 @@ const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
           </div>
 
           <div className="p-3">
-            <div className="relative flex w-full items-center justify-center overflow-hidden rounded-lg p-2">
-              {product.imageUrl && (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={product.imageUrl}
-                  alt={product.title.en}
-                  className="mx-auto h-[220px] w-full object-contain md:h-auto md:max-h-[480px]"
-                />
-              )}
+            <div
+              className="image-container-3d relative mx-auto rounded-xl p-4"
+              style={{ height: '300px' }}
+            >
+              <div className="rotate-y-3d relative z-10 mx-auto h-full w-full max-w-[280px]">
+                {product.imageUrl && (
+                  <>
+                    {/* 表面の画像 */}
+                    <img
+                      src={product.imageUrl}
+                      alt={product.title.en}
+                      className="absolute inset-0 h-full w-full rounded-md object-contain shadow-lg"
+                      style={{
+                        backfaceVisibility: 'hidden',
+                        transform: 'translateZ(0.5px)',
+                      }}
+                    />
+                    {/* 裏面の画像（別の画像を使用） */}
+                    <img
+                      src={'/images/sample/rwa-sample.png'}
+                      alt={product.title.en}
+                      className="absolute inset-0 h-full w-full rounded-md object-contain shadow-lg"
+                      style={{
+                        transform: 'rotateY(180deg) translateZ(0.5px)',
+                        backfaceVisibility: 'hidden',
+                      }}
+                    />
+                  </>
+                )}
+              </div>
             </div>
           </div>
 
-          <div className="mb-12 mt-6 px-6 text-sm text-foreground-muted">
-            <div className="mt-3 break-all leading-relaxed">
-              <div className="font-bold">Storage Location</div>
-              <div>Akira Warehouse</div>
-              <div className="font-bold">Redemption Expiry</div>
-              <div>2025-12-31</div>
-              <div className="font-bold">NFT Address</div>
-              <div className="text-accent-1">3Yf9aXQzUvTx1JmSNoCk7pRWvED5v8EfG4oZNkXZ6aXu</div>
-              <div className="font-bold">Latest Transaction URL</div>
-              <div>
-                <a
-                  href="https://explorer.solana.com/tx/5nQxLdKdu74Exz9vH7FaBWNfZYGVc9TSnCqZbrnSRFuB?cluster=mainnet"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-accent-1"
-                >
-                  https://explorer.solana.com/tx/5nQxLdKdu74Exz9vH7FaBWNfZYGVc9TSnCqZbrnSRFuB?cluster=mainnet
-                </a>
+          <div className="mb-12 mt-6 px-6 text-sm">
+            <div className="rounded-lg border border-border bg-background-soft p-4 text-foreground-muted">
+              <div className="grid grid-cols-1 gap-3 break-all leading-relaxed">
+                <div>
+                  <div className="font-bold text-foreground-strong">Storage Location</div>
+                  <div>Akira Warehouse</div>
+                </div>
+                <div>
+                  <div className="font-bold text-foreground-strong">Redemption Expiry</div>
+                  <div>2025-12-31</div>
+                </div>
+                <div>
+                  <div className="font-bold text-foreground-strong">NFT Address</div>
+                  <div className="break-all text-accent-1">
+                    3Yf9aXQzUvTx1JmSNoCk7pRWvED5v8EfG4oZNkXZ6aXu
+                  </div>
+                </div>
+                <div>
+                  <div className="font-bold text-foreground-strong">Latest Transaction URL</div>
+                  <div>
+                    <a
+                      href="https://explorer.solana.com/tx/5nQxLdKdu74Exz9vH7FaBWNfZYGVc9TSnCqZbrnSRFuB?cluster=mainnet"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="break-all text-accent-1"
+                    >
+                      https://explorer.solana.com/tx/5nQxLdKdu74Exz9vH7FaBWNfZYGVc9TSnCqZbrnSRFuB?cluster=mainnet
+                    </a>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
           {/* RPG Style Action Buttons */}
           <div className="mt-auto">
-            <div className="fixed bottom-0 left-0 z-10 w-full gap-2 bg-background-soft p-4 md:relative md:mb-4 md:grid md:grid-cols-1 md:bg-transparent md:p-0">
+            <div className="fixed bottom-0 left-0 z-10 w-full bg-background-soft p-4 md:relative md:mb-4 md:bg-transparent md:p-0">
               <button
-                className={
-                  'mx-auto flex w-full items-center justify-center rounded-lg bg-accent-1 px-4 py-3 text-center text-white md:w-[320px]'
-                }
+                className="mx-auto flex w-full items-center justify-center gap-2 rounded-lg bg-accent-1 px-4 py-3 text-center text-white transition-transform hover:scale-[1.02] md:w-[320px]"
                 onClick={() => {}}
               >
-                Redeem Real Item
+                <span>Redeem Real Item</span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="h-5 w-5"
+                >
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                </svg>
               </button>
             </div>
           </div>
