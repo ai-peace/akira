@@ -1,10 +1,8 @@
 'use client'
 
 import { ProductEntity } from '@/common/domains/entities/product.entity'
-import { convertJpyToSol, getSolJpyRate } from '@/common/utils/currency'
 import EDotFont from '@/front/components/01_elements/EDotFont'
 import { OAppHeader } from '@/front/components/02_organisms/OAppHeader'
-import { Button } from '@/front/components/ui/button'
 import { usePromptGroup } from '@/front/hooks/resources/prompt-groups/usePromptGroup'
 import { cn } from '@/lib/utils'
 import { CheckCircle2, Circle, CircleDashed, Loader2 } from 'lucide-react'
