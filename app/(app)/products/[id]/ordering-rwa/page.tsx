@@ -11,9 +11,6 @@ export default function Page() {
   const productUniqueKey = params?.id as string
   const promptGroupUniqueKey = searchParams?.get('pgKey') || ''
 
-  console.log('productUniqueKey-------------', productUniqueKey)
-  console.log('promptGroupUniqueKey-------------', promptGroupUniqueKey)
-
   return (
     <SProductOrderingRwaScreen
       productUniqueKey={productUniqueKey}

@@ -23,26 +23,61 @@ const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
   const [loading, setLoading] = useState(true)
   const [pageTitle, setPageTitle] = useState('Product Detail - AKIRA')
   const [pageDescription, setPageDescription] = useState('View product details on AKIRA')
-  const [solPrice, setSolPrice] = useState<number>(0)
-  const [solRate, setSolRate] = useState<number>(0)
 
   // Fetch promptGroup data
   const { promptGroup, promptGroupIsLoading } = usePromptGroup({
     uniqueKey: promptGroupUniqueKey,
   })
 
-  // SOL/JPYレートを取得
-  useEffect(() => {
-    const fetchRate = async () => {
-      const rate = await getSolJpyRate()
-      setSolRate(rate)
-    }
-    fetchRate()
+  // Add current step state
+  const [currentStep, setCurrentStep] = useState(0)
+  const steps = [
+    {
+      title: 'Deposit',
+      description: 'Send SOL to the escrow account',
+    },
+    {
+      title: 'Processing',
+      description: 'Processing your purchase',
+    },
+    {
+      title: 'Minting',
+      description: 'Creating your RWA NFT',
+    },
+  ]
 
-    // 5分ごとにレートを更新
-    const interval = setInterval(fetchRate, 5 * 60 * 1000)
-    return () => clearInterval(interval)
-  }, [])
+  // 自動的にステップを進める
+  useEffect(() => {
+    // 最初のステップ（Deposit）を3秒後に完了し、次へ
+    const depositTimer = setTimeout(() => {
+      setCurrentStep(1) // Processingステップへ
+    }, 3000)
+
+    // Processingステップを60秒後に完了し、次へ
+    const processingTimer = setTimeout(() => {
+      setCurrentStep(2) // Mintingステップへ
+    }, 3000 + 60000) // 3秒 + 60秒後
+
+    // Mintingステップを10秒後に完了し、リダイレクト
+    const mintingTimer = setTimeout(
+      () => {
+        // 最終的なリダイレクト先
+        if (promptGroup?.uniqueKey) {
+          router.push(`/products/${productUniqueKey}/minted?pgKey=${promptGroup.uniqueKey}`)
+        } else {
+          router.push(`/products/${productUniqueKey}/minted`)
+        }
+      },
+      3000 + 60000 + 10000 + 100000000,
+    ) // 3秒 + 60秒 + 10秒後
+
+    // クリーンアップ
+    return () => {
+      clearTimeout(depositTimer)
+      clearTimeout(processingTimer)
+      clearTimeout(mintingTimer)
+    }
+  }, [productUniqueKey, promptGroup, router])
 
   useEffect(() => {
     if (promptGroupIsLoading || !promptGroup) return
@@ -69,12 +104,6 @@ const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
 
           // Update document title dynamically
           document.title = `${foundProduct.title.en} | AKIRA`
-
-          // JPY価格からSOL価格を計算
-          if (foundProduct.price && foundProduct.currency === 'JPY') {
-            const sol = convertJpyToSol(foundProduct.price, solRate)
-            setSolPrice(sol)
-          }
         }
       }
     } catch (error) {
@@ -82,24 +111,7 @@ const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
     } finally {
       setLoading(false)
     }
-  }, [promptGroup, productUniqueKey, promptGroupIsLoading, solRate])
-
-  // Add current step state
-  const [currentStep, setCurrentStep] = useState(0)
-  const steps = [
-    {
-      title: 'Deposit',
-      description: 'Send SOL to the escrow account',
-    },
-    {
-      title: 'Processing',
-      description: 'Processing your purchase',
-    },
-    {
-      title: 'Minting',
-      description: 'Creating your RWA NFT',
-    },
-  ]
+  }, [promptGroup, productUniqueKey, promptGroupIsLoading])
 
   if (loading || promptGroupIsLoading) {
     return (
@@ -133,45 +145,36 @@ const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
         {product.imageUrl && <meta name="twitter:image" content={product.imageUrl} />}
       </Head>
       <div>
-        <OAppHeader
-          leftSecond={
-            <>
-              {promptGroup?.chatUniqueKey && (
-                <Button
-                  variant="ghost"
-                  onClick={() => router.push(`/chats/${promptGroup.chatUniqueKey}`)}
-                  className="flex items-center justify-center p-2 text-foreground"
-                  size="icon"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="h-5 w-5"
-                  >
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                  </svg>
-                </Button>
-              )}
-            </>
-          }
-        />
+        <OAppHeader leftFirst={<></>} leftSecond={<></>} rightFirst={<></>} />
 
-        <div className="mx-auto max-w-[480px] pb-16">
-          <div>
-            <EDotFont text={'Minting RWA...'} className="text-2xl font-bold" />
+        <div className="mx-auto max-w-[480px] px-6 pb-16">
+          <div className="mb-2 text-center">
+            <EDotFont text={'Minting RWA'} className="title-dots relative text-2xl font-bold" />
           </div>
-          <div>
+          <div className="text-center">
             <EDotFont text={product.title.en} className="text-foreground-subtle" />
           </div>
-          <div className="mx-auto mt-8">
+          {product.imageUrl && (
+            <div className="image-container-3d relative mx-auto mt-4 rounded-xl p-4">
+              <div className="rotate-y-3d relative z-10 mx-auto h-64 w-64">
+                <img
+                  src={product.imageUrl}
+                  alt={product.title.en}
+                  className="absolute h-full w-full rounded-md object-contain"
+                  style={{ backfaceVisibility: 'visible' }}
+                />
+              </div>
+            </div>
+          )}
+          <div className="border-border-fain mx-auto mt-8 rounded-lg border bg-background-soft p-6">
             <VerticalStepper steps={steps} currentStep={currentStep} />
+          </div>
+
+          <div className="mx-auto mt-6 max-w-[400px] text-center">
+            <p className="fade-in-out text-sm text-foreground-muted">
+              AKIRA is making this purchase on your behalf.{' '}
+              <span className="text-accent-1">This process may take up to 10 minutes.</span>
+            </p>
           </div>
         </div>
       </div>
@@ -204,6 +207,67 @@ if (styleElement) {
     @keyframes dotPulse {
       0%, 100% { opacity: 0.4; }
       50% { opacity: 1; }
+    }
+    
+    @keyframes titleDots {
+      0% { content: '.'; }
+      33% { content: '..'; }
+      66% { content: '...'; }
+      100% { content: '.'; }
+    }
+    
+    .title-dots::after {
+      content: '.';
+      animation: titleDots 1.8s infinite steps(1);
+    }
+    
+    @keyframes fadeInOut {
+      0% { opacity: 0.5; }
+      50% { opacity: 1; }
+      100% { opacity: 0.5; }
+    }
+    
+    .fade-in-out {
+      animation: fadeInOut 4s infinite ease-in-out;
+    }
+    
+    @keyframes textColorCycle {
+      0% { color: var(--accent-1); opacity: 1; }
+      33% { color: var(--foreground-muted); opacity: 0.8; }
+      66% { color: var(--foreground-muted); opacity: 0.4; }
+      100% { color: var(--accent-1); opacity: 1; }
+    }
+    
+    @keyframes rotateY {
+      0% { transform: translateZ(20px) rotateY(0deg); }
+      100% { transform: translateZ(20px) rotateY(360deg); }
+    }
+    
+    @keyframes floatText {
+      0% { transform: translateZ(60px); }
+      50% { transform: translateZ(100px); }
+      100% { transform: translateZ(60px); }
+    }
+    
+    .rotate-y-3d {
+      animation: rotateY 3s linear infinite;
+      transform-style: preserve-3d;
+      backface-visibility: visible;
+    }
+    
+    .float-text-3d {
+      animation: floatText 3s ease-in-out infinite;
+      transform-style: preserve-3d;
+    }
+    
+    .image-container-3d {
+      perspective: 1200px;
+      transform-style: preserve-3d;
+      perspective-origin: center center;
+    }
+    
+    .text-color-cycle {
+      animation: textColorCycle 2s infinite;
     }
     
     .processing-dots::after {
@@ -280,7 +344,7 @@ const Step: FC<StepProps> = ({
           />
         )}
       </div>
-      <div className="flex flex-1 flex-col pb-8">
+      <div className="flex flex-1 flex-col pb-4 last:pb-0">
         <div
           className={cn(
             'text-sm font-medium',
@@ -289,7 +353,7 @@ const Step: FC<StepProps> = ({
               : status === 'current'
                 ? 'text-foreground-strong'
                 : 'text-foreground-muted',
-            isProcessing && 'animate-pulse',
+            isProcessing && 'text-color-cycle',
           )}
         >
           {title}
@@ -297,7 +361,7 @@ const Step: FC<StepProps> = ({
         </div>
         {description && (
           <div
-            className={cn('mt-1 text-sm text-foreground-muted', isProcessing && 'animate-pulse')}
+            className={cn('mt-1 text-sm text-foreground-muted', isProcessing && 'text-color-cycle')}
           >
             {description}
           </div>
