@@ -2,6 +2,7 @@
 
 import { ProductEntity } from '@/common/domains/entities/product.entity'
 import { STOCK_STATUS, getStockStatusDisplay } from '@/common/domains/types/stock-status'
+import { convertJpyToSol, formatCurrency, getSolJpyRate } from '@/common/utils/currency'
 import EDotFont from '@/front/components/01_elements/EDotFont'
 import EShareButton from '@/front/components/01_elements/EShareButton'
 import { OAppHeader } from '@/front/components/02_organisms/OAppHeader'
@@ -33,7 +34,8 @@ const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
   const { theme } = useTheme()
   const isDarkMode = theme === 'dark'
   const [showFavoriteModal, setShowFavoriteModal] = useState(false)
-  const [showRwaModal, setShowRwaModal] = useState(false)
+  const [solPrice, setSolPrice] = useState<number>(0)
+  const [solRate, setSolRate] = useState<number>(0)
 
   // Fetch promptGroup data
   const { promptGroup, promptGroupIsLoading } = usePromptGroup({
@@ -42,6 +44,20 @@ const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
 
   // Store all products for related products section
   const [allProducts, setAllProducts] = useState<ProductEntity[]>([])
+
+  // SOL/JPYレートを取得
+  useEffect(() => {
+    const fetchRate = async () => {
+      const rate = await getSolJpyRate()
+      setSolRate(rate)
+    }
+
+    fetchRate()
+
+    // 5分ごとにレートを更新
+    const interval = setInterval(fetchRate, 5 * 60 * 1000)
+    return () => clearInterval(interval)
+  }, [])
 
   useEffect(() => {
     if (promptGroupIsLoading || !promptGroup) return
@@ -68,6 +84,12 @@ const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
 
           // Update document title dynamically
           document.title = `${foundProduct.title.en} | AKIRA`
+
+          // JPY価格からSOL価格を計算
+          if (foundProduct.price && foundProduct.currency === 'JPY') {
+            const sol = convertJpyToSol(foundProduct.price, solRate)
+            setSolPrice(sol)
+          }
         }
 
         // Store all products for related products section
@@ -78,7 +100,7 @@ const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
     } finally {
       setLoading(false)
     }
-  }, [promptGroup, productUniqueKey, promptGroupIsLoading])
+  }, [promptGroup, productUniqueKey, promptGroupIsLoading, solRate])
 
   // Function to handle favorite button click
   const handleFavoriteClick = () => {
@@ -87,7 +109,7 @@ const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
 
   // Function to handle RWA NFT button click
   const handleRwaClick = () => {
-    setShowRwaModal(true)
+    router.push(`/products/${productUniqueKey}/order-rwa?pgKey=${promptGroupUniqueKey}`)
   }
 
   // Close modal handlers
@@ -95,14 +117,9 @@ const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
     setShowFavoriteModal(false)
   }
 
-  const handleCloseRwaModal = () => {
-    setShowRwaModal(false)
-  }
-
   // Navigate to waitlist handler
   const handleNavigateToWaitlist = () => {
     setShowFavoriteModal(false)
-    setShowRwaModal(false)
     router.push('/waitlists')
   }
 
@@ -290,13 +307,7 @@ const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
                   {/* Price */}
                   <div className="mb-6">
                     <div className="text-3xl font-bold text-accent-1">
-                      <EDotFont
-                        text={`$${Math.round(product.price / 150).toLocaleString()}`}
-                        className="text-3xl font-bold text-accent-1"
-                        animate={true}
-                        speed={1}
-                        delay={30}
-                      />
+                      {formatCurrency(solPrice, 'SOL')}
                     </div>
                     <div className="text-sm text-foreground-muted">
                       <EDotFont
@@ -456,50 +467,6 @@ const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
               className="w-full rounded-lg border-2 border-accent-1 bg-accent-1 px-4 py-2 text-white hover:bg-accent-1/90"
             >
               <EDotFont text="Join Waitlist" animate={true} speed={1} delay={100} />
-            </button>
-          </>
-        }
-      />
-
-      {/* RWA Modal */}
-      <OModal
-        isOpen={showRwaModal}
-        onClose={handleCloseRwaModal}
-        heading={
-          <EDotFont
-            text="Deposit & Mint RWA"
-            className="text-xl font-bold text-foreground-strong"
-            animate={true}
-            speed={1}
-            delay={0}
-          />
-        }
-        main={
-          <>
-            <div>To purchase this RWA NFT, you need to deposit 0.5 SOL.</div>
-            {product.imageUrl && (
-              <div className="mt-6 flex flex-col gap-2">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={product.imageUrl} alt={product.title.en} className="" />
-              </div>
-            )}
-          </>
-        }
-        footer={
-          <>
-            <button
-              onClick={handleNavigateToWaitlist}
-              className="mb-2 w-full rounded-lg border-2 border-accent-1 bg-accent-1 px-4 py-2 text-white hover:bg-accent-1/90"
-            >
-              <EDotFont text="NEXT" animate={true} speed={1} delay={100} />
-            </button>
-            <button
-              onClick={handleCloseRwaModal}
-              className={`w-full rounded-lg border-2 ${
-                isDarkMode ? 'border-white/60' : 'border-black/60'
-              } px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-800`}
-            >
-              <EDotFont text="Close" animate={true} speed={1} delay={100} />
             </button>
           </>
         }

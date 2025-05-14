@@ -1,6 +1,6 @@
 'use client'
 
-import { SProductDetailScreen } from '@/front/components/04_screens/SProductDetailScreen'
+import { SProductOrderRwaScreen } from '@/front/components/04_screens/SProductOrderRwaScreen'
 import { useParams, useSearchParams } from 'next/navigation'
 
 export default function Page() {
@@ -15,7 +15,7 @@ export default function Page() {
   console.log('promptGroupUniqueKey-------------', promptGroupUniqueKey)
 
   return (
-    <SProductDetailScreen
+    <SProductOrderRwaScreen
       productUniqueKey={productUniqueKey}
       promptGroupUniqueKey={promptGroupUniqueKey}
     />
