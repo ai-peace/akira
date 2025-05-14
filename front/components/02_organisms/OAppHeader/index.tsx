@@ -56,7 +56,7 @@ const DefaultLeftFirst = () => {
 }
 
 const DefaultCenter = () => {
-  return <ELogoAkira width={80} height={34} />
+  return <></>
 }
 
 const DefaultRightFirst = () => {
