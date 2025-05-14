@@ -61,12 +61,12 @@ const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
       () => {
         // 最終的なリダイレクト先
         if (promptGroup?.uniqueKey) {
-          router.push(`/products/${productUniqueKey}/minted?pgKey=${promptGroup.uniqueKey}`)
+          router.push(`/products/${productUniqueKey}/minted-rwa?pgKey=${promptGroup.uniqueKey}`)
         } else {
-          router.push(`/products/${productUniqueKey}/minted`)
+          router.push(`/products/${productUniqueKey}/minted-rwa`)
         }
       },
-      3000 + 60000 + 10000 + 100000000,
+      3000 + 60000 + 10000,
     ) // 3秒 + 60秒 + 10秒後
 
     // クリーンアップ

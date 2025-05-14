@@ -6,6 +6,7 @@ import { OAppHeader } from '@/front/components/02_organisms/OAppHeader'
 import { Button } from '@/front/components/ui/button'
 import { Card } from '@/front/components/ui/card'
 import { usePromptGroup } from '@/front/hooks/resources/prompt-groups/usePromptGroup'
+import { Award, Sparkles, Star, Trophy } from 'lucide-react'
 import Head from 'next/head'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { FC, useEffect, useState } from 'react'
@@ -103,22 +104,30 @@ const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
       <div>
         <OAppHeader />
 
-        <div className="container mx-auto max-w-[540px] px-4 pb-16 pt-8">
-          <div className="mb-4 flex justify-center">
+        <div className="container mx-auto max-w-[540px] px-4 pb-24 pt-8">
+          <div className="mb-8 flex justify-center">
             <div className="text-center">
               <div className="mb-3 flex justify-center">
-                <img
-                  src="/images/celebration-party-popper.png"
-                  alt="Celebration"
-                  className="h-20 w-20"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement
-                    target.src =
-                      'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4MCIgaGVpZ2h0PSI4MCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwb2x5Z29uIHBvaW50cz0iMTMgMiAzIDE0IDEyIDE0IDExIDIyIDIxIDEwIDEyIDEwIDEzIDIiLz48L3N2Zz4='
-                  }}
-                />
+                <div className="flex items-center justify-center">
+                  <div className="relative flex h-24 w-24 items-center justify-center rounded-full bg-accent-1/10">
+                    <Trophy className="h-12 w-12 text-accent-1" strokeWidth={1.5} />
+                    <Sparkles
+                      className="absolute -right-1 -top-1 h-8 w-8 text-accent-1"
+                      strokeWidth={1.5}
+                    />
+                    <Sparkles
+                      className="absolute -bottom-1 -left-1 h-8 w-8 text-accent-1"
+                      strokeWidth={1.5}
+                    />
+                    <Star
+                      className="absolute -bottom-3 -right-3 h-10 w-10 rotate-12 text-accent-1"
+                      fill="rgba(0,0,0,0.1)"
+                      strokeWidth={1.5}
+                    />
+                  </div>
+                </div>
               </div>
-              <h1 className="mb-6 text-center text-3xl font-bold uppercase">
+              <h1 className="mb-6 text-center text-3xl font-bold uppercase tracking-wider">
                 Redemption
                 <br />
                 Submitted!
@@ -129,7 +138,7 @@ const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
           <div className="mb-8 flex items-start gap-6">
             <div className="flex-shrink-0">
               {product.imageUrl && (
-                <div className="h-[100px] w-[100px] overflow-hidden rounded-lg border border-border bg-background-muted p-2">
+                <div className="h-[120px] w-[120px] overflow-hidden rounded-lg border border-border bg-background-muted p-2">
                   <img
                     src={product.imageUrl}
                     alt={product.title.en}
@@ -140,38 +149,45 @@ const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
             </div>
             <div className="flex-1">
               <h2 className="mb-1 text-lg font-semibold text-foreground-strong">
-                {product.title.en}
+                <EDotFont text={product.title.en} />
               </h2>
+              <div className="text-sm text-foreground-muted">
+                <span className="text-accent-1">RWA NFT</span> - Redemption in progress
+              </div>
+              <div className="mt-2 text-sm font-medium">
+                Your item will be shipped within 5-7 business days.
+              </div>
             </div>
           </div>
 
-          <div className="mb-12 space-y-6 text-center">
-            <p className="text-lg text-foreground-strong">
-              Thank you, your request has been received.
-              <br />
-              A confirmation email has been sent to:
-              <br />
-              <span className="font-semibold text-accent-1">{email}</span>
-            </p>
+          <div className="mb-12 space-y-6">
+            <div className="mb-9 text-center">
+              <p className="text-md text-foreground-strong">
+                Thank you, your request has been received.
+                <br />
+                <span className="mt-2 block">A confirmation email has been sent to:</span>
+                <span className="mt-2 block font-semibold text-accent-1">{email}</span>
+              </p>
+            </div>
 
             <div className="rounded-lg border border-border bg-background-muted p-4">
               <div className="flex items-start gap-2">
-                <span className="text-xl">🚚</span>
+                <span className="mt-1 text-xl">🚚</span>
                 <div>
-                  <h3 className="mb-2 font-semibold">Shipping Notice</h3>
-                  <p className="text-sm text-foreground">
+                  <div className="font-medium">Shipping Notice</div>
+                  <p className="mt-1 text-sm text-foreground-muted">
                     You will receive shipping updates and tracking info via email once the item is
-                    dispatched.
+                    dispatched. Please allow 5-7 business days for processing.
                   </p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="text-center">
+          <div className="fixed bottom-0 left-0 z-10 w-full bg-background-soft p-4 md:relative md:mt-8 md:bg-transparent md:p-0 md:text-center">
             <Button
               onClick={() => router.push('/')}
-              className="px-8 py-3 text-lg"
+              className="mx-auto flex h-14 w-full items-center justify-center gap-2 rounded-lg border-2 border-border bg-background px-4 py-3 text-center font-semibold uppercase tracking-wider text-foreground transition-transform hover:scale-[1.02] md:w-[320px]"
               variant="outline"
             >
               Back to Home
