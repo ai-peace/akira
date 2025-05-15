@@ -53,6 +53,25 @@ if (styleElement) {
     .delay-500 {
       animation-delay: 500ms;
     }
+    
+    @keyframes spinYDecelerate {
+      0% { transform: rotateY(0deg) translateZ(-200px); opacity: 0; }
+      30% { opacity: 1; }
+      70% { transform: rotateY(1080deg) translateZ(-50px); }
+      85% { transform: rotateY(1170deg) translateZ(-20px); }
+      100% { transform: rotateY(1080deg) translateZ(0); }
+    }
+    
+    .spin-y-decelerate {
+      animation: spinYDecelerate 1.5s ease-out forwards;
+      transform-style: preserve-3d;
+    }
+    
+    .image-container-3d {
+      perspective: 1200px;
+      transform-style: preserve-3d;
+      perspective-origin: center center;
+    }
   `
   document.head.appendChild(styleElement)
 }
@@ -265,16 +284,18 @@ const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
 
           <div className="p-3">
             <div
-              className={`relative flex w-full items-center justify-center overflow-hidden rounded-lg p-2 ${showAnimation ? 'fade-in-up delay-200' : 'opacity-0'}`}
+              className={`image-container-3d relative flex w-full items-center justify-center overflow-hidden rounded-lg p-2 ${
+                showAnimation ? '' : 'opacity-0'
+              }`}
             >
-              {product.imageUrl && (
-                // eslint-disable-next-line @next/next/no-img-element
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <div className={`${showAnimation ? 'spin-y-decelerate' : ''}`}>
                 <img
-                  src={product.imageUrl}
+                  src="/images/sample/rwa-sample-02.png"
                   alt={product.title.en}
                   className="mx-auto h-[220px] w-full object-contain md:h-auto md:max-h-[480px]"
                 />
-              )}
+              </div>
             </div>
           </div>
 
