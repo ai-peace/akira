@@ -253,7 +253,7 @@ const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
         />
 
         <div className="container mx-auto max-w-[720px] pb-16">
-          <div className={`my-6 text-center ${showAnimation ? 'fade-in-up' : 'opacity-0'}`}>
+          <div className={`mb-2 mt-6 text-center ${showAnimation ? 'fade-in-up' : 'opacity-0'}`}>
             <div className="font-sans text-2xl font-bold text-accent-1">YOU've Got RWA</div>
           </div>
 
@@ -279,7 +279,7 @@ const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
           </div>
 
           <div
-            className={`mb-12 mt-6 px-6 text-sm text-foreground-muted ${showAnimation ? 'fade-in-up delay-300' : 'opacity-0'}`}
+            className={`mb-12 mt-2 px-6 text-sm text-foreground-muted ${showAnimation ? 'fade-in-up delay-300' : 'opacity-0'}`}
           >
             <div className="leading-relaxed">
               This NFT certifies your ownership of a real-world collectible. You can now trade it on

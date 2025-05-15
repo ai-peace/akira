@@ -28,6 +28,7 @@ const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
   const [pageDescription, setPageDescription] = useState('View product details on AKIRA')
   const [solPrice, setSolPrice] = useState<number>(0)
   const [solRate, setSolRate] = useState<number>(0)
+  const [isMinting, setIsMinting] = useState(false)
 
   // Fetch promptGroup data
   const { promptGroup, promptGroupIsLoading } = usePromptGroup({
@@ -86,6 +87,15 @@ const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
       setLoading(false)
     }
   }, [promptGroup, productUniqueKey, promptGroupIsLoading, solRate])
+
+  const handleMintClick = () => {
+    setIsMinting(true)
+
+    // 一瞬ダミーローダーを表示してから遷移する（500ミリ秒後）
+    setTimeout(() => {
+      router.push(`/products/${productUniqueKey}/ordering-rwa?pgKey=${promptGroupUniqueKey}`)
+    }, 500)
+  }
 
   if (loading || promptGroupIsLoading) {
     return (
@@ -284,17 +294,26 @@ const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
               <button
                 className={`mx-auto flex w-full items-center justify-center rounded-lg border-2 border-red-600 bg-red-600 px-4 py-3 text-center text-white md:w-[320px] ${
                   product.status === STOCK_STATUS.OUT_OF_STOCK ||
-                  product.status === STOCK_STATUS.UNKNOWN
+                  product.status === STOCK_STATUS.UNKNOWN ||
+                  isMinting
                     ? 'opacity-50'
                     : ''
                 }`}
                 disabled={
                   product.status === STOCK_STATUS.OUT_OF_STOCK ||
-                  product.status === STOCK_STATUS.UNKNOWN
+                  product.status === STOCK_STATUS.UNKNOWN ||
+                  isMinting
                 }
-                onClick={() => {}}
+                onClick={handleMintClick}
               >
-                Mint - {formatCurrency(solPrice, 'SOL')}
+                {isMinting ? (
+                  <div className="flex items-center justify-center">
+                    <div className="mr-2 h-5 w-5 animate-spin rounded-full border-b-2 border-t-2 border-white"></div>
+                    Processing...
+                  </div>
+                ) : (
+                  `Mint - ${formatCurrency(solPrice, 'SOL')}`
+                )}
               </button>
             </div>
           </div>
