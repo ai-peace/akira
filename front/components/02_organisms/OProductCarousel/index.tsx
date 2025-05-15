@@ -67,7 +67,7 @@ const Component: FC<Props> = ({ products, displayCount, promptGroupUniqueKey }) 
               className="relative flex h-full w-[140px] min-w-[140px] max-w-[140px] flex-shrink-0 snap-start"
             >
               <div className="flex-1">
-                <OProductListItem product={product} />
+                <OProductListItem product={product} promptGroupUniqueKey={promptGroupUniqueKey} />
               </div>
             </div>
           ))}
