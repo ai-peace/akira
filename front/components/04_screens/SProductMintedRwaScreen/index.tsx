@@ -11,6 +11,7 @@ import { Card } from '@/front/components/ui/card'
 import { usePromptGroup } from '@/front/hooks/resources/prompt-groups/usePromptGroup'
 import { ArrowLeft } from 'lucide-react'
 import Head from 'next/head'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { FC, useEffect, useState } from 'react'
 
@@ -328,7 +329,11 @@ const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
                 </a>
               </div>
             </div>
-            <div className="mt-4 text-sm text-accent-1">{`Show More >>`}</div>
+            <div className="mt-4 text-sm text-accent-1">
+              <Link href={`/products/${productUniqueKey}/rwa?pgKey=${promptGroupUniqueKey}`}>
+                {`Show More >>`}
+              </Link>
+            </div>
           </div>
 
           {/* RPG Style Action Buttons */}
