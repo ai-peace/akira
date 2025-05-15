@@ -258,7 +258,7 @@ const Component: FC<Props> = ({ productUniqueKey, promptGroupUniqueKey }) => {
                     />
                     {/* 裏面の画像（別の画像を使用） */}
                     <img
-                      src={'/images/sample/rwa-sample.png'}
+                      src={'/images/sample/rwa-sample-02.png'}
                       alt={product.title.en}
                       className="absolute inset-0 h-full w-full rounded-md object-contain shadow-lg"
                       style={{
