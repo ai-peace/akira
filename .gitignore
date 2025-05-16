@@ -42,3 +42,11 @@ tmp/
 
 .mastra/
 debug/
+
+# solana
+solana/.anchor
+solana/target
+solana/node_modules
+solana/test-ledger
+solana/.yarn
+**/*.rs.bk
