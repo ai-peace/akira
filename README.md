@@ -14,26 +14,48 @@ https://akira.up.railway.app/voice-chats
 
 https://chromewebstore.google.com/detail/backpack/aflkmfhebedbjioipglgcbcmnbpgliof
 
-#### 2. Switch to Sonic from the top button. If it is not available, click +Add Network and add Sonic manually.
+#### 2.Access and login
 
-<img width="355" alt="スクリーンショット 2025-03-18 2 45 55" src="https://github.com/user-attachments/assets/9589c00b-d31f-4eef-936d-07afc9e29e56" />
+<img width="500" src="https://hanzochang-sandbox.s3.ap-northeast-1.amazonaws.com/akira/001.png" />
+<img width="500" src="https://hanzochang-sandbox.s3.ap-northeast-1.amazonaws.com/akira/002.png" />
 
-#### 3. Access the website.
+#### 3.Tap "voice mode"
 
-https://akira.up.railway.app/
+<img width="500" src="https://hanzochang-sandbox.s3.ap-northeast-1.amazonaws.com/akira/003.png" />
 
-#### 4. Click Login and log in using Backpack.
+<img width="500" src="https://hanzochang-sandbox.s3.ap-northeast-1.amazonaws.com/akira/005.png" />
 
-<img width="500" alt="スクリーンショット 2025-03-18 2 46 36" src="https://github.com/user-attachments/assets/77d7745c-24df-428a-a713-0e65a5597e57" />
+#### 4.Ask to akira via microphone
 
-#### 5. Search for an anime keyword you want to look up. Example: dragonball $1000-$5000.
+<img width="500" src="https://hanzochang-sandbox.s3.ap-northeast-1.amazonaws.com/akira/006.png" />
+<img width="500" src="https://hanzochang-sandbox.s3.ap-northeast-1.amazonaws.com/akira/007.png" />
 
-<img width="500" alt="スクリーンショット 2025-03-18 2 47 19" src="https://github.com/user-attachments/assets/9e42df40-1c7f-4e94-9901-374e8f4e1210" />
+#### 5.Seek items
 
-#### 6. The agent will search and present options.
+<img width="500" src="https://hanzochang-sandbox.s3.ap-northeast-1.amazonaws.com/akira/008.png" />
+<img width="500" src="https://hanzochang-sandbox.s3.ap-northeast-1.amazonaws.com/akira/009.png" />
 
-<img width="500" alt="スクリーンショット 2025-03-18 2 47 55" src="https://github.com/user-attachments/assets/5ee788ee-191d-4a61-88e2-649f6f06d15e" />
+#### 6.Order items as RWA
 
-#### 7. Purchase or trade the desired product with RWA (this is just a demo, so the item will not actually be obtained).
+<img width="500" src="https://hanzochang-sandbox.s3.ap-northeast-1.amazonaws.com/akira/009.png" />
 
-<img width="500" alt="スクリーンショット 2025-03-18 2 48 36" src="https://github.com/user-attachments/assets/786026d7-fcc8-485e-84b0-bb353527cd5c" />
+Press "Order as RWA"
+
+#### 7.Deposit and MINT Items
+
+<img width="500" src="https://hanzochang-sandbox.s3.ap-northeast-1.amazonaws.com/akira/010.png" />
+
+(Demo mode)
+
+#### 8.Wait and see for a while
+
+<img width="500" src="https://hanzochang-sandbox.s3.ap-northeast-1.amazonaws.com/akira/011.png" />
+
+#### 9.Complete mint
+
+<img width="500" src="https://hanzochang-sandbox.s3.ap-northeast-1.amazonaws.com/akira/012.png" />
+
+#### 10.Redeem items (Demo mode, not real)
+
+<img width="500" src="https://hanzochang-sandbox.s3.ap-northeast-1.amazonaws.com/akira/013.png" />
+<img width="500" src="https://hanzochang-sandbox.s3.ap-northeast-1.amazonaws.com/akira/014.png" />
