@@ -2,22 +2,41 @@
   "license": "ISC",
   "scripts": {
     "lint:fix": "prettier */*.js \"*/**/*{.js,.ts}\" -w",
-    "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check"
-  },
-  "dependencies": {
-    "@solana/web3.js": "^1.98.2",
-    "bs58": "^6.0.0",
-    "tsx": "^4.19.4"
+    "lint": "prettier */*.js \"*/**/*{.js,.ts}\" --check",
+    "help": "tsx scripts/help.ts",
+    "s:a:init": "tsx scripts/01_admin/01_initialize_global_config.ts",
+    "s:a:config": "tsx scripts/01_admin/02_get_global_config.ts",
+    "s:a:update": "tsx scripts/01_admin/03_update_deposit_target.ts",
+    "s:a:init-collection": "tsx scripts/01_admin/04_initialize_collection.ts",
+    "s:a:update-collection": "tsx scripts/01_admin/05_update_collection.ts",
+    "s:a:exchange-nft": "tsx scripts/01_admin/06_exchange_nft.ts",
+    "s:a:admin-lock": "tsx scripts/01_admin/07_admin_lock_nft.ts",
+    "s:a:update-uri": "tsx scripts/01_admin/08_update_rwa_uri.ts",
+    "s:d:create-purchase-request": "tsx scripts/02_deposit/01_create_purchase_request.ts",
+    "s:d:deposit-funds": "tsx scripts/02_deposit/02_deposit_funds.ts",
+    "s:d:get-request": "tsx scripts/02_deposit/03_get_purchase_request_by_id.ts",
+    "s:d:check-funded": "tsx scripts/02_deposit/04_is_purchase_request_funded.ts",
+    "s:d:find-request": "tsx scripts/02_deposit/05_find_purchase_request.ts",
+    "s:m:mint-rwa": "tsx scripts/03_mint/01_mint_rwa_collection_nft.ts",
+    "setup": "pnpm run s:a:init && pnpm run s:a:init-collection",
+    "deploy": "anchor build && anchor deploy --provider.cluster devnet",
+    "test:deploy-cost": "tsx scripts/utils/calculate_deploy_cost.ts",
+    "test:tx-cost": "tsx scripts/utils/check_transaction_cost.ts"
   },
   "devDependencies": {
     "@coral-xyz/anchor": "^0.31.1",
+    "@solana/spl-token": "^0.4.13",
+    "@solana/web3.js": "^1.98.2",
     "@types/bn.js": "^5.1.0",
     "@types/chai": "^4.3.0",
     "@types/mocha": "^9.0.0",
     "chai": "^4.3.4",
+    "dotenv": "^16.5.0",
     "mocha": "^9.0.3",
     "prettier": "^2.6.2",
     "ts-mocha": "^10.0.0",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.19.4",
     "typescript": "^5.7.3"
   }
 }

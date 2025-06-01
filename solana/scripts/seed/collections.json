@@ -1,0 +1,23 @@
+{
+  "akira": {
+    "name": "Akira-222",
+    "symbol": "AKIRA",
+    "uri": "http://akira.up.railway.app",
+    "sellerFeeBasisPoints": 1000,
+    "seed": "akira-22212"
+  },
+  "akira-1122": {
+    "name": "Akira Collection V2",
+    "symbol": "AKIRAV2",
+    "uri": "https://akira-v2.up.railway.app",
+    "sellerFeeBasisPoints": 750,
+    "seed": "akira-1122"
+  },
+  "test-collection": {
+    "name": "Test Collection",
+    "symbol": "TEST",
+    "uri": "https://test.example.com",
+    "sellerFeeBasisPoints": 500,
+    "seed": "test-collection-dev"
+  }
+}

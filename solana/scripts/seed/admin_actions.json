@@ -1,0 +1,18 @@
+{
+  "exchangeNft": {
+    "nftMint": "GcbE96RABh2xqggFVQU1Xw8kH1KDheLAkQmjq4eWekHT",
+    "collectionSeed": "akira-1122",
+    "description": "NFT exchange for physical asset transfer"
+  },
+  "adminLock": {
+    "nftMint": "GcbE96RABh2xqggFVQU1Xw8kH1KDheLAkQmjq4eWekHT",
+    "reason": "Emergency asset verification required",
+    "description": "Emergency lock by global admin"
+  },
+  "updateUri": {
+    "nftMint": "GcbE96RABh2xqggFVQU1Xw8kH1KDheLAkQmjq4eWekHT",
+    "collectionSeed": "akira-1122",
+    "newUri": "https://arweave.net/updated-metadata-hash-new",
+    "description": "Update metadata URI for physical asset changes"
+  }
+}

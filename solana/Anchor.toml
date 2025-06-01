@@ -6,7 +6,13 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-akira_solana = "7imdRzjtg5ao34crVKZSfudYiaZtFXa4Y65tFGQWQETg"
+akira_solana = "CY6qKVgEFq5yztnwq2ycf1hQAmuDnsaH62DCXMYgQJAK"
+
+[programs.devnet]
+akira_solana = "CY6qKVgEFq5yztnwq2ycf1hQAmuDnsaH62DCXMYgQJAK"
+
+[programs.mainnet]
+akira_solana = "CY6qKVgEFq5yztnwq2ycf1hQAmuDnsaH62DCXMYgQJAK"
 
 [registry]
 url = "https://api.apr.dev"
@@ -16,4 +22,4 @@ cluster = "localnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
-test = "pnpm ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
+test = "yarn run ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.ts"
