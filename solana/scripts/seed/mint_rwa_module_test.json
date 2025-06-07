@@ -1,0 +1,8 @@
+{
+  "requestId": "test-request-module-1749025662",
+  "collectionSeed": "test-collection-dev-2",
+  "nftName": "Module Test RWA Property #001",
+  "nftSymbol": "MTRWA001",
+  "nftUri": "https://arweave.net/module-test-metadata-hash-001",
+  "description": "First RWA NFT for Module Test - Testing new modular architecture"
+}

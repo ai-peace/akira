@@ -1,0 +1,8 @@
+{
+  "requestId": "test-new-freeze-workflow-001",
+  "collectionSeed": "collection_test_01",
+  "nftName": "Test Freeze NFT",
+  "nftSymbol": "TFN",
+  "nftUri": "https://hanzochang-sandbox.s3.ap-northeast-1.amazonaws.com/akira/collection_metadata.json",
+  "description": "Test NFT for freeze functionality"
+}

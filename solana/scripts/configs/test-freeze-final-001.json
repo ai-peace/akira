@@ -1,0 +1,8 @@
+{
+  "requestId": "test-freeze-final-001",
+  "collectionSeed": "freeze-final-2024",
+  "nftName": "Freeze Test NFT Final",
+  "nftSymbol": "FTNF",
+  "nftUri": "https://hanzochang-sandbox.s3.ap-northeast-1.amazonaws.com/akira/collection_metadata.json",
+  "description": "Final test NFT for freeze functionality verification"
+}

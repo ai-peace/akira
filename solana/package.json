@@ -17,6 +17,7 @@
     "s:d:get-request": "tsx scripts/02_deposit/03_get_purchase_request_by_id.ts",
     "s:d:check-funded": "tsx scripts/02_deposit/04_is_purchase_request_funded.ts",
     "s:d:find-request": "tsx scripts/02_deposit/05_find_purchase_request.ts",
+    "s:d:refund": "tsx scripts/02_deposit/07_refund_purchase_request.ts",
     "s:m:mint-rwa": "tsx scripts/03_mint/01_mint_rwa_collection_nft.ts",
     "setup": "pnpm run s:a:init && pnpm run s:a:init-collection",
     "deploy": "anchor build && anchor deploy --provider.cluster devnet",

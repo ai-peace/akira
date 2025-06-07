@@ -19,5 +19,40 @@
     "uri": "https://test.example.com",
     "sellerFeeBasisPoints": 500,
     "seed": "test-collection-dev"
+  },
+  "test-collection-2": {
+    "name": "Test Collection 2",
+    "symbol": "TEST2",
+    "uri": "https://test2.example.com",
+    "sellerFeeBasisPoints": 500,
+    "seed": "test-collection-dev-2"
+  },
+  "test-collection-3": {
+    "name": "Test Collection 3",
+    "symbol": "TEST3",
+    "uri": "https://test3.example.com",
+    "sellerFeeBasisPoints": 500,
+    "seed": "test-collection-dev-3"
+  },
+  "test-collection-4": {
+    "name": "Test Collection 4",
+    "symbol": "TEST4",
+    "uri": "https://test4.example.com",
+    "sellerFeeBasisPoints": 500,
+    "seed": "test-collection-dev-4"
+  },
+  "freeze-test-collection": {
+    "name": "Freeze Test Collection",
+    "symbol": "FREEZE",
+    "uri": "https://freeze-test.example.com",
+    "sellerFeeBasisPoints": 500,
+    "seed": "freeze-test-collection-dev"
+  },
+  "freeze-final": {
+    "name": "Final Freeze Test",
+    "symbol": "FFREEZE",
+    "uri": "https://final-freeze-test.example.com",
+    "sellerFeeBasisPoints": 500,
+    "seed": "freeze-final-2024"
   }
 }

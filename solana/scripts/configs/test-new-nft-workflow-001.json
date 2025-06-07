@@ -1,0 +1,8 @@
+{
+  "requestId": "test-new-nft-workflow-001",
+  "collectionSeed": "test-collection-dev-2",
+  "nftName": "New Test NFT",
+  "nftSymbol": "TNFT",
+  "nftUri": "https://arweave.net/new-test-nft-metadata",
+  "description": "Test NFT for new workflow validation"
+}
